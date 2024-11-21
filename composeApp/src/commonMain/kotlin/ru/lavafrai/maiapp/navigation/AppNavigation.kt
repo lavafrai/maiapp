@@ -7,9 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import ru.lavafrai.maiapp.navigation.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.navigation.rootPages.login.LoginPage
-import ru.lavafrai.maiapp.navigation.rootPages.login.LoginStudentPage
-import ru.lavafrai.maiapp.storage.getSettings
+import ru.lavafrai.maiapp.data.getSettings
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -24,29 +25,30 @@ fun AppNavigation(
         SharedTransitionLayout {
             NavHost(
                 navController = navController,
-                startDestination = if (settings.hasSelectedGroup()) Pages.Main.route else Pages.Login.route,
+                startDestination = if (settings.hasSelectedGroup()) Pages.Main else Pages.Greeting,
             ) {
-                composable(
-                    Pages.Login.route,
+                composable<Pages.Greeting> (
                     enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
                 ) {
-                    LoginPage(
+                    GreetingPage(
                         navController = navController,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
                     )
                 }
 
-                composable(
-                    Pages.LoginStudent.route,
+                composable<Pages.Login> (
                     enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
-                ) {
-                    LoginStudentPage(
+                ) { backStackEntry ->
+                    val loginData: Pages.Login = backStackEntry.toRoute()
+
+                    LoginPage(
                         navController = navController,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
+                        loginData = loginData,
                     )
                 }
             }

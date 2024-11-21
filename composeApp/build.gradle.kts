@@ -15,6 +15,7 @@ val version = "a0.11.0"
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
     buildConfigField("VERSION_NAME", version)
+    buildConfigField("API_BASE_URL", "https://mai3.lavafrai.ru")
 
 }
 
@@ -66,6 +67,9 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kstore)
             implementation(libs.composeIcons.featherIcons)
+            implementation(libs.windowSize)
+            implementation(libs.material.motion)
+            // api(libs.webview) // Does not work on WEB
 
             // implementation(libs.mai.api) // TODO idk how but i need to import it
         }

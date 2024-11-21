@@ -30,6 +30,7 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven("https://jitpack.io")
+        maven("https://jogamp.org/deployment/maven")
     }
 }
 include(":composeApp")

@@ -1,4 +1,4 @@
-package ru.lavafrai.maiapp.storage
+package ru.lavafrai.maiapp.data
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings

@@ -1,92 +1,94 @@
-@file:OptIn(ExperimentalSharedTransitionApi::class)
+@file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 
 package ru.lavafrai.maiapp.navigation.rootPages.login
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.Image
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import maiapp.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.painterResource
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.ArrowLeft
+import androidx.compose.material3.SearchBar
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import compose.icons.feathericons.X
+import kotlinx.serialization.Serializable
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.start_typing
 import org.jetbrains.compose.resources.stringResource
-import ru.lavafrai.maiapp.BuildConfig.VERSION_NAME
-import ru.lavafrai.maiapp.platform.getPlatformName
-import ru.lavafrai.maiapp.theme.MaiColor
+import ru.lavafrai.maiapp.navigation.Pages
+import ru.lavafrai.maiapp.viewmodels.LoginPageViewModel
 
 @Composable
 fun LoginPage(
     navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
+    loginData: Pages.Login,
 ) {
-    with(sharedTransitionScope) {
-        Scaffold(
-            containerColor = MaiColor,
-        ) { contentPadding ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .fillMaxSize(),
-            ) {
-                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Image(
-                        painter = painterResource(Res.drawable.mai_logo),
-                        contentDescription = "Logo",
-                        modifier = Modifier
-                            .sharedElement(
-                                sharedTransitionScope.rememberSharedContentState(key = "logo"),
-                                animatedVisibilityScope = animatedContentScope,
-                            )
-                            .fillMaxWidth(0.5f),
-                    )
-                }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+    val viewModel: LoginPageViewModel = viewModel()
+    val viewState by viewModel.state.collectAsState()
 
-                Column(
+    Surface {
+        val padding by animateDpAsState(if (isExpanded) 0.dp else 8.dp)
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+        ) {
+            Column {
+                SearchBar(
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = searchQuery,
+                            onQueryChange = { searchQuery = it },
+                            onSearch = {},
+                            expanded = isExpanded,
+                            onExpandedChange = { isExpanded = it },
+                            leadingIcon = {
+                                AnimatedVisibility(visible = !isExpanded, enter = fadeIn(), exit = fadeOut()) {
+                                    IconButton(onClick = { navController.navigateUp() }) {
+                                        Icon(FeatherIcons.ArrowLeft, contentDescription = "Back")
+                                    }
+                                }
+                            },
+                            trailingIcon = {
+                                AnimatedVisibility(visible = isExpanded, enter = fadeIn(), exit = fadeOut()) {
+                                    IconButton(onClick = { isExpanded = false }) {
+                                        Icon(FeatherIcons.X, contentDescription = "Close")
+                                    }
+                                }
+                            },
+                            placeholder = { Text(stringResource(Res.string.start_typing)) },
+                        )
+                    },
                     modifier = Modifier
-                        .weight(2f)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
+                        .fillMaxWidth()
+                        .padding(horizontal = padding)
+                        .padding(top = padding),
+                    expanded = isExpanded,
+                    onExpandedChange = { isExpanded = it },
                 ) {
-                    Text(
-                        stringResource(Res.string.sign_in_as),
-                        color = Color.White,
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    LoginPageButton(
-                        onClick = { navController.navigate("login/student") },
-                        text = stringResource(Res.string.student)
-                    )
-                    LoginPageButton(
-                        onClick = { navController.navigate("login/teacher") },
-                        text = stringResource(Res.string.teacher)
-                    )
-                }
 
-                Box {
-                    Text(
-                        "MAI app by. lava_frai\nBuild: $VERSION_NAME@${getPlatformName()}",
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
-                        color = Color.White.copy(alpha = .4f),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
                 }
             }
         }
     }
+}
+
+@Serializable
+enum class LoginType {
+    STUDENT,
+    TEACHER,
+}
+
+@Serializable
+enum class LoginTarget {
+    ADD_SCHEDULE,
 }

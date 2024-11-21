@@ -6,7 +6,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
-import ru.lavafrai.maiapp.storage.getSettings
+import ru.lavafrai.maiapp.data.getSettings
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryLight,

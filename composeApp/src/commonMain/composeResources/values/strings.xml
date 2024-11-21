@@ -3,4 +3,5 @@
     <string name="sign_in_as">Войти как...</string>
     <string name="student">Студент</string>
     <string name="teacher">Преподаватель</string>
+    <string name="start_typing">Начните вводить...</string>
 </resources>

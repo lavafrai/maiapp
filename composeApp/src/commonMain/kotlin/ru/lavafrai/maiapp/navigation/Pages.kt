@@ -1,8 +1,16 @@
 package ru.lavafrai.maiapp.navigation
 
-enum class Pages(val route: String) {
-    Main("main"),
-    Login("login"),
-    LoginStudent("login/student"),
-    LoginTeacher("login/teacher"),
+import kotlinx.serialization.Serializable
+import ru.lavafrai.maiapp.navigation.rootPages.login.LoginTarget
+import ru.lavafrai.maiapp.navigation.rootPages.login.LoginType
+
+object Pages {
+    @Serializable
+    object Main
+
+    @Serializable
+    object Greeting
+
+    @Serializable
+    data class Login(val type: LoginType, val target: LoginTarget)
 }
