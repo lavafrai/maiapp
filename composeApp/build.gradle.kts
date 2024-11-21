@@ -1,4 +1,5 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
@@ -21,13 +22,13 @@ buildConfig {
 
 kotlin {
     jvmToolchain(17)
-    androidTarget {
+
+    jvm {
 
     }
 
-    wasmJs {
-        browser()
-        binaries.executable()
+    androidTarget {
+
     }
 
     listOf(
@@ -85,8 +86,8 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
 
-        wasmJsMain.dependencies {
-            implementation(libs.ktor.client.js)
+        jvmMain.dependencies {
+            implementation(libs.ktor.client.cio)
         }
     }
 }
@@ -106,3 +107,27 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "Multiplatform App"
+            packageVersion = "1.0.0"
+
+            linux {
+                iconFile.set(project.file("desktopAppIcons/LinuxIcon.png"))
+            }
+            windows {
+                iconFile.set(project.file("desktopAppIcons/WindowsIcon.ico"))
+            }
+            macOS {
+                iconFile.set(project.file("desktopAppIcons/MacosIcon.icns"))
+                bundleID = "org.company.app.desktopApp"
+            }
+        }
+    }
+}
+
