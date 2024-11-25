@@ -9,13 +9,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.models.Nameable
 import ru.lavafrai.maiapp.navigation.Pages
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
-class LoginPageViewModel(loginData: Pages.Login) : MaiAppViewModel<LoginPageState>(
+class LoginPageViewModel(
+    val loginData: Pages.Login,
+    val onNavigateBack: () -> Unit,
+    val onLoginDone: (Nameable) -> Unit,
+) : MaiAppViewModel<LoginPageState>(
     initialState = LoginPageState(
         groups = Loadable.loading(),
         teachers = Loadable.loading(),
@@ -79,14 +84,46 @@ class LoginPageViewModel(loginData: Pages.Login) : MaiAppViewModel<LoginPageStat
     }
 
     fun select(selected: Nameable) {
-        viewModelScope.launch(dispatchers.Default) {
-            emit(stateValue.copy(selected = selected))
+        if (loginData.navigateImmediately) {
+            doFinishAction(selected)
+            onLoginDone(selected)
+        }
+        else {
+            viewModelScope.launch(dispatchers.Default) {
+                emit(stateValue.copy(selected = selected))
+            }
         }
     }
 
-    class Factory(private val loginData: Pages.Login): ViewModelProvider.Factory {
+    fun login() {
+        if (stateValue.selected == null) throw IllegalStateException("No selected item")
+        doFinishAction(stateValue.selected!!)
+        onLoginDone(stateValue.selected!!)
+    }
+
+    private fun doFinishAction(selected: Nameable) {
+        if (loginData.target == LoginTarget.ADD_SCHEDULE) {
+            viewModelScope.launch(dispatchers.Default) {
+                ApplicationSettings.setSelectedGroup(selected.name)
+            }
+        }
+    }
+
+    fun navigateBack() {
+        onNavigateBack()
+    }
+
+    class Factory(
+        private val loginData: Pages.Login,
+        val onNavigateBack: () -> Unit,
+        val onLoginDone: (Nameable) -> Unit,
+    ): ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
-            return LoginPageViewModel(loginData = loginData) as T
+            return LoginPageViewModel(
+                loginData = loginData,
+                onNavigateBack = onNavigateBack,
+                onLoginDone = onLoginDone,
+            ) as T
         }
     }
 }

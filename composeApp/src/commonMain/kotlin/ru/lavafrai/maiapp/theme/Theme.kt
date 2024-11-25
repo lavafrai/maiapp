@@ -1,12 +1,10 @@
 package ru.lavafrai.maiapp.theme
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import ru.lavafrai.maiapp.data.getSettings
+import ru.lavafrai.maiapp.data.settings.rememberSettings
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryLight,
@@ -90,17 +88,24 @@ internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
 internal fun AppTheme(
     content: @Composable () -> Unit
 ) {
-    val settings = getSettings()
+    val settings by rememberSettings()
     val systemIsDark = isSystemInDarkTheme()
-    val isDarkState = remember(systemIsDark) { mutableStateOf(systemIsDark) }
+    val themeProvider = ThemeProvider
+
+    val themeId = settings.theme ?: themeProvider.defaultTheme.id
+    val theme = themeProvider.findById(themeId) ?: themeProvider.defaultTheme
+    val isThemeDark = theme.isDark()
 
     CompositionLocalProvider(
-        LocalThemeIsDark provides isDarkState
+        LocalThemeIsDark provides mutableStateOf(isThemeDark)
     ) {
-        val isDark by isDarkState
-        SystemAppearance(!isDark)
+        val isDark = LocalThemeIsDark.current.value
+        SystemAppearance(!isThemeDark)
+
+        val colorScheme = theme.colorScheme()
+
         MaterialTheme(
-            colorScheme = if (isDark) DarkColorScheme else LightColorScheme,
+            colorScheme = colorScheme.animated(),
             content = { Surface(content = content) }
         )
     }

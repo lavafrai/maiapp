@@ -1,8 +1,10 @@
 package ru.lavafrai.maiapp.platform
 
 import androidx.compose.ui.Modifier
+import com.russhwolf.settings.Settings
 import io.ktor.client.engine.*
 import io.ktor.client.engine.android.*
+import ru.lavafrai.maiapp.data.Storage
 
 actual fun getPlatformName(): String {
     return "Android"
@@ -19,3 +21,5 @@ actual fun getPlatformDispatchers(): Dispatchers = Dispatchers(
     Main = kotlinx.coroutines.Dispatchers.Main,
     Default = kotlinx.coroutines.Dispatchers.Default
 )
+
+actual fun getPlatformSettingsStorage(): Settings = Settings()

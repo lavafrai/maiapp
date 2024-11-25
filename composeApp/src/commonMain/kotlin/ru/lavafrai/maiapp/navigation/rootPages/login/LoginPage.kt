@@ -29,21 +29,24 @@ import maiapp.composeapp.generated.resources.start_typing
 import maiapp.composeapp.generated.resources.wait_a_minute
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
+import ru.lavafrai.maiapp.models.Nameable
 import ru.lavafrai.maiapp.navigation.Pages
 import ru.lavafrai.maiapp.viewmodels.login.LoginPageViewModel
 import soup.compose.material.motion.MaterialFadeThrough
 
 @Composable
 fun LoginPage(
-    navController: NavHostController,
+    // navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
+    onNavigateBack: () -> Unit,
+    onLoginDone: (Nameable) -> Unit,
     loginData: Pages.Login,
 ) {
     val focusRequester = remember { FocusRequester() }
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val viewModel: LoginPageViewModel = viewModel(factory = LoginPageViewModel.Factory(loginData))
+    val viewModel: LoginPageViewModel = viewModel(factory = LoginPageViewModel.Factory(loginData, onNavigateBack, onLoginDone))
     val viewState by viewModel.state.collectAsState()
     val clipboardManager = LocalClipboardManager.current
 
@@ -76,7 +79,7 @@ fun LoginPage(
                             onExpandedChange = { isExpanded = it },
                             leadingIcon = {
                                 AnimatedVisibility(visible = !isExpanded, enter = fadeIn(), exit = fadeOut()) {
-                                    IconButton(onClick = { navController.navigateUp() }) {
+                                    IconButton(onClick = { viewModel.onNavigateBack() }) {
                                         Icon(FeatherIcons.ArrowLeft, contentDescription = "Back")
                                     }
                                 }
@@ -159,7 +162,7 @@ fun LoginPage(
                                         append(viewState.neededLoadable.error!!.stackTraceToString())
                                     })
                                 }) {
-                                    Icon(FeatherIcons.Copy, "Retry")
+                                    Icon(FeatherIcons.Copy, "Copy stacktrace")
                                     Spacer(Modifier.width(4.dp))
                                     Text(stringResource(Res.string.copy_stacktrace))
                                 }
@@ -185,7 +188,7 @@ fun LoginPage(
                         .fillMaxWidth()
                 ) {
                     if (viewState.selected != null) Button(onClick = {
-
+                        viewModel.login()
                     }) {
                         Text(stringResource(Res.string.go_next))
                         Spacer(Modifier.width(4.dp))

@@ -12,12 +12,14 @@ androidx-lifecycle = "2.8.3"
 androidx-navigation = "2.8.0-alpha10"
 kotlinx-serialization = "1.7.3"
 koin = "4.0.0"
+materialKolor = "2.0.0"
 multiplatformSettings = "1.2.0"
 kotlinx-datetime = "0.6.1"
 kstore = "0.9.0"
 composeIcons = "1.1.1"
 buildconfig = "5.5.0"
 # maiapi = "v2.0.10"
+sonner = "0.3.8"
 windowSize = "0.5.0"
 webview = "1.9.20"
 material-motion = "2.0.1"
@@ -49,6 +51,8 @@ androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navi
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
+multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatformSettings" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
 multiplatformSettingsSerialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "multiplatformSettings" }
@@ -56,6 +60,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 composeIcons-featherIcons = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "composeIcons" }
 # mai-api = { module = "com.github.lavaFrai:maiapi", version.ref = "maiapi" }
+sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 windowSize = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "windowSize" }
 webview = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "webview" }
 material-motion = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "material-motion" }

@@ -9,6 +9,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.platform.getPlatformDispatchers
 import ru.lavafrai.maiapp.platform.getPlatformKtorEngine
@@ -29,7 +30,12 @@ open class MaiAppViewModel<T>(
         followRedirects = true
 
         install(ContentNegotiation) {
-            json()
+            json(
+                json = Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
+            )
         }
 
         defaultRequest {

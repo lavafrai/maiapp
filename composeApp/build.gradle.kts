@@ -79,6 +79,9 @@ kotlin {
             implementation(libs.windowSize)
             implementation(libs.material.motion)
             // api(libs.webview) // Does not work on WEB
+            implementation(libs.sonner)
+            implementation(libs.multiplatform.settings.test)
+            implementation(libs.material.kolor)
 
             // implementation(libs.mai.api) // TODO idk how but i need to import it
         }
@@ -119,6 +122,11 @@ kotlin {
 
             implementation(libs.ktor.client.cio)
             implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
+        }
+        getByName("commonMain") {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+            }
         }
     }
 }

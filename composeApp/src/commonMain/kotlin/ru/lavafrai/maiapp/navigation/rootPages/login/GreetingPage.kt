@@ -31,9 +31,10 @@ import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
 @Composable
 fun GreetingPage(
-    navController: NavHostController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
+    onLoginAsStudent: () -> Unit,
+    onLoginAsTeacher: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaiColor,
@@ -68,11 +69,11 @@ fun GreetingPage(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 LoginPageButton(
-                    onClick = { navController.navigate(Pages.Login(LoginType.STUDENT, LoginTarget.ADD_SCHEDULE)) },
+                    onClick = onLoginAsStudent,
                     text = stringResource(Res.string.student)
                 )
                 LoginPageButton(
-                    onClick = { navController.navigate(Pages.Login(LoginType.TEACHER, LoginTarget.ADD_SCHEDULE)) },
+                    onClick = onLoginAsTeacher,
                     text = stringResource(Res.string.teacher)
                 )
             }

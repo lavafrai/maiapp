@@ -9,9 +9,12 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.MapSettings
 import io.ktor.client.engine.*
 import io.ktor.client.engine.js.*
 import kotlinx.browser.document
+import ru.lavafrai.maiapp.data.Storage
 
 actual fun getPlatformName(): String {
     return "Web"
@@ -48,3 +51,5 @@ actual fun getPlatformDispatchers(): Dispatchers = Dispatchers(
     Main = kotlinx.coroutines.Dispatchers.Default,
     Default = kotlinx.coroutines.Dispatchers.Default
 )
+
+actual fun getPlatformSettingsStorage(): Settings = Settings()

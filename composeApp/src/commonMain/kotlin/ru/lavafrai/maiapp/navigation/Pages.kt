@@ -16,7 +16,7 @@ object Pages {
     object Greeting
 
     @Serializable
-    data class Login(val type: LoginType, val target: LoginTarget)
+    data class Login(val type: LoginType, val target: LoginTarget, val navigateImmediately: Boolean = false)
 }
 
 inline fun <reified T> navTypeOf(
