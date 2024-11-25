@@ -7,3 +7,4 @@ import io.ktor.client.engine.*
 expect fun getPlatformName(): String
 expect fun getPlatformKtorEngine(): HttpClientEngineFactory<*>
 expect fun Modifier.pointerCursor(): Modifier
+expect fun getPlatformDispatchers(): Dispatchers

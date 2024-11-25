@@ -26,6 +26,8 @@ import ru.lavafrai.maiapp.fragments.LoginPageButton
 import ru.lavafrai.maiapp.navigation.Pages
 import ru.lavafrai.maiapp.platform.getPlatformName
 import ru.lavafrai.maiapp.theme.MaiColor
+import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
+import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
 @Composable
 fun GreetingPage(

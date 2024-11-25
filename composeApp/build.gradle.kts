@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
@@ -11,7 +14,7 @@ plugins {
     alias(libs.plugins.buildconfig)
 }
 
-val version = "a0.11.0"
+val version = "1.0.0"
 
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
@@ -22,6 +25,11 @@ buildConfig {
 
 kotlin {
     jvmToolchain(17)
+
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
 
     jvm {
 
@@ -37,7 +45,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach {
         it.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "maiapp"
             isStatic = true
         }
     }
@@ -80,14 +88,37 @@ kotlin {
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.android)
         }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
 
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
+        }
+
         jvmMain.dependencies {
+            val osName = System.getProperty("os.name")
+            val targetOs = when {
+                osName == "Mac OS X" -> "macos"
+                osName.startsWith("Win") -> "windows"
+                osName.startsWith("Linux") -> "linux"
+                else -> error("Unsupported OS: $osName")
+            }
+
+            val targetArch = when (val osArch = System.getProperty("os.arch")) {
+                "x86_64", "amd64" -> "x64"
+                "aarch64" -> "arm64"
+                else -> error("Unsupported arch: $osArch")
+            }
+
+            val version = "0.8.18" // or any more recent version
+            val target = "${targetOs}-${targetArch}"
+
             implementation(libs.ktor.client.cio)
+            implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
         }
     }
 }
@@ -114,20 +145,23 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Multiplatform App"
-            packageVersion = "1.0.0"
+            packageName = "maiapp"
+            packageVersion = version
 
             linux {
                 iconFile.set(project.file("desktopAppIcons/LinuxIcon.png"))
+                includeAllModules = true
             }
             windows {
                 iconFile.set(project.file("desktopAppIcons/WindowsIcon.ico"))
+                shortcut = true
+                includeAllModules = true
             }
             macOS {
                 iconFile.set(project.file("desktopAppIcons/MacosIcon.icns"))
-                bundleID = "org.company.app.desktopApp"
+                includeAllModules = true
+                bundleID = "ru.lavafrai.maiapp"
             }
         }
     }
 }
-

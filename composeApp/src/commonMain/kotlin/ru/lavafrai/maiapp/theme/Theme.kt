@@ -93,6 +93,7 @@ internal fun AppTheme(
     val settings = getSettings()
     val systemIsDark = isSystemInDarkTheme()
     val isDarkState = remember(systemIsDark) { mutableStateOf(systemIsDark) }
+
     CompositionLocalProvider(
         LocalThemeIsDark provides isDarkState
     ) {

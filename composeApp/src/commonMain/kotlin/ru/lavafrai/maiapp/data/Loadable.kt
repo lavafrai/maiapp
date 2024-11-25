@@ -18,6 +18,15 @@ data class Loadable<T>(
             else -> throw IllegalStateException("Invalid Loadable state")
         }
 
+    val baseStatus: BaseLoadableStatus
+        get() = when(status) {
+            LoadableStatus.Error -> BaseLoadableStatus.Error
+            LoadableStatus.Loading -> BaseLoadableStatus.Loading
+            LoadableStatus.Actual -> BaseLoadableStatus.Actual
+            LoadableStatus.Offline -> BaseLoadableStatus.Actual
+            LoadableStatus.Updating -> BaseLoadableStatus.Actual
+        }
+
     companion object {
         fun <T> loading() = Loadable<T>(null, null, false)
         fun <T> error(error: Exception) = Loadable<T>(null, error, false)
@@ -33,4 +42,10 @@ enum class LoadableStatus {
     Updating,  // data from cache, but loading new data
     Actual,     // actual data, received from server
     Offline,    // data from cache, failed to update
+}
+
+enum class BaseLoadableStatus {
+    Error,
+    Loading,
+    Actual,
 }

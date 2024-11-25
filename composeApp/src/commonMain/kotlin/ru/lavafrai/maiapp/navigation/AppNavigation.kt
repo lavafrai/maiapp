@@ -11,6 +11,9 @@ import androidx.navigation.toRoute
 import ru.lavafrai.maiapp.navigation.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.navigation.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.data.getSettings
+import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
+import ru.lavafrai.maiapp.viewmodels.login.LoginType
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -39,6 +42,10 @@ fun AppNavigation(
                 }
 
                 composable<Pages.Login> (
+                    typeMap = mapOf(
+                        typeOf<LoginType>() to navTypeOf<LoginType>(),
+                        typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
+                    ),
                     enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) { backStackEntry ->

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.maiapp" parent="android:Theme.Material.Light.NoActionBar" >
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/ic_splash</item>
+        <item name="android:windowSplashScreenBackground" tools:targetApi="s">@color/launcher_background</item>
+        <item name="android:windowSplashScreenIconBackgroundColor" tools:targetApi="s">@color/MaiColor</item>
+    </style>
+
+</resources>
