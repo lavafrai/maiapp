@@ -13,7 +13,7 @@ class DefaultDarkTheme: ApplicationTheme() {
     override val readableName: String = "Dark"
 
     @Composable
-    override fun isDark(): Boolean = isSystemInDarkTheme()
+    override fun isDark(): Boolean = true
 
     @Composable
     override fun colorScheme(): ColorScheme {
