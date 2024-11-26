@@ -1,3 +1,5 @@
+name: Build MSI
+
 on:
     push:
         branches: [ "master" ]
@@ -18,3 +20,9 @@ jobs:
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageMsi
+
+            - name: Upload MSI artifact
+              uses: actions/upload-artifact@v2
+              with:
+                    name: msi-artifact
+                    path: composeApp\build\compose\binaries\main\msi\*
