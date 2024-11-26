@@ -26,7 +26,7 @@ jobs:
                   key_password: ${{ secrets.android_key_password }}
 
             - name: Test
-              run: ls -a composeApp/build/outputs
+              run: ls -a composeApp/build/outputs/apk/release
 
             - name: Upload Android artifact
               uses: actions/upload-artifact@v4
