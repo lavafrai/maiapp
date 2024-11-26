@@ -129,10 +129,14 @@ jobs:
         needs:
             - build_web
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pages: write
+            id-token: write
         steps:
             - uses: actions/checkout@v4
 
-            - name: Download WEB artifact
+            - name: Publish WEB artifact
               uses: actions/deploy-pages@v4
               with:
                   artifact_name: web-artifact
