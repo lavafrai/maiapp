@@ -6,7 +6,31 @@ on:
     pull_request:
         branches: [ "main" ]
 
+
 jobs:
+    build_android:
+        name: Build Android
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Allow ro run Gradle
+              run: chmod +x gradlew
+
+            - name: Build Signed APK
+              uses: TeamNecta/build-signed-apk@main
+              with:
+                  keystore_b64: ${{ secrets.android_keystore_b64 }}
+                  keystore_password: ${{ secrets.android_keystore_password }}
+                  key_alias: ${{ secrets.android_key_alias }}
+                  key_password: ${{ secrets.android_key_password }}
+
+            - name: Upload Android artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: android-artifact
+                  path: app/build/outputs/apk/release/app-release.apk
+
     build_web:
         name: Build WEB
         runs-on: ubuntu-latest
