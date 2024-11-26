@@ -46,6 +46,12 @@ jobs:
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
 
+            - name: test
+              run: ls -la composeApp/build/compose/binaries/main
+
+            - name: test2
+              run: ls -la composeApp/build/compose/binaries/main/deb
+
             - name: Upload DEB artifact
               uses: actions/upload-artifact@v4
               with:
