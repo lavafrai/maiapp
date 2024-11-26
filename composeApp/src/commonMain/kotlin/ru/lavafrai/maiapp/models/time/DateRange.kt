@@ -10,12 +10,11 @@ data class DateRange(
     @Serializable(LocalDateComponentSerializer::class) val startDate: LocalDate,
     @Serializable(LocalDateComponentSerializer::class) val endDate: LocalDate,
 ) {
-    /*
-    operator fun contains(another: Date): Boolean {
+    operator fun contains(another: LocalDate): Boolean {
         return another in startDate..endDate
     }
 
-
+/*
     override fun toString(): String {
         return "$startDate - $endDate"
     }

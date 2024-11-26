@@ -1,5 +1,6 @@
 [versions]
 
+hazeMaterials = "1.0.2"
 kotlin = "2.0.21"
 compose = "1.7.0"
 agp = "8.6.0-alpha07"
@@ -29,6 +30,7 @@ material-motion = "2.0.1"
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-uitest-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-uitest-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
+haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "hazeMaterials" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }

@@ -18,9 +18,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
+import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
+import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.platform.getPlatformDispatchers
 import ru.lavafrai.maiapp.theme.ThemeProvider
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
@@ -52,6 +55,15 @@ fun MainPage(
             viewModel.setTheme(themeId)
         }
         Text("Schedule: ${viewState.schedule.status}")
-        Text("Data: ${viewState.schedule.data}")
+
+
+        if (viewState.schedule.hasData()) ScheduleView(
+            schedule = viewState.schedule.data!!,
+            dateRange = DateRange(
+                startDate = LocalDate(2024, 11, 25),
+                endDate = LocalDate(2024, 12, 1),
+            ),
+            modifier = Modifier.fillMaxSize().weight(1f),
+        )
     }
 }

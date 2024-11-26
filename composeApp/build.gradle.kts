@@ -82,6 +82,7 @@ kotlin {
             implementation(libs.sonner)
             implementation(libs.multiplatform.settings.test)
             implementation(libs.material.kolor)
+            implementation(libs.haze.materials)
 
             // implementation(libs.mai.api) // TODO idk how but i need to import it
         }
