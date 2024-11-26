@@ -25,14 +25,11 @@ jobs:
             - name: Build with Gradle
               run: ./gradlew :composeApp:wasmJsBrowserDistribution
 
-            - name: Pack WEB artifact
-              run: zip -j web-artifact.zip composeApp/build/dist/wasmJs/productionExecutable/*
-
             - name: Upload WEB artifact
               uses: actions/upload-artifact@v4
               with:
                   name: web-artifact
-                  path: web-artifact.zip
+                  path: composeApp/build/dist/wasmJs/productionExecutable
 
     build_msi:
         name: Build MSI
