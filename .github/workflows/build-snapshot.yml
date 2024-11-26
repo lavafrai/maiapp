@@ -24,8 +24,6 @@ jobs:
                   keystore_password: ${{ secrets.android_keystore_password }}
                   key_alias: ${{ secrets.android_key_alias }}
                   key_password: ${{ secrets.android_key_password }}
-                  java_distribution: 'graalvm'
-                  java_version: '21'
 
             - name: Upload Android artifact
               uses: actions/upload-artifact@v4
