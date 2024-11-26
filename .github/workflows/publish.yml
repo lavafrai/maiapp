@@ -12,7 +12,7 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Download MSI artifact
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v4
               with:
                   name: msi-artifact
                   path: maiapp.msi

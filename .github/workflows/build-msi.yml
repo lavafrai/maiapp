@@ -22,7 +22,7 @@ jobs:
               run: ./gradlew :composeApp:packageMsi
 
             - name: Upload MSI artifact
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4
               with:
                     name: msi-artifact
                     path: composeApp\build\compose\binaries\main\msi\*
