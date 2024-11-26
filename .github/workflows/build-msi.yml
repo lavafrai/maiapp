@@ -8,6 +8,7 @@ on:
 
 jobs:
     build_msi:
+        name: Build MSI
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v4
@@ -26,6 +27,30 @@ jobs:
               with:
                     name: msi-artifact
                     path: composeApp\build\compose\binaries\main\msi\*
+
+    build_deb:
+        name: Build Debian
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up JDK 11
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'graalvm'
+                  java-version: '21'
+
+            - name: Build with Gradle
+              run: ./gradlew :composeApp:packageDeb
+
+            - name: test
+              run: ls composeApp\build\compose\binaries\main\*
+
+            #- name: Upload DEB artifact
+            #  uses: actions/upload-artifact@v4
+            #  with:
+            #      name: deb-artifact
+            #      path: composeApp\build\compose\binaries\main\deb\*
 
 
     publish:
