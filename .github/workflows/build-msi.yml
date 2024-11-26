@@ -47,7 +47,7 @@ jobs:
               run: ./gradlew :composeApp:packageDeb
 
             - name: test
-              run: ls composeApp\build\compose\binaries\main\*
+              run: ls composeApp\build\compose\binaries\main\
 
             #- name: Upload DEB artifact
             #  uses: actions/upload-artifact@v4
