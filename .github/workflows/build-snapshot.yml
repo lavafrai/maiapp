@@ -26,7 +26,7 @@ jobs:
               run: ./gradlew :composeApp:wasmJsBrowserDistribution
 
             - name: Pack WEB artifact
-              run: zip -j web-artifact.zip composeApp/build/dist/wasmJs/productionExecutable
+              run: zip -j web-artifact.zip composeApp/build/dist/wasmJs/productionExecutable/*
 
             - name: Upload WEB artifact
               uses: actions/upload-artifact@v4
