@@ -30,7 +30,7 @@ jobs:
 
     build_deb:
         name: Build Debian
-        runs-on: windows-latest
+        runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
 
@@ -56,6 +56,7 @@ jobs:
     publish:
         needs:
             - build_msi
+            - build_deb
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
