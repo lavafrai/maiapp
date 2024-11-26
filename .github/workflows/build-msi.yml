@@ -40,6 +40,9 @@ jobs:
                   distribution: 'graalvm'
                   java-version: '21'
 
+            - name: Allow ro run Gradle
+              run: chmod +x gradlew
+
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
 
