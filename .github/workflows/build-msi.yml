@@ -1,4 +1,4 @@
-name: Build MSI
+name: Build Snapshot
 
 on:
     push:
@@ -7,7 +7,7 @@ on:
         branches: [ "main" ]
 
 jobs:
-    build_android:
+    build_msi:
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v4
@@ -26,3 +26,20 @@ jobs:
               with:
                     name: msi-artifact
                     path: composeApp\build\compose\binaries\main\msi\*
+
+
+    publish:
+        needs:
+            - build_msi
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Download MSI artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: msi-artifact
+                  path: maiapp.msi
+
+            - name: Publish MSI artifact
+              run: du -h maiapp.msi
