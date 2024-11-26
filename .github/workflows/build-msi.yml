@@ -67,5 +67,14 @@ jobs:
                   name: msi-artifact
                   path: maiapp.msi
 
+            - name: Download DEB artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: msi-artifact
+                  path: maiapp.deb
+
             - name: Publish MSI artifact
               run: du -h maiapp.msi
+
+            - name: Publish DEB artifact
+              run: du -h maiapp.deb
