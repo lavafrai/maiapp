@@ -24,6 +24,8 @@ jobs:
                   keystore_password: ${{ secrets.android_keystore_password }}
                   key_alias: ${{ secrets.android_key_alias }}
                   key_password: ${{ secrets.android_key_password }}
+                  java_distribution: 'graalvm'
+                  java_version: '21'
 
             - name: Upload Android artifact
               uses: actions/upload-artifact@v4
@@ -100,7 +102,6 @@ jobs:
                   name: deb-artifact
                   path: composeApp/build/compose/binaries/main/deb/*
 
-
     publish:
         needs:
             - build_msi
@@ -124,7 +125,17 @@ jobs:
                   path: maiapp.deb
 
             - name: Publish MSI artifact
-              run: du -h maiapp.msi
+              run: echo "Publishing artifacts..."
 
-            - name: Publish DEB artifact
-              run: du -h maiapp.deb
+    publish_pages:
+        needs:
+            - build_web
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Download WEB artifact
+              uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: web-artifact
+                  preview: 'true'
