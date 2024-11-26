@@ -7,6 +7,30 @@ on:
         branches: [ "main" ]
 
 jobs:
+    build_web:
+        name: Build WEB
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up JDK 11
+              uses: actions/setup-java@v4
+              with:
+                  distribution: 'graalvm'
+                  java-version: '21'
+
+            - name: Build with Gradle
+              run: ./gradlew :composeApp:wasmJsBrowserDistribution
+
+            - name: Pack WEB artifact
+              run: zip -j web-artifact.zip composeApp/build/dist/wasmJs/productionExecutable
+
+            - name: Upload WEB artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: web-artifact
+                  path: web-artifact.zip
+
     build_msi:
         name: Build MSI
         runs-on: windows-latest
@@ -57,6 +81,7 @@ jobs:
         needs:
             - build_msi
             - build_deb
+            - build_web
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
