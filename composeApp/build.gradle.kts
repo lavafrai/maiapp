@@ -1,9 +1,7 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -82,7 +80,7 @@ kotlin {
             implementation(libs.sonner)
             implementation(libs.multiplatform.settings.test)
             implementation(libs.material.kolor)
-            implementation(libs.haze.materials)
+            // implementation(libs.haze.materials) // Does not work idk why
 
             // implementation(libs.mai.api) // TODO idk how but i need to import it
         }
@@ -124,11 +122,6 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
         }
-        getByName("commonMain") {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-            }
-        }
     }
 }
 
@@ -164,6 +157,11 @@ compose.desktop {
             windows {
                 iconFile.set(project.file("desktopAppIcons/WindowsIcon.ico"))
                 shortcut = true
+                msiPackageVersion = version
+                exePackageVersion = version
+                menu = true
+                menuGroup = "maiapp"
+                menu = true
                 includeAllModules = true
             }
             macOS {
