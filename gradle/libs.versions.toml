@@ -24,6 +24,7 @@ sonner = "0.3.8"
 windowSize = "0.5.0"
 webview = "1.9.20"
 material-motion = "2.0.1"
+uiAndroid = "1.7.5"
 
 [libraries]
 
@@ -66,6 +67,7 @@ sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 windowSize = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "windowSize" }
 webview = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "webview" }
 material-motion = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "material-motion" }
+androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 
 [plugins]
 

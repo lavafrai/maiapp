@@ -140,6 +140,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }
+dependencies {
+    implementation(libs.androidx.ui.android)
+}
 
 compose.desktop {
     application {

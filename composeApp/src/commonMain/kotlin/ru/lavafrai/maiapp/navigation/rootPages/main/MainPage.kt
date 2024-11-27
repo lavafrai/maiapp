@@ -5,24 +5,18 @@ package ru.lavafrai.maiapp.navigation.rootPages.main
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDate
-import ru.lavafrai.maiapp.data.settings.ApplicationSettings
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
-import ru.lavafrai.maiapp.models.time.DateRange
-import ru.lavafrai.maiapp.platform.getPlatformDispatchers
-import ru.lavafrai.maiapp.theme.ThemeProvider
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
 @Composable
@@ -41,14 +35,25 @@ fun MainPage(
     var weekSelectorExpanded by remember { mutableStateOf(false) }
 
     Column {
+        MainPageTitle(
+            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+            titleText = {
+                Text(stringResource(Res.string.schedule))
+            },
+            subtitleText = {
+                Text(settings.selectedSchedule!!)
+            },
+            rightButton = {
+                Button(onClick = { weekSelectorExpanded = !weekSelectorExpanded }) {
+                    Text(stringResource(Res.string.select_week))
+                }
+            }
+        )
+
         Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
         Row {
             Button(onClick = { viewModel.clearSettings() }) {
                 Text("Clear settings")
-            }
-
-            Button(onClick = { weekSelectorExpanded = !weekSelectorExpanded }) {
-                Text("Select week")
             }
         }
         ThemeSelectButton { themeId ->

@@ -12,4 +12,6 @@
     <string name="go_next">Продолжить</string>
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="some_data_must_be_loaded">Нужно кое-что загрузить…</string>
+    <string name="schedule">Расписание</string>
+    <string name="select_week">Выбор недели</string>
 </resources>
