@@ -4,9 +4,7 @@ package ru.lavafrai.maiapp.navigation.rootPages.main
 
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.with
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -40,6 +38,7 @@ fun MainPageNavigation(
     var selected by remember { mutableStateOf(mainNavigationItems.find { it.id == MainNavigationPageId.HOME }!!) }
     val navRail = @Composable {
         NavigationRail {
+            Spacer(Modifier.height(8.dp))
             mainNavigationItems.forEachIndexed { index, item ->
                 NavigationRailItem(
                     icon = item.icon,
