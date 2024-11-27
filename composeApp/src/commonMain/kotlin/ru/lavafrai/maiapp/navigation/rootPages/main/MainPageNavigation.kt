@@ -2,6 +2,8 @@
 
 package ru.lavafrai.maiapp.navigation.rootPages.main
 
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +13,12 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Home
 import compose.icons.feathericons.Settings
+import soup.compose.material.motion.MaterialMotion
+import soup.compose.material.motion.animation.*
 
 val mainNavigationItems = listOf(
     MainNavigationItem(
@@ -32,7 +37,7 @@ val mainNavigationItems = listOf(
 fun MainPageNavigation(
     content: @Composable (MainNavigationPageId) -> Unit,
 ) {
-    var selected by remember { mutableStateOf(mainNavigationItems[0]) }
+    var selected by remember { mutableStateOf(mainNavigationItems.find { it.id == MainNavigationPageId.HOME }!!) }
     val navRail = @Composable {
         NavigationRail {
             mainNavigationItems.forEachIndexed { index, item ->
@@ -60,12 +65,20 @@ fun MainPageNavigation(
 
     val windowSizeClass = calculateWindowSizeClass()
     val wideScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    val slideDistance = rememberSlideDistance(slideDistance = 30.dp)
 
     Row {
         if (wideScreen) navRail()
         Column {
             Column(modifier = Modifier.weight(1f)) {
-                content(selected.id)
+                MaterialMotion(
+                    targetState = selected.id,
+                    transitionSpec = {
+                        materialSharedAxisX(forward = true, slideDistance = slideDistance)
+                    },
+                ) { page ->
+                    content(page)
+                }
             }
             if (!wideScreen) navBar()
         }

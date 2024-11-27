@@ -51,14 +51,22 @@ fun MainPage(
         )
 
         MainPageNavigation { page ->
-            //Text("Schedule: ${viewState.schedule.status}")
-            //Text("Week: ${viewState.selectedWeek}")
+            when (page) {
+                MainNavigationPageId.HOME -> {
+                    if (viewState.schedule.hasData()) ScheduleView(
+                        schedule = viewState.schedule.data!!,
+                        dateRange = viewState.selectedWeek,
+                        modifier = Modifier.fillMaxSize().weight(1f),
+                    )
+                }
 
-            if (viewState.schedule.hasData()) ScheduleView(
-                schedule = viewState.schedule.data!!,
-                dateRange = viewState.selectedWeek,
-                modifier = Modifier.fillMaxSize().weight(1f),
-            )
+                MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {
+                    Text("Settings")
+                    ThemeSelectButton {
+                        viewModel.setTheme(it)
+                    }
+                }
+            }
         }
     }
 
