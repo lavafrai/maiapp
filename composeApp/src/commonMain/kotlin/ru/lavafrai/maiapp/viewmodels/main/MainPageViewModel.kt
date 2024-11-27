@@ -11,6 +11,7 @@ import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
+import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
@@ -18,7 +19,8 @@ class MainPageViewModel(
     val onClearSettings: () -> Unit
 ) : MaiAppViewModel<MainPageState>(
     initialState = MainPageState(
-        schedule = Loadable.loading()
+        schedule = Loadable.loading(),
+        selectedWeek = DateRange.currentWeek()
     )
 ) {
     val scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
@@ -60,6 +62,12 @@ class MainPageViewModel(
     fun setTheme(theme: String) {
         viewModelScope.launch(dispatchers.IO) {
             ApplicationSettings.setTheme(theme)
+        }
+    }
+
+    fun setWeek(dateRange: DateRange) {
+        viewModelScope.launch(dispatchers.IO) {
+            emit(stateValue.copy(selectedWeek = dateRange))
         }
     }
 

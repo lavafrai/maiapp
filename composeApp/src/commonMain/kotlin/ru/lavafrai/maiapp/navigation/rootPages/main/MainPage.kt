@@ -8,10 +8,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,29 +38,40 @@ fun MainPage(
         )
     )
     val viewState by viewModel.state.collectAsState()
+    var weekSelectorExpanded by remember { mutableStateOf(false) }
 
     Column {
         Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
-        Button(
-            onClick = {
-                viewModel.clearSettings()
-            },
-        ) {
-            Text("Clear settings")
+        Row {
+            Button(onClick = { viewModel.clearSettings() }) {
+                Text("Clear settings")
+            }
+
+            Button(onClick = { weekSelectorExpanded = !weekSelectorExpanded }) {
+                Text("Select week")
+            }
         }
         ThemeSelectButton { themeId ->
             viewModel.setTheme(themeId)
         }
+
         Text("Schedule: ${viewState.schedule.status}")
+        Text("Week: ${viewState.selectedWeek}")
 
 
         if (viewState.schedule.hasData()) ScheduleView(
             schedule = viewState.schedule.data!!,
-            dateRange = DateRange(
-                startDate = LocalDate(2024, 11, 25),
-                endDate = LocalDate(2024, 12, 1),
-            ),
+            dateRange = viewState.selectedWeek,
             modifier = Modifier.fillMaxSize().weight(1f),
         )
     }
+
+    WeekSelector(
+        onWeekSelected = { dateRange ->
+            viewModel.setWeek(dateRange)
+        },
+        selectedWeek = viewState.selectedWeek,
+        expanded = weekSelectorExpanded,
+        onDismissRequest = { weekSelectorExpanded = false },
+    )
 }
