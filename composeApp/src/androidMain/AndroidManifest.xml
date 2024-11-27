@@ -4,10 +4,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+            android:label="МАИ"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher_round"
-            android:label="МАИ"
             android:theme="@android:style/Theme.Material.NoActionBar"
+            android:appCategory="productivity"
             android:enableOnBackInvokedCallback="true"
             tools:ignore="UnusedAttribute">
 
