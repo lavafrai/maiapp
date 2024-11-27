@@ -10,6 +10,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
@@ -33,6 +34,7 @@ val mainNavigationItems = listOf(
 
 @Composable
 fun MainPageNavigation(
+    header: @Composable (MainNavigationPageId) -> Unit,
     content: @Composable (MainNavigationPageId) -> Unit,
 ) {
     var selected by remember { mutableStateOf(mainNavigationItems.find { it.id == MainNavigationPageId.HOME }!!) }
@@ -70,13 +72,20 @@ fun MainPageNavigation(
         if (wideScreen) navRail()
         Column {
             Column(modifier = Modifier.weight(1f)) {
+                header(selected.id)
                 MaterialMotion(
                     targetState = selected.id,
                     transitionSpec = {
                         materialSharedAxisX(forward = true, slideDistance = slideDistance)
                     },
                 ) { page ->
-                    content(page)
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        content(page)
+                    }
                 }
             }
             if (!wideScreen) navBar()

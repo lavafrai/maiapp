@@ -1,24 +1,27 @@
 package ru.lavafrai.maiapp.navigation.rootPages.main
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.DownloadCloud
-import compose.icons.feathericons.Loader
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
 import ru.lavafrai.maiapp.utils.asDp
 
 @Composable
 fun MainPageTitle(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
     titleText: @Composable () -> Unit,
     subtitleText: @Composable () -> Unit,
     rightButton: @Composable () -> Unit = {},
+    subtitleIcon: @Composable (Dp) -> Unit = {},
 ) {
     Column(modifier
         .fillMaxWidth()
@@ -39,13 +42,7 @@ fun MainPageTitle(
                         subtitleText()
                     }
                     Spacer(Modifier.width(8.dp))
-                    Icon(
-                        FeatherIcons.DownloadCloud,
-                        "loading",
-                        modifier = modifier
-                            .size(MaterialTheme.typography.titleMedium.fontSize.asDp.div(1.2f))
-                            .pulsatingTransparency(),
-                    )
+                    subtitleIcon(MaterialTheme.typography.titleMedium.fontSize.asDp.div(1.2f))
                 }
             }
             // Right button

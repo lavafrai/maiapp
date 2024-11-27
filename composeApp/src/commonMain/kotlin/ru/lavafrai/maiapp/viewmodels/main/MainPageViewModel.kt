@@ -40,11 +40,14 @@ class MainPageViewModel(
             // Download schedule
             supervisorScope {
                 try {
+                    val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
+                    emit(stateValue.copy(schedule = stateValue.schedule.copy(data = cachedSchedule)))
+
                     val schedule = scheduleRepository.getSchedule(scheduleName)
                     emit(stateValue.copy(schedule = Loadable.actual(schedule)))
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    emit(stateValue.copy(schedule = Loadable.error(e)))
+                    emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e)))
                 }
             }
         }
