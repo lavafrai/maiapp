@@ -29,6 +29,7 @@ import maiapp.composeapp.generated.resources.start_typing
 import maiapp.composeapp.generated.resources.wait_a_minute
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
+import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.models.Nameable
 import ru.lavafrai.maiapp.navigation.Pages
 import ru.lavafrai.maiapp.viewmodels.login.LoginPageViewModel
@@ -147,26 +148,10 @@ fun LoginPage(
                         targetState = viewState.neededLoadable.baseStatus,
                     ) { newScreen ->
                         when (newScreen) {
-                            BaseLoadableStatus.Error -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(stringResource(Res.string.something_went_wrong))
-                                Spacer(Modifier.height(4.dp))
-
-                                TextButton(onClick = { viewModel.startLoading() }) {
-                                    Icon(FeatherIcons.Repeat, "Retry")
-                                    Spacer(Modifier.width(4.dp))
-                                    Text(stringResource(Res.string.retry))
-                                }
-
-                                TextButton(onClick = {
-                                    clipboardManager.setText(buildAnnotatedString {
-                                        append(viewState.neededLoadable.error!!.stackTraceToString())
-                                    })
-                                }) {
-                                    Icon(FeatherIcons.Copy, "Copy stacktrace")
-                                    Spacer(Modifier.width(4.dp))
-                                    Text(stringResource(Res.string.copy_stacktrace))
-                                }
-                            }
+                            BaseLoadableStatus.Error -> ErrorView(
+                                error = viewState.neededLoadable.error,
+                                onRetry = { viewModel.startLoading() },
+                            )
 
                             BaseLoadableStatus.Loading -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(stringResource(Res.string.some_data_must_be_loaded))

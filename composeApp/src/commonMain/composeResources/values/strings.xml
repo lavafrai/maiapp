@@ -15,4 +15,8 @@
     <string name="schedule">Расписание</string>
     <string name="select_week">Выбор недели</string>
     <string name="settings">Настройки</string>
+    <string name="last_week">Предыдущая неделя</string>
+    <string name="next_week">Следующая неделя</string>
+    <string name="current_week">Текущая неделя</string>
+    <string name="clear_data_and_restart">Очистить данные</string>
 </resources>

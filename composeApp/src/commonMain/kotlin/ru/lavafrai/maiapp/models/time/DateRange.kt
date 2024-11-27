@@ -1,6 +1,8 @@
 package ru.lavafrai.maiapp.models.time
 
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import kotlinx.datetime.serializers.LocalDateComponentSerializer
 import kotlinx.serialization.Serializable
 
@@ -12,6 +14,26 @@ data class DateRange(
 ) {
     operator fun contains(another: LocalDate): Boolean {
         return another in startDate..endDate
+    }
+
+    fun isNow(): Boolean {
+        return LocalDate.now() in this
+    }
+
+    fun plusDays(amount: Int): DateRange {
+        return DateRange(
+            startDate.plus(amount, DateTimeUnit.DAY),
+            endDate.plus(amount, DateTimeUnit.DAY),
+        )
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        if (other !is DateRange) return false
+        return startDate == other.startDate && endDate == other.endDate
+    }
+
+    override fun toString(): String {
+        return "$startDate - $endDate"
     }
 
     companion object {

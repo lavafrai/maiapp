@@ -12,6 +12,8 @@ import com.dokar.sonner.rememberToasterState
 import ru.lavafrai.maiapp.fragments.LocalToaster
 import ru.lavafrai.maiapp.fragments.ToasterProvider
 import ru.lavafrai.maiapp.navigation.AppNavigation
+import ru.lavafrai.maiapp.navigation.Pages
+import ru.lavafrai.maiapp.platform.getPlatformSettingsStorage
 import ru.lavafrai.maiapp.theme.AppTheme
 import ru.lavafrai.maiapp.theme.LocalThemeIsDark
 
@@ -19,9 +21,14 @@ import ru.lavafrai.maiapp.theme.LocalThemeIsDark
 internal fun App() = AppTheme {
     val navController = rememberNavController()
     val toaster = rememberToasterState()
+    val applicationContext = ApplicationContext(
+        panicCleanup = {
+            navController.navigate(Pages.Greeting) { popUpTo(0) }
+            getPlatformSettingsStorage().clear()
+        },
+    )
 
-
-    CompositionLocalProvider(LocalToaster provides ToasterProvider(toaster)) {
+    CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
         AppNavigation(
             navController = navController,
             modifier = Modifier

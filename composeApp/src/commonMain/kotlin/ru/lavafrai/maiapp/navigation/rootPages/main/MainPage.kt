@@ -19,6 +19,7 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.rememberSettings
+import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
@@ -95,7 +96,10 @@ fun MainPage(
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
                         )
-                        LoadableStatus.Error -> Text("Error")
+                        LoadableStatus.Error -> ErrorView(
+                            error = viewState.schedule.error,
+                            onRetry = { viewModel.startLoading() },
+                        )
                     }
                 }
 

@@ -2,6 +2,8 @@ package ru.lavafrai.maiapp.models.schedule
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.lavafrai.maiapp.models.time.DateRange
+import ru.lavafrai.maiapp.models.time.week
 
 
 @Serializable
@@ -11,6 +13,22 @@ data class Schedule(
     @SerialName("cached") val cached: Long,
     @SerialName("days") val days: List<ScheduleDay>,
 ) {
+    val weeks: List<DateRange>
+        get() {
+            var firstWeek = days.filter { it.date != null }.minByOrNull { it.date!! }?.date?.week()
+            val lastWeek = days.filter { it.date != null }.maxByOrNull { it.date!! }?.date?.week()
+            if (firstWeek == null || lastWeek == null) return emptyList()
+
+            val weeks = mutableListOf<DateRange>()
+            weeks.add(firstWeek!!)
+            do {
+                firstWeek = firstWeek!!.plusDays(7)
+                weeks.add(firstWeek)
+            } while (firstWeek != lastWeek)
+
+            return weeks
+        }
+
     /*
     private var weeks: MutableList<ScheduleWeekId>? = null
 
