@@ -7,11 +7,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.time.DateRange
 
 @Composable
 fun WeekSelector(
     onWeekSelected: (DateRange) -> Unit,
+    schedule: Schedule,
     selectedWeek: DateRange,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
@@ -40,5 +42,6 @@ fun WeekSelector(
         sheetState = modalBottomSheetState,
     ) {
         // Sheet content
+
     }
 }

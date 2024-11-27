@@ -1,9 +1,11 @@
 package ru.lavafrai.maiapp.navigation.rootPages.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -19,7 +21,7 @@ import ru.lavafrai.maiapp.utils.asDp
 fun MainPageTitle(
     modifier: Modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
     titleText: @Composable () -> Unit,
-    subtitleText: @Composable () -> Unit,
+    subtitleText: @Composable () -> Unit = { Text("") },
     rightButton: @Composable () -> Unit = {},
     subtitleIcon: @Composable (Dp) -> Unit = {},
 ) {
@@ -48,5 +50,12 @@ fun MainPageTitle(
             // Right button
             rightButton()
         }
+        Box(
+            Modifier
+                .padding(top = 4.dp)
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+        ) {}
     }
 }

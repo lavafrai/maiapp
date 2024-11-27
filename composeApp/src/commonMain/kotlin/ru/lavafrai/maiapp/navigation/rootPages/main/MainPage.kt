@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.lifecycle.viewmodel.compose.viewModel
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.CloudOff
@@ -61,7 +62,7 @@ fun MainPage(
                         titleText = { Text(stringResource(Res.string.schedule)) },
                         subtitleText = { Text(settings.selectedSchedule!!) },
                         rightButton = {
-                            TextButton(onClick = { weekSelectorExpanded = !weekSelectorExpanded }) {
+                            TextButton(onClick = { weekSelectorExpanded = !weekSelectorExpanded }, enabled = viewState.schedule.hasData()) {
                                 Text(stringResource(Res.string.select_week))
                             }
                         },
@@ -69,7 +70,7 @@ fun MainPage(
                             if (viewState.schedule.status == LoadableStatus.Offline) Icon(
                                 imageVector = FeatherIcons.CloudOff,
                                 contentDescription = "offline",
-                                modifier = Modifier.size(size),
+                                modifier = Modifier.size(size).alpha(0.7f),
                             )
                             if (viewState.schedule.status == LoadableStatus.Updating) Icon(
                                 imageVector = FeatherIcons.DownloadCloud,
@@ -78,9 +79,9 @@ fun MainPage(
                             )
                         },
                     )
+
                     MainNavigationPageId.SETTINGS -> MainPageTitle(
                         titleText = { Text(stringResource(Res.string.settings)) },
-                        subtitleText = { Text(settings.selectedSchedule!!) },
                     )
                 }
             },
@@ -108,12 +109,13 @@ fun MainPage(
         }
     }
 
-    WeekSelector(
+    if (viewState.schedule.hasData()) WeekSelector(
         onWeekSelected = { dateRange ->
             viewModel.setWeek(dateRange)
         },
         selectedWeek = viewState.selectedWeek,
         expanded = weekSelectorExpanded,
         onDismissRequest = { weekSelectorExpanded = false },
+        schedule = viewState.schedule.data!!,
     )
 }
