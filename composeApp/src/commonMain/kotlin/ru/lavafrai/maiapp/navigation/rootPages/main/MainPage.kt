@@ -50,25 +50,16 @@ fun MainPage(
             }
         )
 
-        Spacer(modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
-        Row {
-            Button(onClick = { viewModel.clearSettings() }) {
-                Text("Clear settings")
-            }
+        MainPageNavigation { page ->
+            //Text("Schedule: ${viewState.schedule.status}")
+            //Text("Week: ${viewState.selectedWeek}")
+
+            if (viewState.schedule.hasData()) ScheduleView(
+                schedule = viewState.schedule.data!!,
+                dateRange = viewState.selectedWeek,
+                modifier = Modifier.fillMaxSize().weight(1f),
+            )
         }
-        ThemeSelectButton { themeId ->
-            viewModel.setTheme(themeId)
-        }
-
-        Text("Schedule: ${viewState.schedule.status}")
-        Text("Week: ${viewState.selectedWeek}")
-
-
-        if (viewState.schedule.hasData()) ScheduleView(
-            schedule = viewState.schedule.data!!,
-            dateRange = viewState.selectedWeek,
-            modifier = Modifier.fillMaxSize().weight(1f),
-        )
     }
 
     WeekSelector(
