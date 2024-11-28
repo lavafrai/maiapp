@@ -23,6 +23,7 @@ import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
+import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
 @Composable
@@ -39,55 +40,50 @@ fun MainPage(
     )
     val viewState by viewModel.state.collectAsState()
     var weekSelectorExpanded by remember { mutableStateOf(false) }
+    var workTypeSelectorExpanded by remember { mutableStateOf(false) }
 
     Column {
-        /*MainPageTitle(
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
-            titleText = {
-                Text(stringResource(Res.string.schedule))
-            },
-            subtitleText = {
-                Text(settings.selectedSchedule!!)
-            },
-            rightButton = {
-                Button(onClick = { weekSelectorExpanded = !weekSelectorExpanded }) {
-                    Text(stringResource(Res.string.select_week))
-                }
-            }
-        )*/
-
         MainPageNavigation(
             header = { page ->
                 when (page) {
-                    MainNavigationPageId.HOME -> MainPageTitle(
-                        titleText = { Text(stringResource(Res.string.schedule)) },
-                        subtitleText = { Text(settings.selectedSchedule!!) },
-                        rightButton = {
-                            TextButton(onClick = { weekSelectorExpanded = !weekSelectorExpanded }, enabled = viewState.schedule.hasData()) {
-                                Text(stringResource(Res.string.select_week))
-                            }
-                        },
-                        subtitleIcon = { size ->
-                            if (viewState.schedule.status == LoadableStatus.Offline) Icon(
-                                imageVector = FeatherIcons.CloudOff,
-                                contentDescription = "offline",
-                                modifier = Modifier.size(size).alpha(0.7f),
-                            )
-                            if (viewState.schedule.status == LoadableStatus.Updating) Icon(
-                                imageVector = FeatherIcons.DownloadCloud,
-                                contentDescription = "updating",
-                                modifier = Modifier.size(size).pulsatingTransparency(),
-                            )
-                        },
+                    MainNavigationPageId.WORKS -> MainPageHomeTitle(
+                        title = stringResource(Res.string.works),
+                        schedule = viewState.schedule,
+                        buttonText = stringResource(Res.string.work_type),
+                        onButtonClick = { workTypeSelectorExpanded = !workTypeSelectorExpanded },
+                    )
+
+                    MainNavigationPageId.HOME -> MainPageHomeTitle(
+                        title = stringResource(Res.string.schedule),
+                        schedule = viewState.schedule,
+                        buttonText = stringResource(Res.string.select_week),
+                        onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
 
                     MainNavigationPageId.SETTINGS -> MainPageTitle(
                         titleText = { Text(stringResource(Res.string.settings)) },
+                        subtitleText = { Text(settings.selectedSchedule!!) },
                     )
                 }
             },
         ) { page ->
             when (page) {
+                MainNavigationPageId.WORKS -> {
+                    when (viewState.schedule.status) {
+                        LoadableStatus.Loading -> CircularProgressIndicator()
+                        LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> ScheduleView(
+                            schedule = viewState.schedule.data!!,
+                            dateRange = null,
+                            modifier = Modifier.fillMaxSize(),
+                            selector = remember (viewState.workTypeSelected) {{ _, lesson -> lesson.type in viewState.workTypeSelected }}
+                        )
+                        LoadableStatus.Error -> ErrorView(
+                            error = viewState.schedule.error,
+                            onRetry = { viewModel.startLoading() },
+                        )
+                    }
+                }
+
                 MainNavigationPageId.HOME -> {
                     when (viewState.schedule.status) {
                         LoadableStatus.Loading -> CircularProgressIndicator()
@@ -121,5 +117,14 @@ fun MainPage(
         expanded = weekSelectorExpanded,
         onDismissRequest = { weekSelectorExpanded = false },
         schedule = viewState.schedule.data!!,
+    )
+
+    if (viewState.schedule.hasData()) LessonTypeSelector(
+        expanded = workTypeSelectorExpanded,
+        onDismissRequest = { workTypeSelectorExpanded = false },
+        selectedLessonTypes = viewState.workTypeSelected,
+        onLessonTypeSelected = { lessonTypes ->
+            viewModel.setSelectedWorkTypes(lessonTypes)
+        },
     )
 }

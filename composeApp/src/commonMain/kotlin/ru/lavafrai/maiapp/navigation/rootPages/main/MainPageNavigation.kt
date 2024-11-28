@@ -14,12 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Award
 import compose.icons.feathericons.Home
 import compose.icons.feathericons.Settings
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.*
 
 val mainNavigationItems = listOf(
+    MainNavigationItem(
+        id = MainNavigationPageId.WORKS,
+        icon = { Icon(FeatherIcons.Award, "Works") },
+        title = { Text("Works") },
+    ),
     MainNavigationItem(
         id = MainNavigationPageId.HOME,
         icon = { Icon(FeatherIcons.Home, "Home") },

@@ -12,7 +12,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.datetime.LocalDate
+import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.now
 
@@ -21,13 +23,21 @@ fun ScheduleView(
     schedule: Schedule,
     dateRange: DateRange? = null,
     modifier: Modifier = Modifier,
+    selector: (ScheduleDay, Lesson) -> Boolean = { _, _ -> true },
 ) {
     val filteredDays = remember(dateRange) { schedule.days.filter { if (dateRange == null) true else it.date!! in dateRange } }
+    val filteredLessons = remember(dateRange, selector) {
+        schedule.days.map { day -> day.copy(lessons=day.lessons.filter { selector(day, it) }) }.filter { it.lessons.isNotEmpty() }
+    }
     val lazyColumnState = rememberLazyListState()
 
     LaunchedEffect(dateRange) {
-        if (dateRange == null) lazyColumnState.scrollToItem(0)
-        if (dateRange!!.isNow()) lazyColumnState.scrollToItem((LocalDate.now().dayOfWeek.ordinal) * 2)
+        if (dateRange == null) {
+            val index = filteredLessons.indexOfFirst { it.date!! >= LocalDate.now() }
+            lazyColumnState.scrollToItem(index * 2)
+            return@LaunchedEffect
+        }
+        if (dateRange.isNow()) lazyColumnState.scrollToItem((LocalDate.now().dayOfWeek.ordinal) * 2)
         else lazyColumnState.scrollToItem(0)
     }
 
@@ -35,7 +45,7 @@ fun ScheduleView(
         modifier = modifier,
         state = lazyColumnState,
     ) {
-        for (day in filteredDays) {
+        for (day in filteredLessons) {
             stickyHeader {
                 DayHeader(day = day, modifier = Modifier.background(MaterialTheme.colorScheme.background))
             }

@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.ArrowLeft
@@ -68,7 +69,28 @@ fun WeekSelector(
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             // Special item for current week
-            Row(
+
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.last_week)) },
+                leadingContent = { Icon(FeatherIcons.ArrowLeft, "Last week", modifier = Modifier.size(24.dp)) },
+                modifier = Modifier
+                    .clickable { onWeekSelected(selectedWeek.plusDays(-7)) ; close() }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.current_week)) },
+                leadingContent = { Icon(FeatherIcons.Home, "Current week", modifier = Modifier.size(24.dp)) },
+                modifier = Modifier
+                    .clickable { onWeekSelected(LocalDate.now().week()) ; close() }
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(Res.string.next_week)) },
+                leadingContent = { Icon(FeatherIcons.ArrowRight, "Next week", modifier = Modifier.size(24.dp)) },
+                modifier = Modifier
+                    .clickable { onWeekSelected(selectedWeek.plusDays(7)) ; close() }
+            )
+            /*Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onWeekSelected(selectedWeek.plusDays(-7)) ; close() }
@@ -111,7 +133,7 @@ fun WeekSelector(
                     modifier = Modifier.padding(start = 16.dp),
                     style = MaterialTheme.typography.bodyLarge,
                 )
-            }
+            }*/
 
             Spacer(modifier = Modifier.height(16.dp))
             // Sheet content
@@ -120,7 +142,20 @@ fun WeekSelector(
                 val weekIsCurrent = week == LocalDate.now().week()
                 val weekIsSelected = week == selectedWeek
 
-                Row(
+                ListItem(
+                    headlineContent = { Text(week.toString()) },
+                    leadingContent = {
+                        PairNumber(
+                            text = "${index + 1}",
+                            background = if (weekIsCurrent) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    modifier = Modifier
+                        .clickable { onWeekSelected(week) ; close() },
+                    colors = if (weekIsSelected) ListItemDefaults.colors(containerColor = Color.Transparent) else ListItemDefaults.colors()
+                )
+
+                /*Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .conditional(weekIsSelected) { background(MaterialTheme.colorScheme.surfaceVariant) }
@@ -137,7 +172,7 @@ fun WeekSelector(
                         modifier = Modifier.padding(start = 16.dp),
                         style = MaterialTheme.typography.bodyLarge,
                     )
-                }
+                }*/
             }
         }
     }

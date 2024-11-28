@@ -13,10 +13,12 @@
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="some_data_must_be_loaded">Нужно кое-что загрузить…</string>
     <string name="schedule">Расписание</string>
+    <string name="works">Работы</string>
     <string name="select_week">Выбор недели</string>
     <string name="settings">Настройки</string>
     <string name="last_week">Предыдущая неделя</string>
     <string name="next_week">Следующая неделя</string>
     <string name="current_week">Текущая неделя</string>
     <string name="clear_data_and_restart">Очистить данные</string>
+    <string name="work_type">Тип работы</string>
 </resources>
