@@ -27,7 +27,7 @@ fun ScheduleView(
 ) {
     val filteredDays = remember(dateRange) { schedule.days.filter { if (dateRange == null) true else it.date!! in dateRange } }
     val filteredLessons = remember(dateRange, selector) {
-        schedule.days.map { day -> day.copy(lessons=day.lessons.filter { selector(day, it) }) }.filter { it.lessons.isNotEmpty() }
+        filteredDays.map { day -> day.copy(lessons=day.lessons.filter { selector(day, it) }) }.filter { it.lessons.isNotEmpty() }
     }
     val lazyColumnState = rememberLazyListState()
 
