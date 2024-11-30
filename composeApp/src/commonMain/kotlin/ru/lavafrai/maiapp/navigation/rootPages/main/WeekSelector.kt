@@ -65,7 +65,7 @@ fun WeekSelector(
     if (visible) ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = modalBottomSheetState,
-        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             // Special item for current week
@@ -90,52 +90,12 @@ fun WeekSelector(
                 modifier = Modifier
                     .clickable { onWeekSelected(selectedWeek.plusDays(7)) ; close() }
             )
-            /*Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onWeekSelected(selectedWeek.plusDays(-7)) ; close() }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(FeatherIcons.ArrowLeft, "Last week", modifier = Modifier.size(24.dp))
-                Text(
-                    text = stringResource(Res.string.last_week),
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
 
-            Row(
+            Spacer(
                 modifier = Modifier
+                    .height(16.dp)
                     .fillMaxWidth()
-                    .clickable { onWeekSelected(LocalDate.now().week()) ; close() }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(FeatherIcons.Home, "Current week", modifier = Modifier.size(24.dp))
-                Text(
-                    text = stringResource(Res.string.current_week),
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onWeekSelected(selectedWeek.plusDays(7)) ; close() }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(FeatherIcons.ArrowRight, "Next week", modifier = Modifier.size(24.dp))
-                Text(
-                    text = stringResource(Res.string.next_week),
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }*/
-
-            Spacer(modifier = Modifier.height(16.dp))
+            )
             // Sheet content
             weeks.forEachIndexed { index, week ->
                 // WeekSelectorItem

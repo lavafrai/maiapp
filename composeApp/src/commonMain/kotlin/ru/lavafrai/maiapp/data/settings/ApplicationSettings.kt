@@ -14,6 +14,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.platform.getPlatformSettingsStorage
+import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
 
 
@@ -21,6 +22,7 @@ import ru.lavafrai.maiapp.theme.themes.SystemTheme
 data class ApplicationSettingsData(
     val selectedSchedule: String? = null,
     val theme: String = SystemTheme().id,
+    val colorSchema: String = DefaultColorSchema().id,
 ) {
     fun hasSelectedGroup() = selectedSchedule != null
 }
@@ -44,21 +46,24 @@ object ApplicationSettings {
         return settings
     }
 
-    suspend fun update(new: ApplicationSettingsData) {
+    fun update(new: ApplicationSettingsData) {
         storage.encodeValue("settings", new)
-        flow.emit(new)
+        flow.value = (new)
     }
 
-    suspend fun clear() {
+    fun clear() {
         storage.clear()
-        flow.emit(ApplicationSettingsData())
+        update(ApplicationSettingsData())
     }
 
-    suspend fun setTheme(themeId: String) {
-        mutex.withLock {
-            val current = getCurrent()
-            update(current.copy(theme = themeId))
-        }
+    fun setTheme(themeId: String) {
+        val current = getCurrent()
+        update(current.copy(theme = themeId))
+    }
+
+    fun setColorScheme(colorSchemaId: String) {
+        val current = getCurrent()
+        update(current.copy(colorSchema = colorSchemaId))
     }
 
     suspend fun setSelectedGroup(group: String) {

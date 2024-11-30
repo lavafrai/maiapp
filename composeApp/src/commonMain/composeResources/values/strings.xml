@@ -21,4 +21,6 @@
     <string name="current_week">Текущая неделя</string>
     <string name="clear_data_and_restart">Очистить данные</string>
     <string name="work_type">Тип работы</string>
+    <string name="appearance">Внешний вид</string>
+    <string name="color_scheme">Цвета</string>
 </resources>

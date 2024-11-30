@@ -24,6 +24,7 @@ import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
 import ru.lavafrai.maiapp.models.schedule.LessonType
+import ru.lavafrai.maiapp.navigation.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
 @Composable
@@ -100,10 +101,7 @@ fun MainPage(
                 }
 
                 MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {
-                    Text("Settings")
-                    ThemeSelectButton {
-                        viewModel.setTheme(it)
-                    }
+                    SettingsPage()
                 }
             }
         }

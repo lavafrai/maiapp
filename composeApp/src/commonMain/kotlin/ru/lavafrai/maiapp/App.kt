@@ -15,7 +15,7 @@ import ru.lavafrai.maiapp.navigation.AppNavigation
 import ru.lavafrai.maiapp.navigation.Pages
 import ru.lavafrai.maiapp.platform.getPlatformSettingsStorage
 import ru.lavafrai.maiapp.theme.AppTheme
-import ru.lavafrai.maiapp.theme.LocalThemeIsDark
+import ru.lavafrai.maiapp.theme.LocalApplicationTheme
 
 @Composable
 internal fun App() = AppTheme {
@@ -39,6 +39,6 @@ internal fun App() = AppTheme {
     Toaster(
         state = toaster,
         alignment = Alignment.BottomCenter,
-        darkTheme = LocalThemeIsDark.current.value,
+        darkTheme = LocalApplicationTheme.current.value.isDark(),
     )
 }

@@ -26,7 +26,7 @@ fun ThemeSelectButton(
                 },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = ThemeProvider.themes.size),
             ) {
-                Text(theme.readableName)
+                Text(theme.readableName())
             }
         }
     }

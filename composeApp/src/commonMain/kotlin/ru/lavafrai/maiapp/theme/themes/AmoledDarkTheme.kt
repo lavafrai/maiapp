@@ -8,20 +8,13 @@ import com.materialkolor.dynamicColorScheme
 import ru.lavafrai.maiapp.theme.ApplicationTheme
 import ru.lavafrai.maiapp.theme.MaiColor
 
-class AmoledDarkTheme: ApplicationTheme() {
-    override val id: String = "amoled"
-    override val readableName: String = "Amoled"
+class AmoledDarkTheme: ApplicationTheme {
+    override val id = "amoled"
+    override val readableName = @Composable { "Amoled" }
 
     @Composable
     override fun isDark(): Boolean = true
 
     @Composable
-    override fun colorScheme(): ColorScheme {
-        return dynamicColorScheme(
-            primary = MaiColor,
-            isDark = true,
-            style = PaletteStyle.Vibrant,
-            isAmoled = true,
-        )
-    }
+    override fun isAmoled(): Boolean = true
 }

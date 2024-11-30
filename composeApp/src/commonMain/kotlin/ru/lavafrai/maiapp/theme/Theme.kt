@@ -82,32 +82,33 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainerHighest = SurfaceContainerHighestDark,
 )
 
-internal val LocalThemeIsDark = compositionLocalOf { mutableStateOf(true) }
+internal val LocalApplicationTheme = compositionLocalOf<State<ApplicationTheme>> { error("No theme provided") }
+internal val LocalApplicationColorSchema = compositionLocalOf<State<ApplicationColorSchema>> { error("No color schema provided") }
 
 @Composable
 internal fun AppTheme(
     content: @Composable () -> Unit
 ) {
     val settings by rememberSettings()
-    val systemIsDark = isSystemInDarkTheme()
     val themeProvider = ThemeProvider
 
     val themeId = settings.theme ?: themeProvider.defaultTheme.id
-    val theme = themeProvider.findById(themeId) ?: themeProvider.defaultTheme
-    val isThemeDark = theme.isDark()
+    val colorSchemaId = settings.colorSchema ?: themeProvider.defaultColorSchema.id
 
-    CompositionLocalProvider(
-        LocalThemeIsDark provides mutableStateOf(isThemeDark)
-    ) {
-        val isDark = LocalThemeIsDark.current.value
-        SystemAppearance(!isThemeDark)
+    val theme = themeProvider.findThemeById(themeId) ?: themeProvider.defaultTheme
+    val colorSchema = themeProvider.colorSchemas.find { it.id == colorSchemaId } ?: themeProvider.defaultColorSchema
 
-        val colorScheme = theme.colorScheme()
+    CompositionLocalProvider(LocalApplicationTheme provides mutableStateOf(theme)) {
+        CompositionLocalProvider(LocalApplicationColorSchema provides mutableStateOf(colorSchema)) {
+            SystemAppearance(!theme.isDark())
 
-        MaterialTheme(
-            colorScheme = colorScheme.animated(),
-            content = { Surface(content = content) }
-        )
+            val colorScheme = colorSchema.buildColorScheme(theme)
+
+            MaterialTheme(
+                colorScheme = colorScheme.animated(),
+                content = { Surface(content = content) }
+            )
+        }
     }
 }
 
