@@ -8,8 +8,8 @@ on:
 
 env:
     ANDROID_KEYSTORE: "../android.keystore"
-    ANDROID_KEY_ALIAS: ${{ secrets.android_key_alias }}
-    ANDROID_KEY_PASSWORD: ${{ secrets.android_key_password }}
+    ANDROID_KEYSTORE_KEY: ${{ secrets.android_key_alias }}
+    ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.android_key_password }}
     ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
 
 

@@ -144,7 +144,7 @@ android {
         create("release") {
             storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "maiapp.keystore")
             keyAlias = System.getenv("ANDROID_KEYSTORE_KEY") ?: "maiapp"
-            keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
+            keyPassword = System.getenv("ANDROID_KEYSTORE_KEY_PASSWORD") ?: "password"
             storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
         }
     }
