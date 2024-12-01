@@ -33,7 +33,7 @@ jobs:
               uses: akiojin/decode-base64-github-action@v0.1.0
               with:
                   base64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
-                  output-path: ${{ env.ANDROID_KEYSTORE }}
+                  output-path: '/home/runner/work/maiapp/maiapp/android.keystore'
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:assemble
