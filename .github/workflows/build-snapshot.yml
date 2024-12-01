@@ -26,7 +26,7 @@ jobs:
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v0.1.0
               with:
-                  base64: ${{ secrets.android_keystore_base64 }}
+                  base64: ${{ secrets.android_keystore_b64 }}
                   output-path: ${{ env.ANDROID_KEYSTORE }}
 
             - name: Build with Gradle
