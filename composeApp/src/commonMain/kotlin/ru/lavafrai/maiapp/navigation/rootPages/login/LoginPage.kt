@@ -31,7 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
 import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.models.Nameable
-import ru.lavafrai.maiapp.navigation.Pages
+import ru.lavafrai.maiapp.navigation.pages.Login
 import ru.lavafrai.maiapp.viewmodels.login.LoginPageViewModel
 import soup.compose.material.motion.MaterialFadeThrough
 
@@ -42,7 +42,7 @@ fun LoginPage(
     animatedContentScope: AnimatedContentScope,
     onNavigateBack: () -> Unit,
     onLoginDone: (Nameable) -> Unit,
-    loginData: Pages.Login,
+    loginData: Login,
 ) {
     val focusRequester = remember { FocusRequester() }
     var searchQuery by rememberSaveable { mutableStateOf("") }

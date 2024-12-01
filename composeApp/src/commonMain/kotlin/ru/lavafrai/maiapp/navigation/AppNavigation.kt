@@ -13,6 +13,9 @@ import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.navigation.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.navigation.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.data.settings.getSettings
+import ru.lavafrai.maiapp.navigation.pages.Greeting
+import ru.lavafrai.maiapp.navigation.pages.Login
+import ru.lavafrai.maiapp.navigation.pages.Main
 import ru.lavafrai.maiapp.navigation.rootPages.main.MainPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -31,21 +34,21 @@ fun AppNavigation(
         SharedTransitionLayout {
             NavHost(
                 navController = navController,
-                startDestination = if (settings.hasSelectedGroup()) Pages.Main else Pages.Greeting,
+                startDestination = if (settings.hasSelectedGroup()) Main else Greeting,
             ) {
-                composable<Pages.Greeting> (
+                composable<Greeting> (
                     enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
                 ) { backStackEntry ->
                     GreetingPage(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
-                        onLoginAsStudent = { navController.navigate(Pages.Login(LoginType.STUDENT, LoginTarget.ADD_SCHEDULE, true)) },
-                        onLoginAsTeacher = { navController.navigate(Pages.Login(LoginType.TEACHER, LoginTarget.ADD_SCHEDULE, true)) },
+                        onLoginAsStudent = { navController.navigate(Login(LoginType.STUDENT, LoginTarget.ADD_SCHEDULE, true)) },
+                        onLoginAsTeacher = { navController.navigate(Login(LoginType.TEACHER, LoginTarget.ADD_SCHEDULE, true)) },
                     )
                 }
 
-                composable<Pages.Login> (
+                composable<Login> (
                     typeMap = mapOf(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
                         typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
@@ -53,7 +56,7 @@ fun AppNavigation(
                     enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) { backStackEntry ->
-                    val loginData: Pages.Login = backStackEntry.toRoute()
+                    val loginData: Login = backStackEntry.toRoute()
 
                     LoginPage(
                         sharedTransitionScope = this@SharedTransitionLayout,
@@ -61,7 +64,7 @@ fun AppNavigation(
                         onNavigateBack = { navController.navigateUp() },
                         onLoginDone = {
                             navController.popBackStack()
-                            navController.navigate(Pages.Main) {
+                            navController.navigate(Main) {
                                 popUpTo(0)
                             }
                         },
@@ -69,7 +72,7 @@ fun AppNavigation(
                     )
                 }
 
-                composable<Pages.Main> (
+                composable<Main> (
                     enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) { backStackEntry ->
@@ -77,7 +80,7 @@ fun AppNavigation(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
                         onClearSettings = {
-                            navController.navigate(Pages.Greeting) {
+                            navController.navigate(Greeting) {
                                 popUpTo(0)
                             }
                         },

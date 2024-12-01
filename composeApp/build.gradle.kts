@@ -170,6 +170,14 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "MainKt"
+        buildTypes.release {
+            proguard {
+                configurationFiles = files("proguard-rules.pro")
+                isEnabled = true
+                //optimize = true
+                //obfuscate = true
+            }
+        }
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

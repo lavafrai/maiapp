@@ -7,17 +7,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
+import kotlin.jvm.JvmStatic
 
-object Pages {
-    @Serializable
-    object Main
-
-    @Serializable
-    object Greeting
-
-    @Serializable
-    data class Login(val type: LoginType, val target: LoginTarget, val navigateImmediately: Boolean = false)
-}
 
 inline fun <reified T> navTypeOf(
     isNullableAllowed: Boolean = false,

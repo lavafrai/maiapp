@@ -3,9 +3,15 @@
 
 -keep public class * extends java.lang.Exception
 
--keepnames class <1>$$serializer {
-    static <1>$$serializer INSTANCE;
-}
+# -keepnames class <1>$$serializer {
+#     static <1>$$serializer INSTANCE;
+# }
+
+-keep class io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider { *; }
+-keep class io.ktor.serialization.kotlinx.json.KotlinxSerializationJsonExtensionProvider { *; }
+-keep class ru.lavafrai.maiapp.data.settings.ApplicationSettingsData { *; }
+-keep class ru.lavafrai.maiapp.models.** { *; }
+-keepclasseswithmembers class ru.lavafrai.maiapp.navigation.pages.** { *; }
 
 -dontwarn com.google.api.client.http.GenericUrl
 -dontwarn com.google.api.client.http.HttpHeaders

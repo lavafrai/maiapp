@@ -23,7 +23,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig.VERSION_NAME
 import ru.lavafrai.maiapp.fragments.LoginPageButton
-import ru.lavafrai.maiapp.navigation.Pages
 import ru.lavafrai.maiapp.platform.getPlatformName
 import ru.lavafrai.maiapp.theme.MaiColor
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
