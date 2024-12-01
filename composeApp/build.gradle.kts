@@ -140,6 +140,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "maiapp.keystore")
+            keyAlias = System.getenv("ANDROID_KEYSTORE_KEY") ?: "maiapp"
+            keyPassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
+            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

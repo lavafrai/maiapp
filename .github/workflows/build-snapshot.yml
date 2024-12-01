@@ -6,6 +6,12 @@ on:
     pull_request:
         branches: [ "main" ]
 
+env:
+    ANDROID_KEYSTORE: "android.keystore"
+    ANDROID_KEY_ALIAS: ${{ secrets.android_key_alias }}
+    ANDROID_KEY_PASSWORD: ${{ secrets.android_key_password }}
+    ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
+
 
 jobs:
     build_android:
@@ -17,13 +23,17 @@ jobs:
             - name: Allow ro run Gradle
               run: chmod +x gradlew
 
-            - name: Build Signed APK
-              uses: TeamNecta/build-signed-apk@main
+            - name: Decode keystore
+              uses: akiojin/decode-base64-github-action@v0.1.0
               with:
-                  keystore_b64: ${{ secrets.android_keystore_b64 }}
-                  keystore_password: ${{ secrets.android_keystore_password }}
-                  key_alias: ${{ secrets.android_key_alias }}
-                  key_password: ${{ secrets.android_key_password }}
+                  base64: ${{ secrets.android_keystore_base64 }}
+                  output-path: ${{ env.ANDROID_KEYSTORE }}
+
+            - name: Build with Gradle
+              run: ./gradlew :composeApp:assemble
+
+            - name: Rename APK
+              run: mv composeApp/build/outputs/apk/release/*.apk composeApp/build/outputs/apk/release/maiapp-${timestamp}.apk
 
             - name: Upload Android artifact
               uses: actions/upload-artifact@v4
