@@ -16,8 +16,7 @@ fun DayHeader(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxWidth(),
     ) {
         Text("Day: ${day.date}, ${day.dayOfWeek}")
     }

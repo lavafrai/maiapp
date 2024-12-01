@@ -9,13 +9,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.navigation.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.navigation.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.data.settings.getSettings
-import ru.lavafrai.maiapp.navigation.pages.Greeting
-import ru.lavafrai.maiapp.navigation.pages.Login
-import ru.lavafrai.maiapp.navigation.pages.Main
+import ru.lavafrai.maiapp.navigation.pages.GreetingPage
+import ru.lavafrai.maiapp.navigation.pages.LoginPage
+import ru.lavafrai.maiapp.navigation.pages.MainPage
 import ru.lavafrai.maiapp.navigation.rootPages.main.MainPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -34,21 +33,21 @@ fun AppNavigation(
         SharedTransitionLayout {
             NavHost(
                 navController = navController,
-                startDestination = if (settings.hasSelectedGroup()) Main else Greeting,
+                startDestination = if (settings.hasSelectedGroup()) MainPage else GreetingPage,
             ) {
-                composable<Greeting> (
+                composable<GreetingPage> (
                     enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
                 ) { backStackEntry ->
                     GreetingPage(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
-                        onLoginAsStudent = { navController.navigate(Login(LoginType.STUDENT, LoginTarget.ADD_SCHEDULE, true)) },
-                        onLoginAsTeacher = { navController.navigate(Login(LoginType.TEACHER, LoginTarget.ADD_SCHEDULE, true)) },
+                        onLoginAsStudent = { navController.navigate(LoginPage(LoginType.STUDENT, LoginTarget.ADD_SCHEDULE, true)) },
+                        onLoginAsTeacher = { navController.navigate(LoginPage(LoginType.TEACHER, LoginTarget.ADD_SCHEDULE, true)) },
                     )
                 }
 
-                composable<Login> (
+                composable<LoginPage> (
                     typeMap = mapOf(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
                         typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
@@ -56,7 +55,7 @@ fun AppNavigation(
                     enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) { backStackEntry ->
-                    val loginData: Login = backStackEntry.toRoute()
+                    val loginData: LoginPage = backStackEntry.toRoute()
 
                     LoginPage(
                         sharedTransitionScope = this@SharedTransitionLayout,
@@ -64,7 +63,7 @@ fun AppNavigation(
                         onNavigateBack = { navController.navigateUp() },
                         onLoginDone = {
                             navController.popBackStack()
-                            navController.navigate(Main) {
+                            navController.navigate(MainPage) {
                                 popUpTo(0)
                             }
                         },
@@ -72,7 +71,7 @@ fun AppNavigation(
                     )
                 }
 
-                composable<Main> (
+                composable<MainPage> (
                     enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                     exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) { backStackEntry ->
@@ -80,7 +79,7 @@ fun AppNavigation(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
                         onClearSettings = {
-                            navController.navigate(Greeting) {
+                            navController.navigate(GreetingPage) {
                                 popUpTo(0)
                             }
                         },

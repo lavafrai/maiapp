@@ -16,10 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.*
 import maiapp.composeapp.generated.resources.*
@@ -31,7 +29,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
 import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.models.Nameable
-import ru.lavafrai.maiapp.navigation.pages.Login
+import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginPageViewModel
 import soup.compose.material.motion.MaterialFadeThrough
 
@@ -42,7 +40,7 @@ fun LoginPage(
     animatedContentScope: AnimatedContentScope,
     onNavigateBack: () -> Unit,
     onLoginDone: (Nameable) -> Unit,
-    loginData: Login,
+    loginData: LoginPage,
 ) {
     val focusRequester = remember { FocusRequester() }
     var searchQuery by rememberSaveable { mutableStateOf("") }

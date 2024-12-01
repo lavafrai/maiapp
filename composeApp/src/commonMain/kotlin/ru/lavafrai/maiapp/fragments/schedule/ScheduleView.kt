@@ -4,6 +4,7 @@ package ru.lavafrai.maiapp.fragments.schedule
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
@@ -47,10 +49,20 @@ fun ScheduleView(
     ) {
         for (day in filteredLessons) {
             stickyHeader {
-                DayHeader(day = day, modifier = Modifier.background(MaterialTheme.colorScheme.background))
+                DayHeader(
+                    day = day,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(8.dp),
+                )
             }
+
             item {
-                DayView(day = day, modifier = Modifier)
+                DayView(
+                    day = day,
+                    modifier = Modifier
+                        .padding(8.dp),
+                )
             }
         }
     }

@@ -5,4 +5,4 @@ import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
 @Serializable
-data class Login(val type: LoginType, val target: LoginTarget, val navigateImmediately: Boolean = false)
+data class LoginPage(val type: LoginType, val target: LoginTarget, val navigateImmediately: Boolean = false)

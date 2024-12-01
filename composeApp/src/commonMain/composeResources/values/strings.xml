@@ -23,4 +23,10 @@
     <string name="work_type">Тип работы</string>
     <string name="appearance">Внешний вид</string>
     <string name="color_scheme">Цвета</string>
+    <string name="lecture">Лекция</string>
+    <string name="laboratory">Лабораторная</string>
+    <string name="seminar">Семинар</string>
+    <string name="exam">Экзамен</string>
+    <string name="unknown">Неизвестно</string>
+
 </resources>

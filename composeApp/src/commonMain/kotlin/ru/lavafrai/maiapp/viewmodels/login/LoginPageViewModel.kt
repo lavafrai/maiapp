@@ -11,13 +11,13 @@ import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.models.Nameable
-import ru.lavafrai.maiapp.navigation.pages.Login
+import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
 class LoginPageViewModel(
-    val loginData: Login,
+    val loginData: LoginPage,
     val onNavigateBack: () -> Unit,
     val onLoginDone: (Nameable) -> Unit,
 ) : MaiAppViewModel<LoginPageState>(
@@ -114,7 +114,7 @@ class LoginPageViewModel(
     }
 
     class Factory(
-        private val loginData: Login,
+        private val loginData: LoginPage,
         val onNavigateBack: () -> Unit,
         val onLoginDone: (Nameable) -> Unit,
     ): ViewModelProvider.Factory {
