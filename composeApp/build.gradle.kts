@@ -174,8 +174,8 @@ compose.desktop {
             proguard {
                 configurationFiles = files("proguard-rules.pro")
                 isEnabled = true
-                //optimize = true
-                //obfuscate = true
+                optimize = true
+                obfuscate = true
             }
         }
 
