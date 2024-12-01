@@ -19,6 +19,7 @@ internal fun App() = AppTheme {
     val navController = rememberNavController()
     val toaster = rememberToasterState()
     val applicationContext = ApplicationContext(
+        navController = navController,
         panicCleanup = {
             navController.navigate(GreetingPage) { popUpTo(0) }
             getPlatformSettingsStorage().clear()

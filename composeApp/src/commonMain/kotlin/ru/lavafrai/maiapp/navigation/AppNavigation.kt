@@ -11,10 +11,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import ru.lavafrai.maiapp.navigation.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.navigation.rootPages.login.LoginPage
+import ru.lavafrai.maiapp.navigation.rootPages.teacherReviewsPage.TeacherReviewsPage
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.navigation.pages.GreetingPage
 import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.navigation.pages.MainPage
+import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
 import ru.lavafrai.maiapp.navigation.rootPages.main.MainPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -34,11 +36,12 @@ fun AppNavigation(
             NavHost(
                 navController = navController,
                 startDestination = if (settings.hasSelectedGroup()) MainPage else GreetingPage,
+                popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
+                enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
             ) {
-                composable<GreetingPage> (
-                    enterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
-                    exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
-                ) { backStackEntry ->
+                composable<GreetingPage> { backStackEntry ->
                     GreetingPage(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
@@ -52,8 +55,6 @@ fun AppNavigation(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
                         typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
                     ),
-                    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
-                    exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
                 ) { backStackEntry ->
                     val loginData: LoginPage = backStackEntry.toRoute()
 
@@ -71,10 +72,7 @@ fun AppNavigation(
                     )
                 }
 
-                composable<MainPage> (
-                    enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
-                    exitTransition = { slideOutHorizontally(targetOffsetX = { it }) },
-                ) { backStackEntry ->
+                composable<MainPage> { backStackEntry ->
                     MainPage(
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,
@@ -83,6 +81,22 @@ fun AppNavigation(
                                 popUpTo(0)
                             }
                         },
+                    )
+                }
+
+                composable<TeacherReviewsPage>(
+                    typeMap = mapOf(
+                        typeOf<LoginType>() to navTypeOf<LoginType>(),
+                        typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
+                    ),
+                ) { backStackEntry ->
+                    val loginData: TeacherReviewsPage = backStackEntry.toRoute()
+
+                    TeacherReviewsPage(
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
+                        onNavigateBack = { navController.navigateUp() },
+                        teacherId = loginData.teacherId,
                     )
                 }
             }

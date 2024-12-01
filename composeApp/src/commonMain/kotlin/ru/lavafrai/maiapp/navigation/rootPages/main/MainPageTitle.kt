@@ -22,6 +22,7 @@ fun MainPageTitle(
     modifier: Modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
     titleText: @Composable () -> Unit,
     subtitleText: @Composable () -> Unit = { Text("") },
+    leftButton: @Composable () -> Unit = {},
     rightButton: @Composable () -> Unit = {},
     subtitleIcon: @Composable (Dp) -> Unit = {},
 ) {
@@ -34,6 +35,7 @@ fun MainPageTitle(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            leftButton()
             Column(Modifier.weight(1f)) {
                 // Title
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {

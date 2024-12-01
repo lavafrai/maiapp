@@ -28,5 +28,6 @@
     <string name="seminar">Семинар</string>
     <string name="exam">Экзамен</string>
     <string name="unknown">Неизвестно</string>
+    <string name="reviews">Отзывы</string>
 
 </resources>

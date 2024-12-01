@@ -76,6 +76,8 @@ kotlin {
             implementation(libs.composeIcons.featherIcons)
             implementation(libs.windowSize)
             implementation(libs.material.motion)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
             // api(libs.webview) // Does not work on WEB
             implementation(libs.sonner)
             implementation(libs.multiplatform.settings.test)

@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
+import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
@@ -24,6 +25,7 @@ import ru.lavafrai.maiapp.models.time.now
 fun ScheduleView(
     schedule: Schedule,
     dateRange: DateRange? = null,
+    exlerTeachers: List<ExlerTeacher>? = null,
     modifier: Modifier = Modifier,
     selector: (ScheduleDay, Lesson) -> Boolean = { _, _ -> true },
 ) {
@@ -62,6 +64,7 @@ fun ScheduleView(
                     day = day,
                     modifier = Modifier
                         .padding(8.dp),
+                    exlerTeachers = exlerTeachers,
                 )
             }
         }

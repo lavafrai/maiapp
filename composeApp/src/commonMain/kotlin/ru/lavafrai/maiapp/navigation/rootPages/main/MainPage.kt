@@ -74,6 +74,7 @@ fun MainPage(
                         LoadableStatus.Loading -> CircularProgressIndicator()
                         LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> ScheduleView(
                             schedule = viewState.schedule.data!!,
+                            exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = null,
                             modifier = Modifier.fillMaxSize(),
                             selector = remember (viewState.workTypeSelected) {{ _, lesson -> lesson.type in viewState.workTypeSelected }}
@@ -90,6 +91,7 @@ fun MainPage(
                         LoadableStatus.Loading -> CircularProgressIndicator()
                         LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> ScheduleView(
                             schedule = viewState.schedule.data!!,
+                            exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
                         )

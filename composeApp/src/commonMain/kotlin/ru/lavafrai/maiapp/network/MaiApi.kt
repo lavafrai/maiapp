@@ -3,6 +3,8 @@ package ru.lavafrai.maiapp.network
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import ru.lavafrai.maiapp.models.exler.ExlerTeacher
+import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.group.Group
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherId
@@ -22,4 +24,12 @@ class MaiApi(
     suspend fun schedule(name: String): Schedule = httpClient.get {
         url("$baseUrl/api/v1/schedule/$name")
     }.body<Schedule>()
+
+    suspend fun exlerTeachers(): List<ExlerTeacher> = httpClient.get {
+        url("$baseUrl/api/v1/exler-teachers")
+    }.body<List<ExlerTeacher>>()
+
+    suspend fun exlerTeacherInfo(teacherId: String): ExlerTeacherInfo = httpClient.get {
+        url("$baseUrl/api/v1/exler-teacher/$teacherId")
+    }.body<ExlerTeacherInfo>()
 }

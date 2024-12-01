@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
+import ru.lavafrai.maiapp.data.repositories.ExlerRepository
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.models.schedule.LessonType
@@ -26,10 +25,15 @@ class MainPageViewModel(
             LessonType.LABORATORY,
             LessonType.EXAM,
         ),
+        exlerTeachers = Loadable.loading()
     )
 ) {
     val scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
     val scheduleRepository = ScheduleRepository(
+        httpClient = httpClient,
+        baseUrl = API_BASE_URL
+    )
+    val exlerRepository = ExlerRepository(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
     )
@@ -42,17 +46,28 @@ class MainPageViewModel(
         viewModelScope.launch(dispatchers.IO) {
             emit(initialState)
 
-            // Download schedule
+            val scheduleHandler = CoroutineExceptionHandler { _, e ->
+                e.printStackTrace()
+                emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e as Exception)))
+            }
+            val exlerHandler = CoroutineExceptionHandler { _, e ->
+                e.printStackTrace()
+                emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = e as Exception)))
+            }
+
             supervisorScope {
-                try {
+                // Download schedule
+                launch(scheduleHandler) {
                     val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
                     emit(stateValue.copy(schedule = stateValue.schedule.copy(data = cachedSchedule)))
 
                     val schedule = scheduleRepository.getSchedule(scheduleName)
                     emit(stateValue.copy(schedule = Loadable.actual(schedule)))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e)))
+                }
+
+                launch(exlerHandler) {
+                    val exlerTeachers = exlerRepository.getTeachers()
+                    emit(stateValue.copy(exlerTeachers = Loadable.actual(exlerTeachers)))
                 }
             }
         }
