@@ -2,12 +2,17 @@ package ru.lavafrai.maiapp.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
 import ru.lavafrai.maiapp.navigation.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.navigation.rootPages.login.LoginPage
@@ -84,20 +89,26 @@ fun AppNavigation(
                     )
                 }
 
-                composable<TeacherReviewsPage>(
+                dialog<TeacherReviewsPage>(
                     typeMap = mapOf(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
                         typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
                     ),
+                    dialogProperties = DialogProperties(usePlatformDefaultWidth = false),
                 ) { backStackEntry ->
                     val loginData: TeacherReviewsPage = backStackEntry.toRoute()
 
-                    TeacherReviewsPage(
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedContentScope = this@composable,
-                        onNavigateBack = { navController.navigateUp() },
-                        teacherId = loginData.teacherId,
-                    )
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background,
+                    ) {
+                        TeacherReviewsPage(
+                            //sharedTransitionScope = this@SharedTransitionLayout,
+                            //animatedContentScope = this@dialog,
+                            onNavigateBack = { navController.navigateUp() },
+                            teacherId = loginData.teacherId,
+                        )
+                    }
                 }
             }
         }
