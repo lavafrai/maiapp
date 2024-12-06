@@ -82,6 +82,7 @@ kotlin {
             implementation(libs.sonner)
             implementation(libs.multiplatform.settings.test)
             implementation(libs.material.kolor)
+            implementation(libs.richeditor.compose)
             // implementation(libs.haze.materials) // Does not work idk why
 
             // implementation(libs.mai.api) // TODO idk how but i need to import it
@@ -93,6 +94,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.android)
+            implementation(libs.androidx.browser)
         }
 
         iosMain.dependencies {

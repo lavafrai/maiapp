@@ -16,13 +16,6 @@ import io.ktor.client.engine.js.*
 import kotlinx.browser.document
 import ru.lavafrai.maiapp.data.Storage
 
-actual fun getPlatformName(): String {
-    return "Web"
-}
-
-actual fun getPlatformKtorEngine(): HttpClientEngineFactory<*> {
-    return Js
-}
 
 actual fun Modifier.pointerCursor(): Modifier = composed {
     val hovered = remember { mutableStateOf(false) }
@@ -46,10 +39,4 @@ actual fun Modifier.pointerCursor(): Modifier = composed {
     }
 }
 
-actual fun getPlatformDispatchers(): Dispatchers = Dispatchers(
-    IO = kotlinx.coroutines.Dispatchers.Default,
-    Main = kotlinx.coroutines.Dispatchers.Default,
-    Default = kotlinx.coroutines.Dispatchers.Default
-)
-
-actual fun getPlatformSettingsStorage(): Settings = Settings()
+actual fun getPlatform(): Platform = WebPlatform()

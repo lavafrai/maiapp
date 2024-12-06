@@ -2,21 +2,22 @@
 
 package ru.lavafrai.maiapp.viewmodels.teacherReview
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
-import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.*
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import co.touchlab.kermit.Logger
+import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.fragments.AppCard
+import ru.lavafrai.maiapp.fragments.hypertext.Hypertext
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
+import ru.lavafrai.maiapp.platform.getPlatform
+import ru.lavafrai.maiapp.theme.LinkColor
 
 
 data class CarouselItem(
@@ -25,29 +26,36 @@ data class CarouselItem(
 )
 
 @Composable
-fun TeacherReviewsView(
+fun ColumnScope.TeacherReviewsView(
     teacherInfo: ExlerTeacherInfo,
 ) {
-    val items = teacherInfo.photo
+    val openUrl = { url: String ->
+        val platform = getPlatform()
+        val defaultUrl = "https://mai-exler.ru"
+        val fullUrl = if (url.startsWith("http")) url else "$defaultUrl$url"
+        platform.openUrl(fullUrl)
+    }
+    val appContext = LocalApplicationContext.current
+    val photos = teacherInfo.photo
         ?.filter { !it.endsWith("Jeremy-Hillary-Boob-PhD_form-header.png") }
         ?.mapIndexed { index, it -> CarouselItem(index, it) } ?: emptyList()
+    val reviewHypertexts = teacherInfo.reviews
+        .map { it.hypertext ?: "null" }
+        .map { it.replace("\\n", "\n") }
 
-    Column {
-        /*HorizontalUncontainedCarousel(
-            state = rememberCarouselState { items.count() },
-            itemWidth = 200.dp,
-            itemSpacing = 8.dp,
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            modifier = Modifier.fillMaxWidth(),
-        ) { index ->
-            val item = items[index]
-            AsyncImage(
-                model = item.imageUrl,
-                contentDescription = null,
-                modifier = Modifier.height(205.dp).maskClip(MaterialTheme.shapes.extraLarge),
-            )
-        }*/
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .verticalScroll(rememberScrollState()),
+    ) {
+        reviewHypertexts.forEach { reviewHypertext ->
+            AppCard {
+                Hypertext(reviewHypertext)
+            }
+        }
 
-        Text("Loaded!")
+        Box(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }

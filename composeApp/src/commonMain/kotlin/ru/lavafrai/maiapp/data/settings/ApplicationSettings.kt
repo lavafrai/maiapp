@@ -13,7 +13,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import ru.lavafrai.maiapp.platform.getPlatformSettingsStorage
+import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
 
@@ -31,7 +31,7 @@ data class ApplicationSettingsData(
 object ApplicationSettings {
     private val flow = MutableStateFlow(getCurrent())
     private val storage
-        get() = getPlatformSettingsStorage()
+        get() = getPlatform().storage()
     private val mutex = Mutex()
     val state = flow as StateFlow<ApplicationSettingsData>
 

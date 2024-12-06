@@ -89,12 +89,11 @@ fun AppNavigation(
                     )
                 }
 
-                dialog<TeacherReviewsPage>(
+                composable<TeacherReviewsPage>(
                     typeMap = mapOf(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
                         typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
                     ),
-                    dialogProperties = DialogProperties(usePlatformDefaultWidth = false),
                 ) { backStackEntry ->
                     val loginData: TeacherReviewsPage = backStackEntry.toRoute()
 

@@ -16,23 +16,19 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
-import ru.lavafrai.maiapp.platform.getPlatformDispatchers
+import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.ThemeProvider
 
 @Composable
 fun SettingsPage() {
     val settings by rememberSettings()
-    val settingsScope = rememberCoroutineScope()
-    val settingsDispatcher = getPlatformDispatchers().IO
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         SettingsSection(title = stringResource(Res.string.appearance)) {
             ThemeSelectButton { themeId ->
-                settingsScope.launch(settingsDispatcher) {
-                    ApplicationSettings.setTheme(themeId)
-                }
+                ApplicationSettings.setTheme(themeId)
             }
 
             val colorSchemaIds = ThemeProvider.colorSchemas.map { it.readableName() to it.id }.toMap()

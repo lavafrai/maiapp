@@ -10,7 +10,7 @@ import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
 import ru.lavafrai.maiapp.navigation.AppNavigation
 import ru.lavafrai.maiapp.navigation.pages.GreetingPage
-import ru.lavafrai.maiapp.platform.getPlatformSettingsStorage
+import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.AppTheme
 import ru.lavafrai.maiapp.theme.LocalApplicationTheme
 
@@ -22,7 +22,7 @@ internal fun App() = AppTheme {
         navController = navController,
         panicCleanup = {
             navController.navigate(GreetingPage) { popUpTo(0) }
-            getPlatformSettingsStorage().clear()
+            getPlatform().storage().clear()
         },
     )
 
