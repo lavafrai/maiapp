@@ -60,10 +60,10 @@ class MainPageViewModel(
                 launch(scheduleHandler) {
                     val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
                     emit(stateValue.copy(schedule = stateValue.schedule.copy(data = cachedSchedule)))
-
+                }.invokeOnCompletion { launch(scheduleHandler) {
                     val schedule = scheduleRepository.getSchedule(scheduleName)
                     emit(stateValue.copy(schedule = Loadable.actual(schedule)))
-                }
+                }}
 
                 launch(exlerHandler) {
                     val exlerTeachers = exlerRepository.getTeachers()

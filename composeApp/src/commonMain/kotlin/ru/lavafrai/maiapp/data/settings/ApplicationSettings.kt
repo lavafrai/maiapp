@@ -13,6 +13,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
@@ -37,7 +40,8 @@ object ApplicationSettings {
 
     fun getCurrent(): ApplicationSettingsData {
         val settings = try {
-            storage.decodeValueOrNull<ApplicationSettingsData>("settings") ?: ApplicationSettingsData()
+            val settingsSerialized = storage.getStringOrNull("settings") ?: return ApplicationSettingsData()
+            Json.decodeFromString<ApplicationSettingsData>(settingsSerialized)
         } catch (e: Exception) {
             e.printStackTrace()
             ApplicationSettingsData()
@@ -46,8 +50,10 @@ object ApplicationSettings {
         return settings
     }
 
-    fun update(new: ApplicationSettingsData) {
-        storage.encodeValue("settings", new)
+    private fun update(new: ApplicationSettingsData) {
+        //storage.encodeValue("settings", new)
+        val scheduleEncoded = Json.encodeToString(new)
+        storage.putString("settings", scheduleEncoded)
         flow.value = (new)
     }
 

@@ -12,7 +12,7 @@ class JvmPlatform: Platform {
         Main = kotlinx.coroutines.Dispatchers.Default,
         Default = kotlinx.coroutines.Dispatchers.Default,
     )
-    override fun storage(): Settings = Settings()
+    override fun storage(): Settings = DesktopSettings()
     override fun openUrl(url: String) {
         if (!Desktop.isDesktopSupported()) {
             error("Desktop is not supported")

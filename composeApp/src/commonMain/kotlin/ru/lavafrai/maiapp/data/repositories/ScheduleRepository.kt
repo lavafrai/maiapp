@@ -25,7 +25,7 @@ class ScheduleRepository(
     private suspend inline fun <reified T>withCache(key: String, block: suspend () -> @Serializable T): T {
         val data = block()
         val encoded = Json.encodeToString(data)
-        cache.set(key, encoded)
+        cache.putString(key, encoded)
         return data
     }
 
