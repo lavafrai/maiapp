@@ -3,9 +3,9 @@ name: Build Snapshot
 on:
     push:
         branches: [ "master" ]
-    paths:
-        - 'composeApp/**'
-        - 'models/**'
+        paths:
+            - 'composeApp/**'
+            - 'models/**'
 
 env:
     ANDROID_KEYSTORE: "../android.keystore"
