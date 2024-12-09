@@ -1,4 +1,5 @@
 rootProject.name = "maiapp"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
@@ -33,4 +34,6 @@ dependencyResolutionManagement {
         maven("https://jogamp.org/deployment/maven")
     }
 }
+include(":models")
 include(":composeApp")
+include(":server")

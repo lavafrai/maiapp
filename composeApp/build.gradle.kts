@@ -50,6 +50,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.models)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -131,11 +132,11 @@ kotlin {
 
 android {
     namespace = "ru.lavafrai.maiapp"
-    compileSdk = 34
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 35
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
 
         applicationId = "ru.lavafrai.maiapp"
         versionCode = 1

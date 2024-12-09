@@ -1,15 +1,15 @@
 [versions]
 
+kotlin = "2.0.21"
+agp = "8.5.2"
 coilCompose = "3.0.4"
 hazeMaterials = "1.0.2"
-kotlin = "2.0.21"
 compose = "1.7.0"
-agp = "8.6.0-alpha07"
 androidx-activityCompose = "1.9.3"
-androidx-uiTest = "1.7.4"
+androidx-uiTest = "1.7.5"
 kermit = "2.0.4"
 kotlinx-coroutines = "1.9.0"
-ktor = "3.0.1"
+ktor = "3.0.2"
 androidx-lifecycle = "2.8.3"
 androidx-navigation = "2.8.0-alpha10"
 kotlinx-serialization = "1.7.3"
@@ -20,14 +20,18 @@ kotlinx-datetime = "0.6.1"
 kstore = "0.9.0"
 composeIcons = "1.1.1"
 buildconfig = "5.5.0"
-# maiapi = "v2.0.10"
 richeditorCompose = "1.0.0-rc10"
 sonner = "0.3.8"
 windowSize = "0.5.0"
 webview = "1.9.20"
 material-motion = "2.0.1"
 uiAndroid = "1.7.5"
-androidx-browser = "1.5.0"
+androidx-browser = "1.8.0"
+
+android-compileSdk = "34"
+android-minSdk = "21"
+android-targetSdk = "53"
+
 
 [libraries]
 
@@ -59,6 +63,9 @@ androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navi
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatformSettings" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
@@ -82,5 +89,7 @@ multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotl
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
