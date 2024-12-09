@@ -4,14 +4,11 @@ package ru.lavafrai.maiapp.data.repositories
 
 import com.russhwolf.settings.set
 import io.ktor.client.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
-import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.platform.getPlatform
 

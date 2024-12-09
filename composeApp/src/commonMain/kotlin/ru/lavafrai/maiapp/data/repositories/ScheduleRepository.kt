@@ -2,7 +2,6 @@
 
 package ru.lavafrai.maiapp.data.repositories
 
-import com.russhwolf.settings.set
 import io.ktor.client.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable

@@ -11,10 +11,6 @@ import androidx.compose.ui.draw.alpha
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.CloudOff
 import compose.icons.feathericons.DownloadCloud
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.schedule
-import maiapp.composeapp.generated.resources.select_week
-import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.rememberSettings

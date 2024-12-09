@@ -2,7 +2,6 @@ package ru.lavafrai.maiapp.viewmodels.main
 
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
-import ru.lavafrai.maiapp.models.exler.ExlerTeacherReview
 import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.time.DateRange

@@ -17,7 +17,9 @@ application {
 
 dependencies {
     implementation(projects.models)
+    implementation(projects.shared)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.cio)
-    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.serialization)
+    implementation(libs.ktor.server.serialization.json)
 }

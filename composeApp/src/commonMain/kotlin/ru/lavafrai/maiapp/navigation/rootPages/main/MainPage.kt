@@ -9,21 +9,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.lifecycle.viewmodel.compose.viewModel
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.CloudOff
-import compose.icons.feathericons.DownloadCloud
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.ErrorView
-import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
-import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
-import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.navigation.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 

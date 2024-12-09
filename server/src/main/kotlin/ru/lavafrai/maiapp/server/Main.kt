@@ -1,9 +1,21 @@
 package ru.lavafrai.maiapp.server
 
-import ru.lavafrai.maiapp.models.schedule.TeacherId
+import io.ktor.server.application.*
+import io.ktor.server.cio.*
+import io.ktor.server.engine.*
+import ru.lavafrai.maiapp.server.modules.configureRouting
+import ru.lavafrai.maiapp.server.modules.configureSerialization
 
 
 fun main() {
-    val a = TeacherId(name = "a", uid = "")
-    println("Hello, world!")
+    embeddedServer(
+        CIO,
+        port = 80,
+        module = Application::module
+    ).start(wait = true)
+}
+
+fun Application.module() {
+    configureRouting()
+    configureSerialization()
 }

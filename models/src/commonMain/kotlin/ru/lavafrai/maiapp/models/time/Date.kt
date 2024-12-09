@@ -1,7 +1,6 @@
 package ru.lavafrai.maiapp.models.time
 
 import kotlinx.datetime.*
-import kotlin.time.Duration.Companion.days
 
 fun LocalDate.Companion.now(): LocalDate {
     val clock: Clock = Clock.System
