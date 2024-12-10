@@ -47,7 +47,6 @@ fun LoginPage(
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     val viewModel: LoginPageViewModel = viewModel(factory = LoginPageViewModel.Factory(loginData, onNavigateBack, onLoginDone))
     val viewState by viewModel.state.collectAsState()
-    val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(viewState.neededLoadable.baseStatus) {
         if (viewState.neededLoadable.baseStatus == BaseLoadableStatus.Actual) {
@@ -113,9 +112,7 @@ fun LoginPage(
                     expanded = isExpanded,
                     onExpandedChange = { isExpanded = it },
                 ) {
-                    LazyColumn(
-
-                    ) {
+                    LazyColumn {
                         items(viewState.filteredData) {
                             ListItem(
                                 headlineContent = { Text(it.name) },

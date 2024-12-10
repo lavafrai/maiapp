@@ -29,7 +29,7 @@ fun ScheduleView(
     modifier: Modifier = Modifier,
     selector: (ScheduleDay, Lesson) -> Boolean = { _, _ -> true },
 ) {
-    val filteredDays = remember(dateRange) { schedule.days.filter { if (dateRange == null) true else it.date!! in dateRange } }
+    val filteredDays = remember(dateRange) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
     val filteredLessons = remember(dateRange, selector) {
         filteredDays.map { day -> day.copy(lessons=day.lessons.filter { selector(day, it) }) }.filter { it.lessons.isNotEmpty() }
     }
@@ -37,7 +37,7 @@ fun ScheduleView(
 
     LaunchedEffect(dateRange) {
         if (dateRange == null) {
-            val index = filteredLessons.indexOfFirst { it.date!! >= LocalDate.now() }
+            val index = filteredLessons.indexOfFirst { it.date >= LocalDate.now() }
             lazyColumnState.scrollToItem(index * 2)
             return@LaunchedEffect
         }

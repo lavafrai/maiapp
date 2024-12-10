@@ -2,8 +2,6 @@
 
 package ru.lavafrai.maiapp.navigation.rootPages.main
 
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.with
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -18,7 +16,8 @@ import compose.icons.feathericons.Award
 import compose.icons.feathericons.Home
 import compose.icons.feathericons.Settings
 import soup.compose.material.motion.MaterialMotion
-import soup.compose.material.motion.animation.*
+import soup.compose.material.motion.animation.materialSharedAxisX
+import soup.compose.material.motion.animation.rememberSlideDistance
 
 val mainNavigationItems = listOf(
     MainNavigationItem(

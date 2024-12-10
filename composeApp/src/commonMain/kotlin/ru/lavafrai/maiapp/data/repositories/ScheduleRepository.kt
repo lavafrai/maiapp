@@ -21,7 +21,7 @@ class ScheduleRepository(
     suspend fun getSchedule(name: String) = withCache("schedule:$name") { api.schedule(name) }
     suspend fun getScheduleFromCacheOrNull(name: String) = fromCache<Schedule>("schedule:$name")
 
-    private suspend inline fun <reified T>withCache(key: String, block: suspend () -> @Serializable T): T {
+    private suspend inline fun <reified T>withCache(key: String, block: () -> @Serializable T): T {
         val data = block()
         val encoded = Json.encodeToString(data)
         cache.putString(key, encoded)
@@ -31,7 +31,7 @@ class ScheduleRepository(
     private suspend inline fun <reified T> fromCache(key: String): T? {
         val encoded = cache.getStringOrNull(key)
         val data = if (encoded != null) try {
-            Json.decodeFromString<T>(encoded!!)
+            Json.decodeFromString<T>(encoded)
         } catch (e: Exception) {
             null
         } else null

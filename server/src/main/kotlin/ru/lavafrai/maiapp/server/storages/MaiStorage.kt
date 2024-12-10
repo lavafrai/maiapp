@@ -1,5 +1,3 @@
 package ru.lavafrai.maiapp.server.storages
 
-class MaiStorage {
-
-}
+class MaiStorage

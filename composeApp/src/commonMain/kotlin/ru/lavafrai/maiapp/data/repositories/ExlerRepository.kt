@@ -23,7 +23,7 @@ class ExlerRepository(
     fun getTeachersFromCacheOrNull() = fromCache<List<ExlerTeacher>>("exler-teachers")
     suspend fun getTeacherInfo(teacherId: String) = api.exlerTeacherInfo(teacherId)
 
-    private suspend inline fun <reified T>withCache(key: String, block: suspend () -> @Serializable T): T {
+    private suspend inline fun <reified T>withCache(key: String, block: () -> @Serializable T): T {
         val data = block()
         val encoded = Json.encodeToString(data)
         cache.set(key, encoded)
@@ -33,7 +33,7 @@ class ExlerRepository(
     private inline fun <reified T> fromCache(key: String): T? {
         val encoded = cache.getStringOrNull(key)
         val data = if (encoded != null) try {
-            Json.decodeFromString<T>(encoded!!)
+            Json.decodeFromString<T>(encoded)
         } catch (e: Exception) {
             null
         } else null

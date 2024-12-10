@@ -16,10 +16,10 @@ internal fun AppTheme(
     val settings by rememberSettings()
     val themeProvider = ThemeProvider
 
-    val themeId = settings.theme ?: themeProvider.defaultTheme.id
-    val colorSchemaId = settings.colorSchema ?: themeProvider.defaultColorSchema.id
+    val themeId = settings.theme
+    val colorSchemaId = settings.colorSchema
 
-    val theme = themeProvider.findThemeById(themeId) ?: themeProvider.defaultTheme
+    val theme = themeProvider.findThemeById(themeId)
     val colorSchema = themeProvider.colorSchemas.find { it.id == colorSchemaId } ?: themeProvider.defaultColorSchema
 
     CompositionLocalProvider(LocalApplicationTheme provides mutableStateOf(theme)) {

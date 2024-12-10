@@ -3,7 +3,7 @@ package ru.lavafrai.maiapp.platform
 import com.russhwolf.settings.Settings
 import java.io.File
 
-class DesktopSettings() : Settings {
+class DesktopSettings : Settings {
     init {
         prepareEnvironment()
     }

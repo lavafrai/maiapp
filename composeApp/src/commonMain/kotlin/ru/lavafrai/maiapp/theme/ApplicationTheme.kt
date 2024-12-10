@@ -3,12 +3,12 @@ package ru.lavafrai.maiapp.theme
 import androidx.compose.runtime.Composable
 
 interface ApplicationTheme {
-    abstract val id: String
-    abstract val readableName: @Composable () -> String
+    val id: String
+    val readableName: @Composable () -> String
 
     @Composable
-    abstract fun isDark(): Boolean
+    fun isDark(): Boolean
 
     @Composable
-    abstract fun isAmoled(): Boolean
+    fun isAmoled(): Boolean
 }
