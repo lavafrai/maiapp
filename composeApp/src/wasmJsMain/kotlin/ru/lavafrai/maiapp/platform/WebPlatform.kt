@@ -3,7 +3,6 @@ package ru.lavafrai.maiapp.platform
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.js.*
 import kotlinx.browser.document
-import org.w3c.dom.Document
 
 class WebPlatform: Platform {
     override fun name() = "Web"

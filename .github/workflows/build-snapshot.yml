@@ -6,6 +6,7 @@ on:
         paths:
             - 'composeApp/**'
             - 'models/**'
+            - 'shared/**'
 
 env:
     ANDROID_KEYSTORE: "../android.keystore"

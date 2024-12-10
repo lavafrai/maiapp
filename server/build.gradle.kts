@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinx.serialization)
     application
 }
 
@@ -12,14 +13,20 @@ repositories {
 
 application {
     mainClass.set("ru.lavafrai.maiapp.server.MainKt")
-    //applicationDefaultJvmArgs = listOf("-Dio.ktor.development=${extra["io.ktor.development"] ?: "false"}")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }
 
 dependencies {
+    implementation(projects.network.mai)
     implementation(projects.models)
     implementation(projects.shared)
+    implementation(projects.network.mai)
     implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.cio)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.ktor.logback.classic)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.caching)
     implementation(libs.ktor.server.serialization)
     implementation(libs.ktor.server.serialization.json)
+    implementation(libs.ktor.client.core)
 }

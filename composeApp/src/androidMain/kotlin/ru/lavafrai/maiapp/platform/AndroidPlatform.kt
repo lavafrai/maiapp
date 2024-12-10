@@ -3,7 +3,6 @@ package ru.lavafrai.maiapp.platform
 import ru.lavafrai.maiapp.AndroidApplication
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.ui.platform.UriHandler
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.cio.*
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.platform.AndroidChromeView

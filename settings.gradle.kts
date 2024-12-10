@@ -20,9 +20,10 @@ plugins {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositories {
         google {
-            content { 
+            content {
               	includeGroupByRegex("com\\.android.*")
               	includeGroupByRegex("com\\.google.*")
               	includeGroupByRegex("androidx.*")
@@ -36,5 +37,6 @@ dependencyResolutionManagement {
 }
 include(":models")
 include(":shared")
+include(":network:mai")
 include(":composeApp")
 include(":server")

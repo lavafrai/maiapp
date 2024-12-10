@@ -1,6 +1,6 @@
 [versions]
 
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 agp = "8.5.2"
 coilCompose = "3.0.4"
 compose = "1.7.0"
@@ -16,6 +16,7 @@ materialKolor = "2.0.0"
 multiplatformSettings = "1.2.0"
 kotlinx-datetime = "0.6.1"
 kstore = "0.9.0"
+kotlincrypto = "0.5.3"
 composeIcons = "1.1.1"
 buildconfig = "5.5.0"
 richeditorCompose = "1.0.0-rc10"
@@ -24,6 +25,7 @@ windowSize = "0.5.0"
 material-motion = "2.0.1"
 uiAndroid = "1.7.5"
 androidx-browser = "1.8.0"
+logback-classic = "1.5.11"
 
 android-compileSdk = "34"
 android-minSdk = "21"
@@ -33,6 +35,8 @@ android-targetSdk = "53"
 [libraries]
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+kotlincrypto = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
+kotlincrypto-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
@@ -68,10 +72,11 @@ windowSize = { module = "dev.chrisbanes.material3:material3-window-size-class-mu
 material-motion = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "material-motion" }
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "androidx-browser" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic" }
 ktor-server-serialization = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-caching = { module = "io.ktor:ktor-server-caching-headers", version.ref = "ktor" }
 
 [plugins]
 

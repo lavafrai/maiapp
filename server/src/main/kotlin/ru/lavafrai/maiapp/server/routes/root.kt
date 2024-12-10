@@ -5,6 +5,6 @@ import io.ktor.server.routing.*
 
 fun Route.root() {
     get("/") {
-        call.respondText("Hello, world!")
+        call.respond("Hello, world!\nIt's MAI app server!")
     }
 }

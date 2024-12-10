@@ -1,3 +1,5 @@
+package ru.lavafrai.maiapp
+
 import kotlinx.serialization.json.Json
 
 object JsonProvider {

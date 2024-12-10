@@ -8,7 +8,7 @@ import ru.lavafrai.maiapp.models.time.DayOfWeek
 
 @Serializable
 data class ScheduleDay(
-    @SerialName("date") @Serializable(LocalDateComponentSerializer::class) val date: LocalDate? = null,
+    @SerialName("date") @Serializable(LocalDateComponentSerializer::class) val date: LocalDate,
     @SerialName("day") val dayOfWeek: DayOfWeek,
     @SerialName("lessons") val lessons: List<Lesson>
 )
