@@ -1,0 +1,10 @@
+FROM amazoncorretto:17-alpine3.17
+
+COPY . /opt/app/
+WORKDIR /opt/app
+
+RUN chmod +x gradlew
+RUN ./gradlew --warning-mode all :server:buildFatJar
+
+WORKDIR /opt/app
+CMD java -jar server/build/libs/server-all.jar
