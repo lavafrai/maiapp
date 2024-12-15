@@ -17,4 +17,4 @@ jobs:
                   version: latest
 
             - name: Build with Xcode
-              run: xcodebuild -workspace maiapp.xcworkspace -scheme maiapp -destination 'platform=iOS Simulator,name=iPhone 13' build
+              run: xcodebuild build -workspace iosApp/iosApp.xcworkspace -scheme iosApp -sdk iphoneos -destination name='iPhone 14' -verbose
