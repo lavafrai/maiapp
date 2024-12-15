@@ -17,4 +17,4 @@ jobs:
                   version: latest
 
             - name: Build with Xcode
-              run: xcodebuild build -workspace iosApp/iosApp.xcworkspace -scheme iosApp -sdk iphoneos -destination name='iPhone 14' -verbose
+              run: xcodebuild build -workspace iosApp/iosApp.xcodeproj/iosApp.xcworkspace -scheme iosApp -sdk iphoneos -destination name='iPhone 14' -verbose
