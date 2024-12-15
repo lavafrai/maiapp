@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
+import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
@@ -45,27 +46,29 @@ fun ScheduleView(
         else lazyColumnState.scrollToItem(0)
     }
 
-    LazyColumn(
-        modifier = modifier,
-        state = lazyColumnState,
-    ) {
-        for (day in filteredLessons) {
-            stickyHeader {
-                DayHeader(
-                    day = day,
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(8.dp),
-                )
-            }
+    PageColumn(scroll = false, paddings = false) {
+        LazyColumn(
+            modifier = modifier,
+            state = lazyColumnState,
+        ) {
+            for (day in filteredLessons) {
+                stickyHeader {
+                    DayHeader(
+                        day = day,
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(vertical = 8.dp),
+                    )
+                }
 
-            item {
-                DayView(
-                    day = day,
-                    modifier = Modifier
-                        .padding(8.dp),
-                    exlerTeachers = exlerTeachers,
-                )
+                item {
+                    DayView(
+                        day = day,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp),
+                        exlerTeachers = exlerTeachers,
+                    )
+                }
             }
         }
     }

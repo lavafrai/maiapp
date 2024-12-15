@@ -41,11 +41,6 @@ fun LessonView(
                     style = MaterialTheme.typography.titleMedium.copy(lineHeight = 1.2.em, fontSize = 17.sp, fontWeight = FontWeight.Medium),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    lesson.timeRange,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                )
 
                 lesson.lectors.forEach {
                     val areOnExler = remember(exlerTeachers) { exlerTeachers?.any { exler -> exler.name == it.name } ?: false }
@@ -56,18 +51,29 @@ fun LessonView(
                         modifier = Modifier.conditional(areOnExler) { clickable { appContext.openTeacherReviews(it.name) } }
                     )
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    lesson.timeRange,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                )
             }
         }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 16.dp)
+                .height(32.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(lesson.rooms.joinToString(separator = "/") { it.name }, style = MaterialTheme.typography.bodySmall)
-            AssistChip(onClick = {}, label = { Text(lesson.type.localized().uppercase()) })
+
+            SuggestionChip(
+                onClick = {},
+                label = { Text(lesson.type.localized().uppercase()) },
+                //modifier = Modifier.padding(end = 8.dp)
+            )
         }
     }
 }

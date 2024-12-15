@@ -2,22 +2,23 @@
 
 package ru.lavafrai.maiapp.navigation.rootPages.settings
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import ru.lavafrai.maiapp.fragments.settings.SettingsDropdownLabel
 
 @Composable
-fun SettingsDropdownItem(
+fun <T>SettingsDropdownItem(
     title: String,
-    items: List<String>,
-    selected: String,
-    onItemSelected: (String) -> Unit,
+    items: List<T>,
+    itemContent: @Composable RowScope.(T) -> Unit,
+    selected: T,
+    selectedContent: @Composable RowScope.(T) -> Unit = itemContent,
+    onItemSelected: (T) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -26,20 +27,22 @@ fun SettingsDropdownItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
     ) {
-        Text(title)
+        Text(text=title, modifier = Modifier.weight(1f), fontSize = 18.sp)
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
                 expanded = !expanded
             },
+            modifier = Modifier
         ) {
-            DropdownLabel(
-                selected = selected,
+            SettingsDropdownLabel(
+                selected = { selectedContent(selected) },
                 expanded = expanded,
                 onExpandedChanged = {
-                    expanded = true
+                    expanded = it
                 },
-                modifier = Modifier.menuAnchor(type = MenuAnchorType.SecondaryEditable),
+                modifier = Modifier
+                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
             )
 
             ExposedDropdownMenu(
@@ -47,10 +50,19 @@ fun SettingsDropdownItem(
                 onDismissRequest = {
                     expanded = false
                 },
+                modifier = Modifier.width(IntrinsicSize.Min),
             ) {
                 items.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(item) },
+                        text = {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                itemContent(item)
+                            }
+                        },
                         onClick = {
                             onItemSelected(item)
                             expanded = false

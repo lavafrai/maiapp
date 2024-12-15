@@ -29,5 +29,48 @@
     <string name="exam">Экзамен</string>
     <string name="unknown">Неизвестно</string>
     <string name="reviews">Отзывы</string>
+    <string name="default_color_scheme">Стандартные</string>
+    <string name="classic_color_scheme">Классические</string>
 
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+
+    <string name="monday_short">Пн</string>
+    <string name="tuesday_short">Вт</string>
+    <string name="wednesday_short">Ср</string>
+    <string name="thursday_short">Чт</string>
+    <string name="friday_short">Пт</string>
+    <string name="saturday_short">Сб</string>
+    <string name="sunday_short">Вс</string>
+
+    <string name="january">Январь</string>
+    <string name="february">Февраль</string>
+    <string name="march">Март</string>
+    <string name="april">Апрель</string>
+    <string name="may">Май</string>
+    <string name="june">Июнь</string>
+    <string name="july">Июль</string>
+    <string name="august">Август</string>
+    <string name="september">Сентябрь</string>
+    <string name="october">Октябрь</string>
+    <string name="november">Ноябрь</string>
+    <string name="december">Декабрь</string>
+
+    <string name="january_genitive">Января</string>
+    <string name="february_genitive">Февраля</string>
+    <string name="march_genitive">Марта</string>
+    <string name="april_genitive">Апреля</string>
+    <string name="may_genitive">Мая</string>
+    <string name="june_genitive">Июня</string>
+    <string name="july_genitive">Июля</string>
+    <string name="august_genitive">Августа</string>
+    <string name="september_genitive">Сентября</string>
+    <string name="october_genitive">Октября</string>
+    <string name="november_genitive">Ноября</string>
+    <string name="december_genitive">Декабря</string>
 </resources>

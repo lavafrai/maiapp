@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -25,8 +24,6 @@ import ru.lavafrai.maiapp.BuildConfig.VERSION_NAME
 import ru.lavafrai.maiapp.fragments.LoginPageButton
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.MaiColor
-import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
-import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
 @Composable
 fun GreetingPage(
@@ -79,7 +76,7 @@ fun GreetingPage(
 
             Box {
                 Text(
-                    "MAI app by. lava_frai\nBuild: $VERSION_NAME@${getPlatform().storage()}",
+                    "MAI app by. lava_frai\nBuild: $VERSION_NAME@${getPlatform().name()}",
                     modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
                     color = Color.White.copy(alpha = .4f),
                     style = MaterialTheme.typography.bodySmall,

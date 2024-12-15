@@ -18,6 +18,7 @@ application {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.guava)
     implementation(projects.network.mai)
     implementation(projects.models)
     implementation(projects.shared)
