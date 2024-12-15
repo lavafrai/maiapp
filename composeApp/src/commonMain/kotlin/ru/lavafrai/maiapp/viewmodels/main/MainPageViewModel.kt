@@ -28,12 +28,12 @@ class MainPageViewModel(
         exlerTeachers = Loadable.loading()
     )
 ) {
-    val scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
-    val scheduleRepository = ScheduleRepository(
+    private val scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
+    private val scheduleRepository = ScheduleRepository(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
     )
-    val exlerRepository = ExlerRepository(
+    private val exlerRepository = ExlerRepository(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
     )

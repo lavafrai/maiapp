@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -34,7 +35,7 @@ fun ScheduleView(
     val filteredLessons = remember(dateRange, selector) {
         filteredDays.map { day -> day.copy(lessons=day.lessons.filter { selector(day, it) }) }.filter { it.lessons.isNotEmpty() }
     }
-    val lazyColumnState = rememberLazyListState()
+    val lazyColumnState: LazyListState = rememberLazyListState()
 
     LaunchedEffect(dateRange) {
         if (dateRange == null || dateRange.isNow()) {
@@ -49,7 +50,7 @@ fun ScheduleView(
         else lazyColumnState.scrollToItem(0)
     }
 
-    PageColumn(scroll = false, paddings = false) {
+    PageColumn(scrollState = null) {
         LazyColumn(
             modifier = modifier,
             state = lazyColumnState,

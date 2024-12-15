@@ -33,6 +33,9 @@
     <string name="classic_color_scheme">Классические</string>
     <string name="today">Сегодня</string>
     <string name="tomorrow">Завтра</string>
+    <string name="author">Автор</string>
+    <string name="publishTime">Опубликовано</string>
+    <string name="source">Источник</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>
