@@ -1,0 +1,20 @@
+name: Build iOS
+
+on:
+    workflow_dispatch:
+
+
+jobs:
+    build_ios:
+        name: Build iOS
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up cocoapods
+              uses: maxim-lobanov/setup-cocoapods@v1
+              with:
+                  version: latest
+
+            - name: Build with Xcode
+              run: xcodebuild -workspace maiapp.xcworkspace -scheme maiapp -destination 'platform=iOS Simulator,name=iPhone 13' build
