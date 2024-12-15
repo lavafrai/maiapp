@@ -11,4 +11,8 @@ data class ScheduleDay(
     @SerialName("date") @Serializable(LocalDateComponentSerializer::class) val date: LocalDate,
     @SerialName("day") val dayOfWeek: DayOfWeek,
     @SerialName("lessons") val lessons: List<Lesson>
-)
+) {
+    fun isFinished(): Boolean {
+        return lessons.all { it.isFinished() }
+    }
+}

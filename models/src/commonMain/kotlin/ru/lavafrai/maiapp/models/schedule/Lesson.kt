@@ -1,10 +1,13 @@
 package ru.lavafrai.maiapp.models.schedule
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.serializers.LocalDateComponentSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.time.Time
+import ru.lavafrai.maiapp.models.time.now
 
 @Serializable
 data class Lesson(
@@ -35,5 +38,11 @@ data class Lesson(
 
     fun getUid(): Int {
         return "$name $day ${getPairNumber()}".hashCode()
+    }
+
+    fun isFinished(): Boolean {
+        if (day > LocalDate.now()) return false
+        if (day < LocalDate.now()) return true
+        return timeEnd.toLocalTime() < LocalTime.now()
     }
 }

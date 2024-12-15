@@ -31,6 +31,8 @@
     <string name="reviews">Отзывы</string>
     <string name="default_color_scheme">Стандартные</string>
     <string name="classic_color_scheme">Классические</string>
+    <string name="today">Сегодня</string>
+    <string name="tomorrow">Завтра</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

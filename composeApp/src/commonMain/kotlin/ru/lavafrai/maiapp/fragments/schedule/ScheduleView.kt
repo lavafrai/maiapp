@@ -37,12 +37,15 @@ fun ScheduleView(
     val lazyColumnState = rememberLazyListState()
 
     LaunchedEffect(dateRange) {
-        if (dateRange == null) {
-            val index = filteredLessons.indexOfFirst { it.date >= LocalDate.now() }
+        if (dateRange == null || dateRange.isNow()) {
+            val pairsFinishedToday = filteredLessons.find { it.date == LocalDate.now() }?.isFinished() ?: false
+            var index = filteredLessons.indexOfFirst { it.date >= LocalDate.now() } + if (pairsFinishedToday) 1 else 0
+            if (index == -1) index = filteredLessons.size - 1
+
             lazyColumnState.scrollToItem(index * 2)
             return@LaunchedEffect
         }
-        if (dateRange.isNow()) lazyColumnState.scrollToItem((LocalDate.now().dayOfWeek.ordinal) * 2)
+
         else lazyColumnState.scrollToItem(0)
     }
 
