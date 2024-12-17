@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.teacherReviewsPage
+package ru.lavafrai.maiapp.rootPages.teacherReviewsPage
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -27,7 +27,7 @@ import maiapp.composeapp.generated.resources.reviews
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
 import ru.lavafrai.maiapp.fragments.ErrorView
-import ru.lavafrai.maiapp.navigation.rootPages.main.MainPageTitle
+import ru.lavafrai.maiapp.rootPages.main.MainPageTitle
 import ru.lavafrai.maiapp.viewmodels.teacherReview.TeacherReviewViewModel
 import ru.lavafrai.maiapp.viewmodels.teacherReview.TeacherReviewsView
 

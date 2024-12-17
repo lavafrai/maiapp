@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.main
+package ru.lavafrai.maiapp.rootPages.main
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

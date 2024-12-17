@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.login
+package ru.lavafrai.maiapp.rootPages.login
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi

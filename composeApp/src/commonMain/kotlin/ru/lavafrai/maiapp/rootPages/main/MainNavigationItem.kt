@@ -1,4 +1,4 @@
-package ru.lavafrai.maiapp.navigation.rootPages.main
+package ru.lavafrai.maiapp.rootPages.main
 
 import androidx.compose.runtime.Composable
 

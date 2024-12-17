@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.settings
+package ru.lavafrai.maiapp.rootPages.settings
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.border

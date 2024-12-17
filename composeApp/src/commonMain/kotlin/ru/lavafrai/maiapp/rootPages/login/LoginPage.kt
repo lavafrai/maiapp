@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.login
+package ru.lavafrai.maiapp.rootPages.login
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState

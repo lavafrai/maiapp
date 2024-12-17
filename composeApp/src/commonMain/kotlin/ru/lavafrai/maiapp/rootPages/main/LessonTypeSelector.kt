@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.main
+package ru.lavafrai.maiapp.rootPages.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets

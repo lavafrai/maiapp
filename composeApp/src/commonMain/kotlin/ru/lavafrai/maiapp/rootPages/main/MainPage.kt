@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalSharedTransitionApi::class)
 
-package ru.lavafrai.maiapp.navigation.rootPages.main
+package ru.lavafrai.maiapp.rootPages.main
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -17,7 +17,7 @@ import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
-import ru.lavafrai.maiapp.navigation.rootPages.settings.SettingsPage
+import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
 @Composable
