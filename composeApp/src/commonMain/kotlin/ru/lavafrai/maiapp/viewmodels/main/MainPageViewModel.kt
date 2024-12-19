@@ -16,7 +16,8 @@ import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
 class MainPageViewModel(
-    val onClearSettings: () -> Unit
+    val onClearSettings: () -> Unit,
+    val onShowUpdateInfo: () -> Unit,
 ) : MaiAppViewModel<MainPageState>(
     initialState = MainPageState(
         schedule = Loadable.loading(),
@@ -100,12 +101,22 @@ class MainPageViewModel(
         }
     }
 
+    fun onVersionUpdated(
+        lastVersion: String?,
+        currentVersion: String,
+        onSuccessShown: () -> Unit,
+    ) {
+        onShowUpdateInfo()
+    }
+
     class Factory(
-        private val onClearSettings: () -> Unit
+        private val onClearSettings: () -> Unit,
+        private val onShowUpdateInfo: () -> Unit,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
             return MainPageViewModel(
                 onClearSettings = onClearSettings,
+                onShowUpdateInfo = onShowUpdateInfo,
             ) as T
         }
     }

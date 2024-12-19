@@ -1,5 +1,7 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import java.util.Date
+import java.text.SimpleDateFormat
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
@@ -12,7 +14,8 @@ plugins {
     alias(libs.plugins.buildconfig)
 }
 
-val version = "1.0.0"
+val nowStamp: String = SimpleDateFormat("MM-dd-yyyy_HH-mm").format(Date())
+val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "nonrelease-$nowStamp"
 
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
@@ -186,9 +189,10 @@ compose.desktop {
         }
 
         nativeDistributions {
+            val nativeVersion = if (version.startsWith("nonrelease")) "1.0.0" else version
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "maiapp"
-            packageVersion = version
+            packageVersion = nativeVersion
 
             linux {
                 iconFile.set(project.file("desktopAppIcons/LinuxIcon.png"))
@@ -197,8 +201,8 @@ compose.desktop {
             windows {
                 iconFile.set(project.file("desktopAppIcons/WindowsIcon.ico"))
                 shortcut = true
-                msiPackageVersion = version
-                exePackageVersion = version
+                msiPackageVersion = nativeVersion
+                exePackageVersion = nativeVersion
                 menu = true
                 menuGroup = "maiapp"
                 menu = true

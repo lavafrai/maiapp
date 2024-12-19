@@ -13,9 +13,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.data.LoadableStatus
+import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.ErrorView
+import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
@@ -26,15 +29,21 @@ fun MainPage(
     animatedContentScope: AnimatedContentScope,
     onClearSettings: () -> Unit,
 ) {
+    var weekSelectorExpanded by remember { mutableStateOf(false) }
+    var workTypeSelectorExpanded by remember { mutableStateOf(false) }
+    var updateInfoExpanded by remember { mutableStateOf(false) }
     val settings by rememberSettings()
+
     val viewModel: MainPageViewModel = viewModel(
         factory = MainPageViewModel.Factory(
             onClearSettings = onClearSettings,
+            onShowUpdateInfo = {
+                updateInfoExpanded = true
+            },
         )
     )
+
     val viewState by viewModel.state.collectAsState()
-    var weekSelectorExpanded by remember { mutableStateOf(false) }
-    var workTypeSelectorExpanded by remember { mutableStateOf(false) }
 
     Column {
         MainPageNavigation(
@@ -100,6 +109,22 @@ fun MainPage(
                 }
             }
         }
+    }
+
+    if (updateInfoExpanded) {
+        UpdateInfoDialog(
+            lastVersion = VersionInfo.lastVersion,
+            currentVersion = VersionInfo.currentVersion,
+            onDismissRequest = { updateInfoExpanded = false ; VersionInfo.updateLastVersion() },
+            onOkay = { updateInfoExpanded = false ; VersionInfo.updateLastVersion() },
+        )
+    }
+
+    if (VersionInfo.hasBeenUpdated()) {
+        val lastVersion = VersionInfo.lastVersion
+        val currentVersion = VersionInfo.currentVersion
+
+        viewModel.onVersionUpdated(lastVersion, currentVersion, { updateInfoExpanded = true })
     }
 
     if (viewState.schedule.hasData()) WeekSelector(

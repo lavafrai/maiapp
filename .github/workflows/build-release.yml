@@ -1,16 +1,14 @@
 name: Build Snapshot
 
 on:
-    push:
-        branches: [ "master" ]
-        paths:
-            - 'composeApp/**'
-            - 'models/**'
-            - 'shared/**'
-            - 'gradle/libs.versions.toml'
     workflow_dispatch:
+        inputs:
+            version:
+                description: 'Name of the version'
+                required: true
 
 env:
+    MAIAPP_BUILD_VERSION: ${{ github.event.inputs.version }}
     ANDROID_KEYSTORE: "../android.keystore"
     ANDROID_KEYSTORE_KEY: ${{ secrets.android_key_alias }}
     ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.android_key_password }}
@@ -125,3 +123,45 @@ jobs:
               with:
                   name: deb-artifact
                   path: composeApp/build/compose/binaries/main/deb/*
+
+    publish:
+        needs:
+            - build_msi
+            - build_deb
+            - build_web
+            - build_android
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Download MSI artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: msi-artifact
+                  path: maiapp.msi
+
+            - name: Download DEB artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: msi-artifact
+                  path: maiapp.deb
+
+            - name: Publish MSI artifact
+              run: echo "Publishing artifacts..."
+
+    publish_pages:
+        needs:
+            - build_web
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pages: write
+            id-token: write
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Publish WEB artifact
+              uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: pages-artifact
+                  preview: 'true'
