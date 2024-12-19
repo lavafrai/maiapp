@@ -1,9 +1,20 @@
 import UIKit
 import ComposeApp
 
+class PlatformDependencyImplementation: IosPlatformDependency {
+    func openUrl(url: URL) {
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
+}
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+
+    override init() {
+        let dependency = PlatformDependencyImplementation()
+        IosPlatformDependencyKt.setInstance(new: dependency)
+    }
 
     func application(
         _ application: UIApplication,

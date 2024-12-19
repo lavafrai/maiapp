@@ -1,8 +1,10 @@
 package ru.lavafrai.maiapp.platform
 
+import IosPlatformDependency
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.darwin.*
 import kotlinx.coroutines.IO
+import platform.Foundation.NSURL
 
 class IOSPlatform: Platform {
     override fun name() = "iOS"
@@ -14,7 +16,6 @@ class IOSPlatform: Platform {
     )
     override fun storage() = Settings()
     override fun openUrl(url: String) {
-        error("Not implemented")
-        /* TODO: Implement ios web browser */
+        IosPlatformDependency.getInstance().openUrl(NSURL(string = url))
     }
 }
