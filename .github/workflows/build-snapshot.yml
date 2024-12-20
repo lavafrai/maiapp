@@ -125,27 +125,3 @@ jobs:
               with:
                   name: deb-artifact
                   path: composeApp/build/compose/binaries/main/deb/*
-
-    build_ios:
-        name: Build iOS
-        runs-on: macos-latest
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Set up JDK 21
-              uses: actions/setup-java@v4
-              with:
-                  distribution: 'graalvm'
-                  java-version: '21'
-
-            - uses: yukiarrr/ios-build-action@v1.12.0
-              with:
-                configuration: Release
-                project-path: 'iosApp/iosApp.xcodeproj'
-                workspace-path: 'iosApp/iosApp.xcodeproj/project.xcworkspace'
-                p12-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
-                mobileprovision-base64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
-                code-signing-identity: ${{ secrets.APPLE_CODE_SIGNING_IDENTITY }}
-                team-id: ${{ secrets.APPLE_TEAM_ID }}
-                certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-
