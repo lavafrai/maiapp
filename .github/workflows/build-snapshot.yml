@@ -142,7 +142,7 @@ jobs:
               with:
                 configuration: Release
                 project-path: 'iosApp/iosApp.xcodeproj'
-                workspace-path: 'iosApp/iosApp.xcodeproj/iosApp.xcworkspace'
+                workspace-path: 'iosApp/iosApp.xcodeproj/project.xcworkspace'
                 p12-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
                 mobileprovision-base64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
                 code-signing-identity: ${{ secrets.APPLE_CODE_SIGNING_IDENTITY }}
