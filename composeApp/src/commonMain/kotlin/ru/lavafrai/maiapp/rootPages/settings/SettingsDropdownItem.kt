@@ -50,24 +50,25 @@ fun <T>SettingsDropdownItem(
                 onDismissRequest = {
                     expanded = false
                 },
-                modifier = Modifier.width(IntrinsicSize.Min),
             ) {
-                items.forEach { item ->
-                    DropdownMenuItem(
-                        text = {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                itemContent(item)
-                            }
-                        },
-                        onClick = {
-                            onItemSelected(item)
-                            expanded = false
-                        },
-                    )
+                Column(modifier = Modifier.width(IntrinsicSize.Min)) {
+                    items.forEach { item ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    itemContent(item)
+                                }
+                            },
+                            onClick = {
+                                onItemSelected(item)
+                                expanded = false
+                            },
+                        )
+                    }
                 }
             }
         }

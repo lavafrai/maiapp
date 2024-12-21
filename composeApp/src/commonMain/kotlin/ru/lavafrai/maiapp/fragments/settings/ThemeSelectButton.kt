@@ -7,8 +7,10 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.theme.ThemeProvider
+import kotlin.math.max
 
 @Composable
 fun ThemeSelectButton(
@@ -26,7 +28,7 @@ fun ThemeSelectButton(
                 },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = ThemeProvider.themes.size),
             ) {
-                Text(theme.readableName())
+                Text(theme.readableName(), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

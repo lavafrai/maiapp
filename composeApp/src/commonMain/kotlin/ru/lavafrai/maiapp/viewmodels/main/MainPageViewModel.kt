@@ -10,6 +10,7 @@ import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
+import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
@@ -41,6 +42,13 @@ class MainPageViewModel(
 
     init {
         startLoading()
+
+        if (VersionInfo.hasBeenUpdated()) {
+            val lastVersion = VersionInfo.lastVersion
+            val currentVersion = VersionInfo.currentVersion
+
+            onVersionUpdated(lastVersion, currentVersion)
+        }
     }
 
     fun startLoading() {
@@ -104,9 +112,9 @@ class MainPageViewModel(
     fun onVersionUpdated(
         lastVersion: String?,
         currentVersion: String,
-        onSuccessShown: () -> Unit,
     ) {
-        onShowUpdateInfo()
+        if (lastVersion != null) onShowUpdateInfo()
+        else VersionInfo.updateLastVersion()
     }
 
     class Factory(

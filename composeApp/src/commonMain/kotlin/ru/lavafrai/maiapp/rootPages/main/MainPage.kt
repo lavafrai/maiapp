@@ -120,13 +120,6 @@ fun MainPage(
         )
     }
 
-    if (VersionInfo.hasBeenUpdated()) {
-        val lastVersion = VersionInfo.lastVersion
-        val currentVersion = VersionInfo.currentVersion
-
-        viewModel.onVersionUpdated(lastVersion, currentVersion, { updateInfoExpanded = true })
-    }
-
     if (viewState.schedule.hasData()) WeekSelector(
         onWeekSelected = { dateRange ->
             viewModel.setWeek(dateRange)

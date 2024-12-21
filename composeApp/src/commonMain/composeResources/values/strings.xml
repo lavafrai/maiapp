@@ -36,6 +36,13 @@
     <string name="author">Автор</string>
     <string name="publishTime">Опубликовано</string>
     <string name="source">Источник</string>
+    <string name="update">Обновление</string>
+    <string name="do_support">Поддержать</string>
+    <string name="continue">Продолжить</string>
+    <string name="close">Закрыть</string>
+    <string name="ok">Окей</string>
+    <string name="update_dialog_gratitude">Спасибо, что поддерживаете приложение в актуальном состоянии!</string>
+    <string name="update_dialog_scam">Как насчет того, чтобы поддержать разработчика монеткой?)</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

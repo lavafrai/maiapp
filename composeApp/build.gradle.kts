@@ -1,7 +1,5 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import java.util.Date
-import java.text.SimpleDateFormat
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
@@ -14,8 +12,10 @@ plugins {
     alias(libs.plugins.buildconfig)
 }
 
-val nowStamp: String = SimpleDateFormat("MM-dd-yyyy_HH-mm").format(Date())
-val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "nonrelease-$nowStamp"
+// val nowStamp: String = SimpleDateFormat("MM-dd-yyyy_HH-mm").format(Date())
+val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.0"
+val versionPlain = System.getenv("MAIAPP_BUILD_VERSION") ?: version
+val versionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
 
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
@@ -143,7 +143,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
 
         applicationId = "ru.lavafrai.maiapp"
-        versionCode = 1
+        versionCode = versionCode
         versionName = version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -189,7 +189,7 @@ compose.desktop {
         }
 
         nativeDistributions {
-            val nativeVersion = if (version.startsWith("nonrelease")) "1.0.0" else version
+            val nativeVersion = versionPlain
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "maiapp"
             packageVersion = nativeVersion
