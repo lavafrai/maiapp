@@ -1,4 +1,5 @@
 import platform.Foundation.NSURL
+import ru.lavafrai.maiapp.BuildConfig.APPMETRICA_APIKEY
 
 interface IosPlatformDependency {
     fun openUrl(url: NSURL)
@@ -14,4 +15,8 @@ interface IosPlatformDependency {
 
 fun setInstance(new: IosPlatformDependency) {
     IosPlatformDependency.instance = new
+}
+
+fun getAppmetricaKey(): String {
+    return APPMETRICA_APIKEY
 }

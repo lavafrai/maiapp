@@ -1,4 +1,5 @@
 import UIKit
+import AppMetricaCore
 import ComposeApp
 
 class PlatformDependencyImplementation: IosPlatformDependency {
@@ -25,6 +26,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window.rootViewController = MainKt.MainViewController()
             window.makeKeyAndVisible()
         }
+
+        let appmetricaApiKey = IosPlatformDependencyKt.getAppmetricaKey()
+        if let configuration = AppMetricaConfiguration(apiKey: "") {
+            configuration.areLogsEnabled = true
+            AppMetrica.activate(with: configuration)
+        }
+        
         return true
     }
 }

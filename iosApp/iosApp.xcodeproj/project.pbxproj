@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A188FB482D1C8121007E7CAD /* AppMetricaAdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = A188FB472D1C8121007E7CAD /* AppMetricaAdSupport */; };
+		A188FB4A2D1C8121007E7CAD /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = A188FB492D1C8121007E7CAD /* AppMetricaCore */; };
+		A188FB4C2D1C8121007E7CAD /* AppMetricaCrashes in Frameworks */ = {isa = PBXBuildFile; productRef = A188FB4B2D1C8121007E7CAD /* AppMetricaCrashes */; };
+		A188FB4E2D1C8121007E7CAD /* AppMetricaLibraryAdapter in Frameworks */ = {isa = PBXBuildFile; productRef = A188FB4D2D1C8121007E7CAD /* AppMetricaLibraryAdapter */; };
 		A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93A953A29CC810C00F8E227 /* iosApp.swift */; };
 		A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A93A953E29CC810D00F8E227 /* Assets.xcassets */; };
 		A93A954229CC810D00F8E227 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A93A954129CC810D00F8E227 /* Preview Assets.xcassets */; };
@@ -24,6 +28,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A188FB4E2D1C8121007E7CAD /* AppMetricaLibraryAdapter in Frameworks */,
+				A188FB4C2D1C8121007E7CAD /* AppMetricaCrashes in Frameworks */,
+				A188FB482D1C8121007E7CAD /* AppMetricaAdSupport in Frameworks */,
+				A188FB4A2D1C8121007E7CAD /* AppMetricaCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +124,9 @@
 				Base,
 			);
 			mainGroup = A93A952E29CC810C00F8E227;
+			packageReferences = (
+				A188FB462D1C8121007E7CAD /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
+			);
 			productRefGroup = A93A953829CC810C00F8E227 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -357,6 +368,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A188FB462D1C8121007E7CAD /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A188FB472D1C8121007E7CAD /* AppMetricaAdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A188FB462D1C8121007E7CAD /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaAdSupport;
+		};
+		A188FB492D1C8121007E7CAD /* AppMetricaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A188FB462D1C8121007E7CAD /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaCore;
+		};
+		A188FB4B2D1C8121007E7CAD /* AppMetricaCrashes */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A188FB462D1C8121007E7CAD /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaCrashes;
+		};
+		A188FB4D2D1C8121007E7CAD /* AppMetricaLibraryAdapter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A188FB462D1C8121007E7CAD /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaLibraryAdapter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A93A952F29CC810C00F8E227 /* Project object */;
 }
