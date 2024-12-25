@@ -1,7 +1,11 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.util.*
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -17,10 +21,26 @@ val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.0"
 val versionPlain = System.getenv("MAIAPP_BUILD_VERSION") ?: version
 val versionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
 
+
+
+var secretPropertiesFile: File = rootProject.file("composeApp/secrets.properties")
+val secretProperties = Properties()
+try {
+    secretProperties.load(FileInputStream(secretPropertiesFile))
+    Logging.getLogger("SECRETS_LOAGER").info("Using secrets.properties")
+} catch (e: FileNotFoundException) {
+    // secretPropertiesFile = rootProject.file("app/secrets.properties.example")
+    // secretProperties.load(FileInputStream(secretPropertiesFile))
+    // Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
+
+    error("No secrets.properties file found. Please create composeApp/secrets.properties")
+}
+
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
     buildConfigField("VERSION_NAME", version)
     buildConfigField("API_BASE_URL", "https://mai3.lavafrai.ru")
+    buildConfigField("APPMETRICA_APIKEY", secretProperties["appmetrica.api_key"] as String)
 
 }
 
@@ -100,6 +120,7 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
+            implementation(libs.analytics)
         }
 
         iosMain.dependencies {

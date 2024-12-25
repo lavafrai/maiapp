@@ -1,5 +1,6 @@
 [versions]
 
+analytics = "7.5.0"
 kotlin = "2.1.0"
 agp = "8.5.2"
 coilCompose = "3.0.4"
@@ -34,6 +35,7 @@ android-targetSdk = "53"
 
 [libraries]
 
+analytics = { module = "io.appmetrica.analytics:analytics", version.ref = "analytics" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 kotlincrypto = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
 kotlincrypto-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto" }
