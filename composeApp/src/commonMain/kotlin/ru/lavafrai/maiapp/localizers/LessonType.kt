@@ -14,3 +14,12 @@ fun LessonType.localized() = when (this) {
     LessonType.EXAM -> stringResource(Res.string.exam)
     LessonType.UNKNOWN -> stringResource(Res.string.unknown)
 }
+
+@Composable
+fun LessonType.localizedShortNonContext() = when (this) {
+    LessonType.LECTURE -> "ЛК"
+    LessonType.LABORATORY -> "ЛР"
+    LessonType.SEMINAR -> "ПЗ"
+    LessonType.EXAM -> "ЭК"
+    LessonType.UNKNOWN -> "ХЗ"
+}

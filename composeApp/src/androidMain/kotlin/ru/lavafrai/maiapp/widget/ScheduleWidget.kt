@@ -5,29 +5,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.glance.*
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
-import androidx.glance.text.TextStyle
+import androidx.glance.text.FontFamily
+import androidx.glance.text.TextDefaults
 import androidx.glance.unit.ColorProvider
 import co.touchlab.kermit.Logger
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceTitle
-import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.LocalGlanceTextStyle
 import ru.lavafrai.maiapp.R
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
+import ru.lavafrai.maiapp.localizers.localizedGenitiveNonContext
+import ru.lavafrai.maiapp.localizers.localizedNonContext
+import ru.lavafrai.maiapp.localizers.localizedShortNonContext
+import ru.lavafrai.maiapp.localizers.toApplication
+import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceText
-import ru.lavafrai.maiapp.localizers.*
+import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceTitle
+import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.LocalGlanceTextStyle
+import ru.lavafrai.maiapp.theme.MaiColor
 
 class ScheduleWidget: GlanceAppWidget() {
     private val widgetBackground = Color(0xE0000000)
@@ -42,11 +51,14 @@ class ScheduleWidget: GlanceAppWidget() {
         provideContent {
             Column(modifier = GlanceModifier
                 .fillMaxSize()
-                .cornerRadius(16.dp)
+                .cornerRadius(26.dp)
                 .appWidgetBackground()
                 .background(widgetBackground),
             ) {
-                CompositionLocalProvider(LocalGlanceTextStyle provides TextStyle(color = ColorProvider(Color.White))) {
+                CompositionLocalProvider(LocalGlanceTextStyle provides TextDefaults.defaultTextStyle.copy(
+                    color = ColorProvider(Color.White),
+                    fontSize = 14.sp,)
+                ) {
                     ScheduleWidgetContent(group, schedule)
                 }
             }
@@ -72,15 +84,79 @@ fun ScheduleWidgetSchedule(
     val today = LocalDate.now()
     val filteredDays = schedule.days
         .filter { it.date >= today }
+        .filter { it.date < today.plus(DatePeriod(days = 7)) }
         .filter { it.lessons.isNotEmpty() }
-        .filter { it.date > today.plus(DatePeriod(days = 7)) }
 
-
-    LazyColumn () {
-        items(filteredDays.size) { dayIndex ->
-            val day = filteredDays[dayIndex]
-            GlanceText(day.date.toString())
+    LazyColumn(modifier = GlanceModifier.padding(horizontal = 8.dp)) {
+        items(7) { dayIndex ->
+            val day = today.plus(DatePeriod(days = dayIndex))
+            val daySchedule =
+                filteredDays.find { it.date == day } ?: ScheduleDay(day, day.dayOfWeek.toApplication(), emptyList())
+            Column {
+                Spacer(modifier = GlanceModifier.height(8.dp))
+                ScheduleWidgetDay(daySchedule)
+            }
         }
+        item {
+            Spacer(modifier = GlanceModifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun ScheduleWidgetDay(
+    day: ScheduleDay,
+) {
+    Column {
+        ScheduleWidgetHeader(day)
+        Spacer(modifier = GlanceModifier.height(6.dp))
+
+        if (day.lessons.isNotEmpty()) day.lessons.forEach {
+            ScheduleWidgetLesson(it)
+            Spacer(modifier = GlanceModifier.height(4.dp))
+        } else {
+            Row {
+                GlanceText("В этот день нет занятий")
+            }
+        }
+    }
+}
+
+@Composable
+fun ScheduleWidgetLesson(
+    lesson: Lesson,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column {
+            GlanceText(lesson.timeRange.split(" – ")[0], fontFamily = FontFamily.Monospace)
+            GlanceText(lesson.timeRange.split(" – ")[1], fontFamily = FontFamily.Monospace)
+        }
+
+        Spacer(GlanceModifier.width(4.dp))
+        Box(modifier = GlanceModifier.fillMaxHeight().width(2.dp).background(MaiColor)) {  }
+        Spacer(GlanceModifier.width(4.dp))
+
+        Column {
+            GlanceText(lesson.name, maxLines = 1)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                GlanceText(lesson.type.localizedShortNonContext(), maxLines = 1, fontFamily = FontFamily.Monospace)
+
+                Spacer(GlanceModifier.width(4.dp))
+                Box(modifier = GlanceModifier.width(1.dp).background(Color.White.copy(alpha = 0.3f)).fillMaxHeight()) {}
+                Spacer(GlanceModifier.width(4.dp))
+
+                GlanceText(lesson.rooms.map { it.name }.joinToString(", "), maxLines = 1)
+            }
+        }
+    }
+}
+
+@Composable
+fun ScheduleWidgetHeader(
+    day: ScheduleDay,
+) {
+    Row {
+        GlanceText("${day.date.dayOfWeek.localizedNonContext()}, ${day.date.dayOfMonth} ${day.date.month.localizedGenitiveNonContext()}", fontSize = 17.sp)
     }
 }
 
@@ -133,7 +209,7 @@ fun ScheduleWidgetHeader() {
                     null,
                     modifier = GlanceModifier
                         .size(18.dp)
-                        .clickable {  }
+                        .clickable(actionRunCallback<RefreshScheduleWidgetAction>())
                         .cornerRadius(4.dp),
                 )
             }
