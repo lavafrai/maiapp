@@ -43,3 +43,22 @@ fun Month.localizedGenitive(): String {
         else -> throw IllegalArgumentException("Unknown month: $this")
     }
 }
+
+@Composable
+fun Month.localizedGenitiveNonContext(): String {
+    return when(this) {
+        Month.JANUARY -> "Января"
+        Month.FEBRUARY -> "Февраля"
+        Month.MARCH -> "Марта"
+        Month.APRIL -> "Апреля"
+        Month.MAY -> "Мая"
+        Month.JUNE -> "Июня"
+        Month.JULY -> "Июля"
+        Month.AUGUST -> "Августа"
+        Month.SEPTEMBER -> "Сентября"
+        Month.OCTOBER -> "Октября"
+        Month.NOVEMBER -> "Ноября"
+        Month.DECEMBER -> "Декабря"
+        else -> throw IllegalArgumentException("Unknown month: $this")
+    }
+}

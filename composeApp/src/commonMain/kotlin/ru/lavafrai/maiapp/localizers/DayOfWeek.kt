@@ -38,6 +38,9 @@ fun DayOfWeek.localizedShort(): String {
 fun kotlinx.datetime.DayOfWeek.localized(): String = this.toApplication().localized()
 
 @Composable
+fun kotlinx.datetime.DayOfWeek.localizedNonContext(): String = this.toApplication().localizedNonContext()
+
+@Composable
 fun kotlinx.datetime.DayOfWeek.localizedShort(): String = this.toApplication().localizedShort()
 
 fun DayOfWeek.toKotlinx(): kotlinx.datetime.DayOfWeek = when(this) {
@@ -59,4 +62,20 @@ fun kotlinx.datetime.DayOfWeek.toApplication(): DayOfWeek = when(this) {
     kotlinx.datetime.DayOfWeek.SATURDAY -> DayOfWeek.SATURDAY
     kotlinx.datetime.DayOfWeek.SUNDAY -> DayOfWeek.SUNDAY
     else -> throw IllegalArgumentException("Unknown day of week: $this")
+}
+
+
+
+@Composable
+fun DayOfWeek.localizedNonContext(): String {
+    return when (this) {
+        DayOfWeek.MONDAY -> "Понедельник"
+        DayOfWeek.TUESDAY -> "Вторник"
+        DayOfWeek.WEDNESDAY -> "Среда"
+        DayOfWeek.THURSDAY -> "Четверг"
+        DayOfWeek.FRIDAY -> "Пятница"
+        DayOfWeek.SATURDAY -> "Суббота"
+        DayOfWeek.SUNDAY -> "Воскресенье"
+        else -> throw IllegalArgumentException("Unknown day of week: $this")
+    }
 }

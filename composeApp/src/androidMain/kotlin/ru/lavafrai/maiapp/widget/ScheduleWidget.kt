@@ -119,7 +119,7 @@ fun ScheduleWidgetHeader() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.Start,
             ) {
-                GlanceTitle("27 ${today.month.localizedGenitive()} ${today.dayOfWeek.localized()}")
+                GlanceTitle("${today.dayOfMonth} ${today.month.localizedGenitiveNonContext()}, ${today.dayOfWeek.localizedNonContext().lowercase()}")
             }
 
             Row(
@@ -133,7 +133,8 @@ fun ScheduleWidgetHeader() {
                     null,
                     modifier = GlanceModifier
                         .size(18.dp)
-                        .clickable {  },
+                        .clickable {  }
+                        .cornerRadius(4.dp),
                 )
             }
         }

@@ -14,7 +14,7 @@ runs:
         - name: Set up JDK ${{ inputs.java-version }}
           uses: actions/setup-java@v4
           with:
-              distribution: 'zulu' # Or 'graalvm' as needed
+              distribution: 'graalvm' # Or 'graalvm' as needed
               java-version: ${{ inputs.java-version }}
 
         - name: Allow to run Gradle
@@ -24,5 +24,5 @@ runs:
         - name: Decode secret.properties
           uses: DamianReeves/write-file-action@master
           with:
-              path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/composeApp/secrets.properties'
+              path: 'composeApp/secrets.properties'
               contents: ${{ inputs.secrets-properties }}
