@@ -35,7 +35,7 @@ class DesktopSettings : Settings {
     }
 
     private fun getStorageFileIfExists(key: String): File? {
-        val file = File(getApplicationStorageDirectory(), key)
+        val file = getStorageFile(key)
         return if (file.exists()) file else null
     }
 

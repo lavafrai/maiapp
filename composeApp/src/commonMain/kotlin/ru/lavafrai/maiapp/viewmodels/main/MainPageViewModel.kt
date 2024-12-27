@@ -13,6 +13,7 @@ import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.models.time.DateRange
+import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
@@ -21,6 +22,7 @@ class MainPageViewModel(
     val onShowUpdateInfo: () -> Unit,
 ) : MaiAppViewModel<MainPageState>(
     initialState = MainPageState(
+        page = MainNavigationPageId.HOME,
         schedule = Loadable.loading(),
         selectedWeek = DateRange.currentWeek(),
         workTypeSelected = listOf(
@@ -48,6 +50,12 @@ class MainPageViewModel(
             val currentVersion = VersionInfo.currentVersion
 
             onVersionUpdated(lastVersion, currentVersion)
+        }
+    }
+
+    fun setPage(page: MainNavigationPageId) {
+        viewModelScope.launch(dispatchers.IO) {
+            emit(stateValue.copy(page = page))
         }
     }
 

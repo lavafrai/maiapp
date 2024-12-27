@@ -47,6 +47,8 @@ fun MainPage(
 
     Column {
         MainPageNavigation(
+            page = viewState.page,
+            setPage = { page -> viewModel.setPage(page) },
             header = { page ->
                 when (page) {
                     MainNavigationPageId.WORKS -> MainPageHomeTitle(

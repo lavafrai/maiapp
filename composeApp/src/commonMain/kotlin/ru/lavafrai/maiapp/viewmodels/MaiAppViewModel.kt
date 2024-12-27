@@ -17,6 +17,7 @@ open class MaiAppViewModel<T>(
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<T> = _state
 
+
     val dispatchers = getPlatform().dispatchers()
 
     protected fun emit(newState: T) { _state.value = newState }

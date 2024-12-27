@@ -8,6 +8,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -15,6 +16,7 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.Award
 import compose.icons.feathericons.Home
 import compose.icons.feathericons.Settings
+import ru.lavafrai.maiapp.utils.MainNavigationPageIdSaver
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.materialSharedAxisX
 import soup.compose.material.motion.animation.rememberSlideDistance
@@ -39,10 +41,14 @@ val mainNavigationItems = listOf(
 
 @Composable
 fun MainPageNavigation(
+    page: MainNavigationPageId,
+    setPage: (MainNavigationPageId) -> Unit,
     header: @Composable (MainNavigationPageId) -> Unit,
     content: @Composable (MainNavigationPageId) -> Unit,
 ) {
-    var selected by remember { mutableStateOf(mainNavigationItems.find { it.id == MainNavigationPageId.HOME }!!) }
+    // var selected by rememberSaveable(saver = MainNavigationPageIdSaver, key = "main-page-selected") { mutableStateOf(MainNavigationPageId.HOME) }
+    val selectedItem by remember(page) { mutableStateOf(mainNavigationItems.find { it.id == page }!!) }
+
     val navRail = @Composable {
         NavigationRail {
             Spacer(Modifier.height(8.dp))
@@ -50,8 +56,8 @@ fun MainPageNavigation(
                 NavigationRailItem(
                     icon = item.icon,
                     label = item.title,
-                    onClick = { selected = mainNavigationItems[index] },
-                    selected = selected.id == item.id,
+                    onClick = { setPage(mainNavigationItems[index].id) },
+                    selected = selectedItem.id == item.id,
                 )
             }
         }
@@ -62,8 +68,8 @@ fun MainPageNavigation(
                 NavigationBarItem(
                     icon = item.icon,
                     label = item.title,
-                    onClick = { selected = mainNavigationItems[index] },
-                    selected = selected.id == item.id,
+                    onClick = { setPage(mainNavigationItems[index].id) },
+                    selected = selectedItem.id == item.id,
                 )
             }
         }
@@ -77,9 +83,9 @@ fun MainPageNavigation(
         if (wideScreen) navRail()
         Column {
             Column(modifier = Modifier.weight(1f)) {
-                header(selected.id)
+                header(selectedItem.id)
                 MaterialMotion(
-                    targetState = selected.id,
+                    targetState = selectedItem.id,
                     transitionSpec = {
                         materialSharedAxisX(forward = true, slideDistance = slideDistance)
                     },

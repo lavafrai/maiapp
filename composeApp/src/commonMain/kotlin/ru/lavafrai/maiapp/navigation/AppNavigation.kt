@@ -14,14 +14,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
+import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
 import ru.lavafrai.maiapp.data.settings.getSettings
-import ru.lavafrai.maiapp.navigation.pages.GreetingPage
-import ru.lavafrai.maiapp.navigation.pages.LoginPage
-import ru.lavafrai.maiapp.navigation.pages.MainPage
-import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
+import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
+import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.rootPages.main.MainPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -34,6 +33,8 @@ fun AppNavigation(
     navController: NavHostController
 ) {
     val settings = remember { getSettings() }
+    val appContext = LocalApplicationContext.current
+
     Box(
         modifier = modifier,
     ) {
@@ -85,6 +86,16 @@ fun AppNavigation(
                             navController.navigate(GreetingPage) {
                                 popUpTo(0)
                             }
+                        },
+                    )
+                }
+
+                dialog<SafeDataCleanup> {
+                    SafeDataCleanupView(
+                        onNavigateBack = { navController.navigateUp() },
+                        onClean = {
+                            appContext.safeCleanup()
+                            // navController.navigateUp()
                         },
                     )
                 }

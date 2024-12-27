@@ -40,7 +40,12 @@
     <string name="do_support">Поддержать</string>
     <string name="continue">Продолжить</string>
     <string name="close">Закрыть</string>
+    <string name="storage_usage">Использование хранилища</string>
+    <string name="clear_application_data">Очистить данные приложения</string>
     <string name="ok">Окей</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="cancel">Отменить</string>
+    <string name="data">Данные</string>
     <string name="widget">Виджет</string>
     <string name="widget_unsupported_on_platform">Виджет не поддерживается</string>
     <string name="add_widget">Создать</string>
@@ -48,6 +53,8 @@
     <string name="update_dialog_scam">Как насчет того, чтобы поддержать разработчика монеткой?)</string>
     <string name="schedule_is_empty">Здесь нету ни одного занятия, можете отдыхать!</string>
     <string name="widget_description">Приложение поддерживает вывод расписания в виджет. Попробуйте добавить его на главный экран и пользоваться.</string>
+    <string name="safe_data_cleanup_warning">Вы уверены?</string>
+    <string name="safe_data_cleanup_warning_description">Вы точно хотите удалить все данные приложения с устройства? Среди них находятся все настройки и загруженные расписания.\n\nПриложение будет перезапущено.</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

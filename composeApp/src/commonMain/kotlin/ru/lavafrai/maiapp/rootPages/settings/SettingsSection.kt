@@ -16,7 +16,7 @@ fun SettingsSection(
 ) {
     AppCard {
         Text(title, style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         body()
     }
 }

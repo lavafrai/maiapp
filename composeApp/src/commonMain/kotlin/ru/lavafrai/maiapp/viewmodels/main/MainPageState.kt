@@ -5,8 +5,10 @@ import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.time.DateRange
+import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
 
 data class MainPageState(
+    val page: MainNavigationPageId,
     val schedule: Loadable<Schedule>,
     val selectedWeek: DateRange,
     val workTypeSelected: List<LessonType>,

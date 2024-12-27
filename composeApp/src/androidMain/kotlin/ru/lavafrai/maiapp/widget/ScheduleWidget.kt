@@ -116,6 +116,7 @@ fun ScheduleWidgetDay(
             Spacer(modifier = GlanceModifier.height(4.dp))
         } else {
             Row {
+                Spacer(modifier = GlanceModifier.width(8.dp))
                 GlanceText("В этот день нет занятий")
             }
         }
