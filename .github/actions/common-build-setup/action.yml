@@ -26,4 +26,4 @@ runs:
           uses: DamianReeves/write-file-action@master
           with:
               path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/composeApp/secrets.properties'
-              contents: ${{ inputs.SECRETS_PROPERTIES }}
+              contents: ${{ inputs.secrets-properties }}
