@@ -1,0 +1,25 @@
+name: 'Common Build Setup'
+description: 'Sets up Java, checks out code, and decodes secrets.'
+inputs:
+    java-version:
+        description: 'The Java version to set up'
+        required: true
+runs:
+    using: "composite"
+    steps:
+        - uses: actions/checkout@v4
+        - name: Set up JDK ${{ inputs.java-version }}
+          uses: actions/setup-java@v4
+          with:
+              distribution: 'zulu' # Or 'graalvm' as needed
+              java-version: ${{ inputs.java-version }}
+
+        - name: Allow to run Gradle
+          shell: bash
+          run: chmod +x gradlew
+
+        - name: Decode secret.properties
+          uses: DamianReeves/write-file-action@master
+          with:
+              path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/composeApp/secrets.properties'
+              contents: ${{ secrets.SECRETS_PROPERTIES }}

@@ -17,34 +17,20 @@ env:
     ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.android_key_password }}
     ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
 
-
 jobs:
     build_android:
         name: Build Android
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-
-            - name: Set up JDK 17
-              uses: actions/setup-java@v4
+            - uses: ./.github/actions/common-build-setup
               with:
-                  distribution: 'zulu'
                   java-version: '17'
-
-            - name: Allow ro run Gradle
-              run: chmod +x gradlew
-
-            - name: Decode secret.properties
-              uses: DamianReeves/write-file-action@master
-              with:
-                  path: '/home/runner/work/maiapp/maiapp/composeApp/secrets.properties'
-                  contents: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v0.1.0
               with:
                   base64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
-                  output-path: '/home/runner/work/maiapp/maiapp/android.keystore'
+                  output-path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/android.keystore'
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:assemble
@@ -62,16 +48,9 @@ jobs:
         name: Build WEB
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-
-            - name: Set up JDK 21
-              uses: actions/setup-java@v4
+            - uses: ./.github/actions/common-build-setup
               with:
-                  distribution: 'graalvm'
-                  java-version: '21'
-
-            - name: Allow ro run Gradle
-              run: chmod +x gradlew
+                  java-version: '21' # Or 'graalvm' if needed
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:wasmJsBrowserDistribution
@@ -92,13 +71,17 @@ jobs:
         name: Build MSI
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v4
-
-            - name: Set up JDK 11
+            - uses: actions/checkout@v4 # Keep checkout here as composite actions run in 'ubuntu-latest'
+            - name: Set up JDK
               uses: actions/setup-java@v4
               with:
-                    distribution: 'graalvm'
-                    java-version: '21'
+                  distribution: 'graalvm'
+                  java-version: '21' # You had 11 here, check if this is correct
+            - name: Decode secret.properties
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/composeApp/secrets.properties'
+                  contents: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageMsi
@@ -106,23 +89,16 @@ jobs:
             - name: Upload MSI artifact
               uses: actions/upload-artifact@v4
               with:
-                    name: msi-artifact
-                    path: composeApp\build\compose\binaries\main\msi\*
+                  name: msi-artifact
+                  path: composeApp\build\compose\binaries\main\msi\*
 
     build_deb:
         name: Build Debian
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-
-            - name: Set up JDK 11
-              uses: actions/setup-java@v4
+            - uses: ./.github/actions/common-build-setup
               with:
-                  distribution: 'graalvm'
-                  java-version: '21'
-
-            - name: Allow ro run Gradle
-              run: chmod +x gradlew
+                  java-version: '21' # Or 'graalvm' if needed
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
