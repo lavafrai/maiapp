@@ -16,13 +16,14 @@ import ru.lavafrai.maiapp.theme.LocalApplicationTheme
 
 @Composable
 internal fun App() = AppTheme {
+    val platform = getPlatform()
     val navController = rememberNavController()
     val toaster = rememberToasterState()
     val applicationContext = ApplicationContext(
         navController = navController,
         panicCleanup = {
             navController.navigate(GreetingPage) { popUpTo(0) }
-            getPlatform().storage().clear()
+            platform.storage().clear()
         },
     )
 

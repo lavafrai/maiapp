@@ -41,8 +41,13 @@
     <string name="continue">Продолжить</string>
     <string name="close">Закрыть</string>
     <string name="ok">Окей</string>
+    <string name="widget">Виджет</string>
+    <string name="widget_unsupported_on_platform">Виджет не поддерживается</string>
+    <string name="add_widget">Создать</string>
     <string name="update_dialog_gratitude">Спасибо, что поддерживаете приложение в актуальном состоянии!</string>
     <string name="update_dialog_scam">Как насчет того, чтобы поддержать разработчика монеткой?)</string>
+    <string name="schedule_is_empty">Здесь нету ни одного занятия, можете отдыхать!</string>
+    <string name="widget_description">Приложение поддерживает вывод расписания в виджет. Попробуйте добавить его на главный экран и пользоваться.</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

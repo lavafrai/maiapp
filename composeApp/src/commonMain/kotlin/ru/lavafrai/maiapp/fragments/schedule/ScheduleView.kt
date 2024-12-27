@@ -53,7 +53,7 @@ fun ScheduleView(
     }
 
     PageColumn(scrollState = null) {
-        LazyColumn(
+        if (filteredDays.isNotEmpty()) LazyColumn(
             modifier = modifier,
             state = lazyColumnState,
         ) {
@@ -80,6 +80,8 @@ fun ScheduleView(
             item {
                 Spacer(Modifier.height(16.dp))
             }
-        }
+        } else EmptyScheduleView(
+            dateRange = dateRange,
+        )
     }
 }

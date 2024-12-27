@@ -9,4 +9,6 @@ interface Platform {
     fun dispatchers(): Dispatchers
     fun storage(): Settings
     fun openUrl(url: String)
+    fun supportsWidget(): Boolean = false
+    fun requestWidgetCreation(): Unit = error("Widget isn't supported on this platform")
 }

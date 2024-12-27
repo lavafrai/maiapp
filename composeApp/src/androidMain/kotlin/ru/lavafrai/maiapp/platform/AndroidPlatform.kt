@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.cio.*
+import kotlinx.coroutines.CoroutineScope
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.platform.AndroidChromeView
 
 
@@ -23,5 +24,10 @@ class AndroidPlatform: Platform {
         browserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         //context.startActivity(browserIntent)
         AndroidChromeView.openTab(context, url)
+    }
+
+    override fun supportsWidget(): Boolean = true
+    override fun requestWidgetCreation() {
+        val context = AndroidApplication.instance()
     }
 }

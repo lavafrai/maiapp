@@ -1,6 +1,5 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import java.io.FileInputStream
@@ -16,7 +15,6 @@ plugins {
     alias(libs.plugins.buildconfig)
 }
 
-// val nowStamp: String = SimpleDateFormat("MM-dd-yyyy_HH-mm").format(Date())
 val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.0"
 val versionPlain = System.getenv("MAIAPP_BUILD_VERSION") ?: version
 val versionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
@@ -29,11 +27,11 @@ try {
     secretProperties.load(FileInputStream(secretPropertiesFile))
     Logging.getLogger("SECRETS_LOAGER").info("Using secrets.properties")
 } catch (e: FileNotFoundException) {
-    // secretPropertiesFile = rootProject.file("app/secrets.properties.example")
-    // secretProperties.load(FileInputStream(secretPropertiesFile))
-    // Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
+    secretPropertiesFile = rootProject.file("app/secrets.properties.example")
+    secretProperties.load(FileInputStream(secretPropertiesFile))
+    Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
 
-    error("No secrets.properties file found. Please create composeApp/secrets.properties")
+    /// error("No secrets.properties file found. Please create composeApp/secrets.properties")
 }
 
 buildConfig {
@@ -121,6 +119,10 @@ kotlin {
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
             implementation(libs.analytics)
+
+            // Widget
+            implementation(libs.androidx.glance.appwidget)
+            implementation(libs.androidx.glance.material3)
         }
 
         iosMain.dependencies {

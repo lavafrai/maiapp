@@ -33,6 +33,13 @@ jobs:
             - name: Allow ro run Gradle
               run: chmod +x gradlew
 
+            - name: Decode secret.properties
+              uses: kurt-code/gha-properties@v0.0.1
+              with:
+                  operation: 'write'
+                  file-path: 'composeApp/secret.properties'
+                  key-value-pairs: '{"appmetrica.api_key": "{{ secrets.APPMETRICA_API_KEY }}"}'
+
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v0.1.0
               with:

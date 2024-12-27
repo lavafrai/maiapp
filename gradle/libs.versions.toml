@@ -1,6 +1,7 @@
 [versions]
 
 analytics = "7.5.0"
+glance = "1.1.1"
 kotlin = "2.1.0"
 agp = "8.5.2"
 coilCompose = "3.0.4"
@@ -9,7 +10,7 @@ androidx-activityCompose = "1.9.3"
 kermit = "2.0.4"
 kotlinx-coroutines = "1.9.0"
 ktor = "3.0.2"
-androidx-lifecycle = "2.8.3"
+androidx-lifecycle = "2.8.4"
 androidx-navigation = "2.8.0-alpha10"
 kotlinx-serialization = "1.7.3"
 koin = "4.0.0"
@@ -24,12 +25,12 @@ richeditorCompose = "1.0.0-rc10"
 sonner = "0.3.8"
 windowSize = "0.5.0"
 material-motion = "2.0.1"
-uiAndroid = "1.7.5"
+uiAndroid = "1.7.6"
 androidx-browser = "1.8.0"
 logback-classic = "1.5.11"
 
 android-compileSdk = "34"
-android-minSdk = "21"
+android-minSdk = "23"
 android-targetSdk = "53"
 
 
@@ -37,6 +38,8 @@ android-targetSdk = "53"
 
 analytics = { module = "io.appmetrica.analytics:analytics", version.ref = "analytics" }
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 kotlincrypto = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
 kotlincrypto-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }

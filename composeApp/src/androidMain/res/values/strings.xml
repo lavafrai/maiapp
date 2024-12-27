@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="schedule_widget_description">This is a widget that shows the schedule of the day.</string>
+</resources>
