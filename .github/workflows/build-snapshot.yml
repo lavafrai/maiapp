@@ -35,11 +35,10 @@ jobs:
               run: chmod +x gradlew
 
             - name: Decode secret.properties
-              uses: kurt-code/gha-properties@v0.0.1
+              uses: DamianReeves/write-file-action@master
               with:
-                  operation: 'write'
-                  file-path: '/home/runner/work/maiapp/maiapp/composeApp/secrets.properties'
-                  key-value-pairs: ${{ secrets.SECRETS_PROPERTIES_JSON }}
+                  path: '/home/runner/work/maiapp/maiapp/composeApp/secrets.properties'
+                  contents: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v0.1.0
