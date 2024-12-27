@@ -27,11 +27,11 @@ try {
     secretProperties.load(FileInputStream(secretPropertiesFile))
     Logging.getLogger("SECRETS_LOAGER").info("Using secrets.properties")
 } catch (e: FileNotFoundException) {
-    secretPropertiesFile = rootProject.file("app/secrets.properties.example")
-    secretProperties.load(FileInputStream(secretPropertiesFile))
-    Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
+    // secretPropertiesFile = rootProject.file("app/secrets.properties.example")
+    // secretProperties.load(FileInputStream(secretPropertiesFile))
+    // Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
 
-    /// error("No secrets.properties file found. Please create composeApp/secrets.properties")
+    error("No secrets.properties file found. Please create composeApp/secrets.properties")
 }
 
 buildConfig {

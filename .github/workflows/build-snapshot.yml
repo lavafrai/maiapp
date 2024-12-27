@@ -22,6 +22,7 @@ jobs:
         name: Build Android
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
               with:
                   java-version: '17'
@@ -48,9 +49,10 @@ jobs:
         name: Build WEB
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
               with:
-                  java-version: '21' # Or 'graalvm' if needed
+                  java-version: '21'
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:wasmJsBrowserDistribution
@@ -71,17 +73,10 @@ jobs:
         name: Build MSI
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v4 # Keep checkout here as composite actions run in 'ubuntu-latest'
-            - name: Set up JDK
-              uses: actions/setup-java@v4
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/common-build-setup
               with:
-                  distribution: 'graalvm'
-                  java-version: '21' # You had 11 here, check if this is correct
-            - name: Decode secret.properties
-              uses: DamianReeves/write-file-action@master
-              with:
-                  path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/composeApp/secrets.properties'
-                  contents: ${{ secrets.SECRETS_PROPERTIES }}
+                  java-version: '21'
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageMsi
@@ -96,9 +91,10 @@ jobs:
         name: Build Debian
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
               with:
-                  java-version: '21' # Or 'graalvm' if needed
+                  java-version: '21'
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
