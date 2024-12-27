@@ -4,6 +4,7 @@ on:
     push:
         branches: [ "master" ]
         paths:
+            - '.github/workflows/build-snapshot.yml'
             - 'composeApp/**'
             - 'models/**'
             - 'shared/**'
@@ -15,7 +16,6 @@ env:
     ANDROID_KEYSTORE_KEY: ${{ secrets.android_key_alias }}
     ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.android_key_password }}
     ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
-    APPMETRICA_API_KEY: ${{ secrets.APPMETRICA_API_KEY }}
 
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
               with:
                   operation: 'write'
                   file-path: '/home/runner/work/maiapp/maiapp/composeApp/secrets.properties'
-                  key-value-pairs: '{"appmetrica.api_key": "$APPMETRICA_API_KEY"}'
+                  key-value-pairs: ${{ secrets.SECRETS_PROPERTIES_JSON }}
 
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v0.1.0
