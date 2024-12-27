@@ -73,7 +73,7 @@ fun ScheduleWidgetSchedule(
     val filteredDays = schedule.days
         .filter { it.date >= today }
         .filter { it.lessons.isNotEmpty() }
-        .filter { it.date.plus(DatePeriod(days = 7)) < today }
+        .filter { it.date > today.plus(DatePeriod(days = 7)) }
 
 
     LazyColumn () {
