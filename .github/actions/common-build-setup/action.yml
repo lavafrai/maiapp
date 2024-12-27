@@ -4,6 +4,10 @@ inputs:
     java-version:
         description: 'The Java version to set up'
         required: true
+    secrets-properties:
+        description: 'The secrets.properties file to decode'
+        required: true
+
 runs:
     using: "composite"
     steps:
@@ -22,4 +26,4 @@ runs:
           uses: DamianReeves/write-file-action@master
           with:
               path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/composeApp/secrets.properties'
-              contents: ${{ secrets.SECRETS_PROPERTIES }}
+              contents: ${{ inputs.SECRETS_PROPERTIES }}

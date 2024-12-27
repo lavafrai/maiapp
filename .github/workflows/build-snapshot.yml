@@ -26,6 +26,7 @@ jobs:
             - uses: ./.github/actions/common-build-setup
               with:
                   java-version: '17'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v0.1.0
@@ -53,6 +54,7 @@ jobs:
             - uses: ./.github/actions/common-build-setup
               with:
                   java-version: '21'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:wasmJsBrowserDistribution
@@ -77,6 +79,7 @@ jobs:
             - uses: ./.github/actions/common-build-setup
               with:
                   java-version: '21'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageMsi
@@ -95,6 +98,7 @@ jobs:
             - uses: ./.github/actions/common-build-setup
               with:
                   java-version: '21'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
