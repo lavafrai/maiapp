@@ -14,7 +14,7 @@ runs:
         - name: Set up JDK ${{ inputs.java-version }}
           uses: actions/setup-java@v4
           with:
-              distribution: 'graalvm' # Or 'graalvm' as needed
+              distribution: 'zulu' # Or 'graalvm' as needed
               java-version: ${{ inputs.java-version }}
 
         - name: Allow to run Gradle
