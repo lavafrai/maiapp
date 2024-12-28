@@ -33,7 +33,7 @@ fun AppNavigation(
     navController: NavHostController
 ) {
     val settings = remember { getSettings() }
-    val appContext = LocalApplicationContext.current
+    // val appContext = LocalApplicationContext.current TODO("Понять, почему багует и вернуть")
 
     Box(
         modifier = modifier,
@@ -94,7 +94,7 @@ fun AppNavigation(
                     SafeDataCleanupView(
                         onNavigateBack = { navController.navigateUp() },
                         onClean = {
-                            appContext.safeCleanup()
+                            // appContext.safeCleanup() TODO("Понять, почему багует и вернуть")
                             // navController.navigateUp()
                         },
                     )
