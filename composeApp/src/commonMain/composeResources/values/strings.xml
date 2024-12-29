@@ -39,6 +39,8 @@
     <string name="update">Обновление</string>
     <string name="do_support">Поддержать</string>
     <string name="continue">Продолжить</string>
+    <string name="information">Информация</string>
+    <string name="account">Аккаунт</string>
     <string name="close">Закрыть</string>
     <string name="storage_usage">Использование хранилища</string>
     <string name="clear_application_data">Очистить данные приложения</string>

@@ -39,7 +39,7 @@ fun ScheduleView(
     }
     val lazyColumnState: LazyListState = rememberLazyListState()
 
-    LaunchedEffect(dateRange) {
+    LaunchedEffect(dateRange, selector) {
         if (dateRange == null || dateRange.isNow()) {
             val pairsFinishedToday = filteredLessons.find { it.date == LocalDate.now() }?.isFinished() ?: false
             var index = filteredLessons.indexOfFirst { it.date >= LocalDate.now() } + if (pairsFinishedToday) 1 else 0

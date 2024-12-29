@@ -13,15 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.Award
-import compose.icons.feathericons.Home
-import compose.icons.feathericons.Settings
+import compose.icons.feathericons.*
 import ru.lavafrai.maiapp.utils.MainNavigationPageIdSaver
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.materialSharedAxisX
 import soup.compose.material.motion.animation.rememberSlideDistance
 
 val mainNavigationItems = listOf(
+    MainNavigationItem(
+        id = MainNavigationPageId.INFORMATION,
+        icon = { Icon(FeatherIcons.Info, "Info") },
+        title = { Text("Info") },
+    ),
     MainNavigationItem(
         id = MainNavigationPageId.WORKS,
         icon = { Icon(FeatherIcons.Award, "Works") },
@@ -31,6 +34,11 @@ val mainNavigationItems = listOf(
         id = MainNavigationPageId.HOME,
         icon = { Icon(FeatherIcons.Home, "Home") },
         title = { Text("Home") },
+    ),
+    MainNavigationItem(
+        id = MainNavigationPageId.ACCOUNT,
+        icon = { Icon(FeatherIcons.User, "Account") },
+        title = { Text("Account") },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.SETTINGS,
@@ -50,24 +58,29 @@ fun MainPageNavigation(
     val selectedItem by remember(page) { mutableStateOf(mainNavigationItems.find { it.id == page }!!) }
 
     val navRail = @Composable {
-        NavigationRail {
-            Spacer(Modifier.height(8.dp))
-            mainNavigationItems.forEachIndexed { index, item ->
-                NavigationRailItem(
-                    icon = item.icon,
-                    label = item.title,
-                    onClick = { setPage(mainNavigationItems[index].id) },
-                    selected = selectedItem.id == item.id,
-                )
+        NavigationRail(
+            windowInsets = WindowInsets.safeDrawing
+        ) {
+            Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
+                mainNavigationItems.forEachIndexed { index, item ->
+                    NavigationRailItem(
+                        icon = item.icon,
+                        label = item.title,
+                        onClick = { setPage(mainNavigationItems[index].id) },
+                        selected = selectedItem.id == item.id,
+                    )
+                }
             }
         }
     }
     val navBar = @Composable {
-        NavigationBar {
+        NavigationBar (
+
+        ) {
             mainNavigationItems.forEachIndexed { index, item ->
                 NavigationBarItem(
                     icon = item.icon,
-                    label = item.title,
+                    // label = item.title,
                     onClick = { setPage(mainNavigationItems[index].id) },
                     selected = selectedItem.id == item.id,
                 )

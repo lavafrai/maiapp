@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Preview
@@ -40,8 +41,6 @@ fun PairNumber(
     ) {
         Surface(
             modifier = Modifier
-                .width(30.dp)
-                .height(30.dp)
                 .clip(CircleShape)
                 .align(Alignment.Center),
             color = background
@@ -54,7 +53,8 @@ fun PairNumber(
                     text,
                     color = color,
                     textAlign = TextAlign.Center,
-                    fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium
+                    fontSize = 18.sp,
+                    fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 )
             }
         }

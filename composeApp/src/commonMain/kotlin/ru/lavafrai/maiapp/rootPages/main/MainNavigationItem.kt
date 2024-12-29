@@ -5,8 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class MainNavigationPageId {
+    INFORMATION,
     WORKS,
     HOME,
+    ACCOUNT,
     SETTINGS,
 }
 

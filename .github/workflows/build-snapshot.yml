@@ -108,3 +108,21 @@ jobs:
               with:
                   name: deb-artifact
                   path: composeApp/build/compose/binaries/main/deb/*
+
+
+    publish_pages:
+      needs:
+          - build_web
+      runs-on: ubuntu-latest
+      permissions:
+          contents: read
+          pages: write
+          id-token: write
+      steps:
+          -   uses: actions/checkout@v4
+
+          -   name: Publish WEB artifact
+              uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: pages-artifact
+                  preview: 'true'

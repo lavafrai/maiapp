@@ -51,6 +51,11 @@ fun MainPage(
             setPage = { page -> viewModel.setPage(page) },
             header = { page ->
                 when (page) {
+                    MainNavigationPageId.INFORMATION -> MainPageTitle(
+                        titleText = { Text(stringResource(Res.string.information)) },
+                        subtitleText = { Text(settings.selectedSchedule!!) },
+                    )
+
                     MainNavigationPageId.WORKS -> MainPageHomeTitle(
                         title = stringResource(Res.string.works),
                         schedule = viewState.schedule,
@@ -65,6 +70,11 @@ fun MainPage(
                         onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
 
+                    MainNavigationPageId.ACCOUNT -> MainPageTitle(
+                        titleText = { Text(stringResource(Res.string.account)) },
+                        subtitleText = { Text(settings.selectedSchedule!!) },
+                    )
+
                     MainNavigationPageId.SETTINGS -> MainPageTitle(
                         titleText = { Text(stringResource(Res.string.settings)) },
                         subtitleText = { Text(settings.selectedSchedule!!) },
@@ -73,6 +83,10 @@ fun MainPage(
             },
         ) { page ->
             when (page) {
+                MainNavigationPageId.INFORMATION -> Column(Modifier.fillMaxSize()) {
+                    // InformationPage()
+                }
+
                 MainNavigationPageId.WORKS -> {
                     when (viewState.schedule.status) {
                         LoadableStatus.Loading -> CircularProgressIndicator()
@@ -104,6 +118,10 @@ fun MainPage(
                             onRetry = { viewModel.startLoading() },
                         )
                     }
+                }
+
+                MainNavigationPageId.ACCOUNT -> Column(Modifier.fillMaxSize()) {
+                    // AccountPage()
                 }
 
                 MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {

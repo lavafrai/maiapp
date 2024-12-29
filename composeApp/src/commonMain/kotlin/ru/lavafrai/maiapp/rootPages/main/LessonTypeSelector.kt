@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
+import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.schedule.LessonType
 
 @Composable
@@ -53,7 +54,7 @@ fun LessonTypeSelector(
             allowedLessonTypes.forEach { lessonType ->
                 val isSelected = selectedLessonTypes.contains(lessonType)
                 ListItem(
-                    headlineContent = { Text(lessonType.name) },
+                    headlineContent = { Text(lessonType.localized()) },
                     trailingContent = {
                         Checkbox(
                             checked = isSelected,

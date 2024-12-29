@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -25,8 +27,12 @@ fun LessonView(
     exlerTeachers: List<ExlerTeacher>?,
 ) {
     val appContext = LocalApplicationContext.current
+    val haptic = LocalHapticFeedback.current
 
-    AppCard {
+    AppCard(
+        modifier = Modifier
+            .clickable { haptic.performHapticFeedback(HapticFeedbackType.LongPress) }
+    ) {
         Row {
             Column {
                 PairNumber(text = lesson.getPairNumber().toString())
