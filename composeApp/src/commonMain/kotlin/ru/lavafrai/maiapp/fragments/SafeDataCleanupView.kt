@@ -25,8 +25,8 @@ fun SafeDataCleanupView(
 
     Dialog(onDismissRequest = onNavigateBack) {
         Surface(
-            color = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
             shape = MaterialTheme.shapes.large,
         ) {
             Column(

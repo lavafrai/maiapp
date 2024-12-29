@@ -15,6 +15,6 @@ enum class MainNavigationPageId {
 @Serializable
 data class MainNavigationItem(
     val id: MainNavigationPageId,
-    val icon: @Composable () -> Unit,
+    val icon: @Composable (selected: Boolean) -> Unit,
     val title: @Composable () -> Unit,
 )

@@ -1,6 +1,9 @@
 package ru.lavafrai.maiapp.navigation
 
-import androidx.compose.animation.*
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -8,20 +11,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
 import ru.lavafrai.maiapp.LocalApplicationContext
-import ru.lavafrai.maiapp.rootPages.login.GreetingPage
-import ru.lavafrai.maiapp.rootPages.login.LoginPage
-import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
+import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
+import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.navigation.pages.*
+import ru.lavafrai.maiapp.rootPages.login.GreetingPage
+import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
+import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 import kotlin.reflect.typeOf
@@ -59,7 +63,7 @@ fun AppNavigation(
                 composable<LoginPage> (
                     typeMap = mapOf(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
-                        typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
+                        typeOf<LoginTarget>() to navTypeOf<LoginTarget>(),
                     ),
                 ) { backStackEntry ->
                     val loginData: LoginPage = backStackEntry.toRoute()
@@ -97,6 +101,19 @@ fun AppNavigation(
                             appContext.safeCleanup()
                             // navController.navigateUp()
                         },
+                    )
+                }
+
+                dialog<LessonDetailsPage>(
+                    typeMap = mapOf(
+                        typeOf<Lesson>() to navTypeOf<Lesson>(),
+                    ),
+                ) { backStackEntry ->
+                    val lesson = (backStackEntry.toRoute() as LessonDetailsPage).lesson
+
+                    LessonDetailsDialog(
+                        onNavigateBack = { navController.navigateUp() },
+                        lesson = lesson,
                     )
                 }
 

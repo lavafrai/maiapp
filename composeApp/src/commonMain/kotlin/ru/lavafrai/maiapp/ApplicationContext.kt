@@ -2,6 +2,8 @@ package ru.lavafrai.maiapp
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavController
+import ru.lavafrai.maiapp.models.schedule.Lesson
+import ru.lavafrai.maiapp.navigation.pages.LessonDetailsPage
 import ru.lavafrai.maiapp.navigation.pages.SafeDataCleanup
 import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
 import ru.lavafrai.maiapp.utils.UrlHandler
@@ -21,6 +23,10 @@ class ApplicationContext(
 
     fun requestSafeDataClean() {
         navController.navigate(SafeDataCleanup)
+    }
+
+    fun openLessonDetails(lesson: Lesson) {
+        navController.navigate(LessonDetailsPage(lesson))
     }
 }
 

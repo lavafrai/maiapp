@@ -8,12 +8,13 @@ coilCompose = "3.0.4"
 compose = "1.7.0"
 androidx-activityCompose = "1.9.3"
 kermit = "2.0.4"
-kotlinx-coroutines = "1.9.0"
+kotlinx-coroutines = "1.10.1"
 ktor = "3.0.2"
 androidx-lifecycle = "2.8.4"
 androidx-navigation = "2.8.0-alpha10"
 kotlinx-serialization = "1.7.3"
 koin = "4.0.0"
+libres = "1.2.3"
 materialKolor = "2.0.0"
 multiplatformSettings = "1.2.0"
 kotlinx-datetime = "0.6.1"
@@ -29,7 +30,7 @@ uiAndroid = "1.7.6"
 androidx-browser = "1.8.0"
 logback-classic = "1.5.11"
 
-android-compileSdk = "34"
+android-compileSdk = "35"
 android-minSdk = "23"
 android-targetSdk = "53"
 
@@ -64,6 +65,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+libres = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatformSettings" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
@@ -86,6 +88,7 @@ ktor-server-caching = { module = "io.ktor:ktor-server-caching-headers", version.
 
 [plugins]
 
+libres = { id = "io.github.skeptick.libres", version.ref = "libres" }
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }

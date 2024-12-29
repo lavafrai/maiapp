@@ -7,14 +7,16 @@ import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.*
-import ru.lavafrai.maiapp.utils.MainNavigationPageIdSaver
+import io.github.skeptick.libres.compose.painterResource
+import ru.lavafrai.maiapp.LibRes
+import ru.lavafrai.maiapp.fragments.AnimatedIcon
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.materialSharedAxisX
 import soup.compose.material.motion.animation.rememberSlideDistance
@@ -22,27 +24,53 @@ import soup.compose.material.motion.animation.rememberSlideDistance
 val mainNavigationItems = listOf(
     MainNavigationItem(
         id = MainNavigationPageId.INFORMATION,
-        icon = { Icon(FeatherIcons.Info, "Info") },
+        // icon = { selected -> Icon(painterResource(if (selected) LibRes.image.info_filled else LibRes.image.info), "Info") },
+        icon = { selected -> AnimatedIcon(
+            iconPainter = painterResource(LibRes.image.info),
+            enabledIconPainter = painterResource(LibRes.image.info_filled),
+            contentDescription = "Info",
+            enabled = selected,
+        )},
         title = { Text("Info") },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.WORKS,
-        icon = { Icon(FeatherIcons.Award, "Works") },
+        icon = { selected -> AnimatedIcon(
+            iconPainter = painterResource(LibRes.image.award),
+            enabledIconPainter = painterResource(LibRes.image.award_filled),
+            contentDescription = "Works",
+            enabled = selected,
+        )},
         title = { Text("Works") },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.HOME,
-        icon = { Icon(FeatherIcons.Home, "Home") },
+        icon = { selected -> AnimatedIcon(
+            iconPainter = painterResource(LibRes.image.home),
+            enabledIconPainter = painterResource(LibRes.image.home_filled),
+            contentDescription = "Home",
+            enabled = selected,
+        )},
         title = { Text("Home") },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.ACCOUNT,
-        icon = { Icon(FeatherIcons.User, "Account") },
+        icon = { selected -> AnimatedIcon(
+            iconPainter = painterResource(LibRes.image.user),
+            enabledIconPainter = painterResource(LibRes.image.user_filled),
+            contentDescription = "Account",
+            enabled = selected,
+        )},
         title = { Text("Account") },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.SETTINGS,
-        icon = { Icon(FeatherIcons.Settings, "Settings") },
+        icon = { selected -> AnimatedIcon(
+            iconPainter = painterResource(LibRes.image.settings),
+            enabledIconPainter = painterResource(LibRes.image.settings_filled),
+            contentDescription = "Settings",
+            enabled = selected,
+        )},
         title = { Text("Settings") },
     ),
 )
@@ -64,7 +92,7 @@ fun MainPageNavigation(
             Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
                 mainNavigationItems.forEachIndexed { index, item ->
                     NavigationRailItem(
-                        icon = item.icon,
+                        icon = { item.icon(selectedItem.id == item.id) },
                         label = item.title,
                         onClick = { setPage(mainNavigationItems[index].id) },
                         selected = selectedItem.id == item.id,
@@ -79,7 +107,7 @@ fun MainPageNavigation(
         ) {
             mainNavigationItems.forEachIndexed { index, item ->
                 NavigationBarItem(
-                    icon = item.icon,
+                    icon = { item.icon(selectedItem.id == item.id) },
                     // label = item.title,
                     onClick = { setPage(mainNavigationItems[index].id) },
                     selected = selectedItem.id == item.id,

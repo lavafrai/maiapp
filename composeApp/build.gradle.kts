@@ -13,6 +13,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.buildconfig)
+    alias(libs.plugins.libres)
 }
 
 val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.0"
@@ -108,6 +109,7 @@ kotlin {
             implementation(libs.richeditor.compose)
             // implementation(libs.haze.materials) // Does not work idk why
 
+            implementation(libs.libres)
             // implementation(libs.mai.api) // TODO idk how but i need to import it
         }
 
@@ -238,4 +240,9 @@ compose.desktop {
             }
         }
     }
+}
+
+libres {
+    generatedClassName = "LibRes"
+    generateNamedArguments = true
 }

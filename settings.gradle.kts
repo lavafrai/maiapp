@@ -3,6 +3,7 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
+        maven("https://jitpack.io")
         google {
             content { 
               	includeGroupByRegex("com\\.android.*")
