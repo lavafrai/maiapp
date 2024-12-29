@@ -3,6 +3,7 @@ package ru.lavafrai.maiapp
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
@@ -16,16 +17,16 @@ import ru.lavafrai.maiapp.theme.LocalApplicationTheme
 
 @Composable
 internal fun App() = AppTheme {
-    val platform = getPlatform()
+    val platform = remember { getPlatform() }
     val navController = rememberNavController()
     val toaster = rememberToasterState()
-    val applicationContext = ApplicationContext(
+    val applicationContext = remember { ApplicationContext(
         navController = navController,
         panicCleanup = {
             navController.navigate(GreetingPage) { popUpTo(0) }
             platform.storage().clear()
         },
-    )
+    )}
 
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
         AppNavigation(
