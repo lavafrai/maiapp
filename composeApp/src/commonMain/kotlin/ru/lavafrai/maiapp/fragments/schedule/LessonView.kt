@@ -1,6 +1,10 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package ru.lavafrai.maiapp.fragments.schedule
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -30,8 +34,7 @@ fun LessonView(
     val haptic = LocalHapticFeedback.current
 
     AppCard(
-        modifier = Modifier
-            .clickable { haptic.performHapticFeedback(HapticFeedbackType.LongPress) }
+        onLongClick = { haptic.performHapticFeedback(HapticFeedbackType.LongPress) },
     ) {
         Row {
             Column {
