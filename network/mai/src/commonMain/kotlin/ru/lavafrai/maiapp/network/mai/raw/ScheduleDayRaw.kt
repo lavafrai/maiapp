@@ -1,4 +1,4 @@
-package mai.raw
+package ru.lavafrai.maiapp.network.mai.raw
 
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName

@@ -59,6 +59,12 @@
     <string name="safe_data_cleanup_warning">Вы уверены?</string>
     <string name="safe_data_cleanup_warning_description">Вы точно хотите удалить все данные приложения с устройства? Среди них находятся все настройки и загруженные расписания.\n\nПриложение будет перезапущено.</string>
 
+    <string name="final_test">Зачет</string>
+    <string name="control_work">Контрольная</string>
+    <string name="сolloquium">Коллоквиум</string>
+    <string name="home_work">Домашняя работа</string>
+    <string name="comment">Заметка</string>
+
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>
     <string name="wednesday">Среда</string>

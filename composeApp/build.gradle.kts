@@ -98,6 +98,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kstore)
             implementation(libs.composeIcons.featherIcons)
+            implementation(libs.composeIcons.lineAwesomeIcons)
             implementation(libs.windowSize)
             implementation(libs.material.motion)
             implementation(libs.coil.compose)
@@ -154,6 +155,7 @@ kotlin {
             val target = "${targetOs}-${targetArch}"
 
             implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.logback.classic)
             implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
         }
     }

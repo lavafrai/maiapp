@@ -1,4 +1,4 @@
-package mai
+package ru.lavafrai.maiapp.network.mai
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.Sign
@@ -15,7 +15,7 @@ import ru.lavafrai.maiapp.exceptions.NotFoundException
 import ru.lavafrai.maiapp.models.group.Group
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherId
-import mai.raw.parseRawSchedule
+import ru.lavafrai.maiapp.network.mai.raw.parseRawSchedule
 import org.kotlincrypto.hash.md.MD5
 
 class MaiRepository(

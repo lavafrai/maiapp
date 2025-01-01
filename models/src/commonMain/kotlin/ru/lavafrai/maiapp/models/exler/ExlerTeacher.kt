@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class ExlerTeacher(
     val name: String,
     val path: String,
+    val faculty: ExlerFaculty,
 
     val nameHash: Int = teacherNameHash(name),
 )

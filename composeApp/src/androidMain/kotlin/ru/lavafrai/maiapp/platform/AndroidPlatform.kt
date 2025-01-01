@@ -3,10 +3,14 @@ package ru.lavafrai.maiapp.platform
 import ru.lavafrai.maiapp.AndroidApplication
 import android.content.Intent
 import android.net.Uri
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.platform.AndroidChromeView
+import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.ScheduleWidgetReceiver
 
 
 class AndroidPlatform: Platform {
@@ -29,5 +33,10 @@ class AndroidPlatform: Platform {
     override fun supportsWidget(): Boolean = true
     override fun requestWidgetCreation() {
         val context = AndroidApplication.instance()
+        GlobalScope.launch {
+            GlanceAppWidgetManager(context).requestPinGlanceAppWidget(
+                ScheduleWidgetReceiver::class.java, successCallback = null
+            )
+        }
     }
 }

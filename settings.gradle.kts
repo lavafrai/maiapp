@@ -39,5 +39,6 @@ dependencyResolutionManagement {
 include(":models")
 include(":shared")
 include(":network:mai")
+include(":network:exler")
 include(":composeApp")
 include(":server")

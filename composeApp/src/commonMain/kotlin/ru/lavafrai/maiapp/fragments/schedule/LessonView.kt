@@ -19,8 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.data.repositories.LessonAnnotationsRepository
 import ru.lavafrai.maiapp.fragments.AppCard
 import ru.lavafrai.maiapp.localizers.localized
+import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
+import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.theme.LinkColor
@@ -30,6 +33,8 @@ import ru.lavafrai.maiapp.utils.conditional
 fun LessonView(
     lesson: Lesson,
     exlerTeachers: List<ExlerTeacher>?,
+    annotations: List<LessonAnnotation>,
+    scheduleName: String,
 ) {
     val appContext = LocalApplicationContext.current
     val haptic = LocalHapticFeedback.current
@@ -37,12 +42,17 @@ fun LessonView(
     AppCard(
         onLongClick = {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+
             appContext.openLessonDetails(lesson)
         },
     ) {
         Row {
             Column {
                 PairNumber(text = lesson.getPairNumber().toString())
+
+                annotations.filter { it.lessonUid == lesson.getUid() }.forEach {
+                    AnnotationView(it)
+                }
             }
             Column(
                 modifier = Modifier

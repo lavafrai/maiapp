@@ -2,7 +2,7 @@ package ru.lavafrai.maiapp.server.routes
 
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import mai.MaiRepository
+import ru.lavafrai.maiapp.network.mai.MaiRepository
 
 fun Route.groups(
     maiRepository: MaiRepository,

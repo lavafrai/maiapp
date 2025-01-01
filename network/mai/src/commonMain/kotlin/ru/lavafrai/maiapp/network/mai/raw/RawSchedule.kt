@@ -1,4 +1,4 @@
-package mai.raw
+package ru.lavafrai.maiapp.network.mai.raw
 
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.decodeFromJsonElement

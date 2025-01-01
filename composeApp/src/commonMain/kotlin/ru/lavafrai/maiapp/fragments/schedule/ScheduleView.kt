@@ -11,12 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
+import ru.lavafrai.maiapp.data.repositories.LessonAnnotationsRepository
 import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
@@ -33,11 +32,17 @@ fun ScheduleView(
     modifier: Modifier = Modifier,
     selector: (ScheduleDay, Lesson) -> Boolean = { _, _ -> true },
 ) {
+    val lessonAnnotationRepository = remember { LessonAnnotationsRepository }
     val filteredDays = remember(dateRange) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
     val filteredLessons = remember(dateRange, selector) {
         filteredDays.map { day -> day.copy(lessons=day.lessons.filter { selector(day, it) }) }.filter { it.lessons.isNotEmpty() }
     }
     val lazyColumnState: LazyListState = rememberLazyListState()
+    val annotations by lessonAnnotationRepository.follow(schedule.name).collectAsState()
+
+    val filteredAnnotations = remember(annotations, dateRange) {
+        annotations.filter { it.lessonUid in filteredLessons.flatMap { it.lessons.map { it.getUid() } } }
+    }
 
     LaunchedEffect(dateRange, selector) {
         if (dateRange == null || dateRange.isNow()) {
@@ -45,7 +50,7 @@ fun ScheduleView(
             var index = filteredLessons.indexOfFirst { it.date >= LocalDate.now() } + if (pairsFinishedToday) 1 else 0
             if (index == -1) index = filteredLessons.size - 1
 
-            lazyColumnState.scrollToItem(index * 2)
+            lazyColumnState.scrollToItem((index * 2).coerceIn(0, Int.MAX_VALUE))
             return@LaunchedEffect
         }
 
@@ -73,6 +78,8 @@ fun ScheduleView(
                         modifier = Modifier
                             .padding(vertical = 8.dp),
                         exlerTeachers = exlerTeachers,
+                        annotations = filteredAnnotations,
+                        scheduleName = schedule.name,
                     )
                 }
             }

@@ -2,6 +2,7 @@
 
 analytics = "7.5.0"
 glance = "1.1.1"
+jsoup = "1.10.2"
 kotlin = "2.1.0"
 agp = "8.5.2"
 coilCompose = "3.0.4"
@@ -41,6 +42,7 @@ analytics = { module = "io.appmetrica.analytics:analytics", version.ref = "analy
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 kotlincrypto = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
 kotlincrypto-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
@@ -74,6 +76,7 @@ multiplatformSettingsSerialization = { module = "com.russhwolf:multiplatform-set
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kstore = { module = "io.github.xxfast:kstore", version.ref = "kstore" }
 composeIcons-featherIcons = { module = "br.com.devsrsouza.compose.icons:feather", version.ref = "composeIcons" }
+composeIcons-lineAwesomeIcons = { module = "br.com.devsrsouza.compose.icons:line-awesome", version.ref = "composeIcons" }
 richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditorCompose" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 windowSize = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "windowSize" }

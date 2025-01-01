@@ -20,6 +20,7 @@ application {
 dependencies {
     implementation(libs.kotlinx.coroutines.guava)
     implementation(projects.network.mai)
+    implementation(projects.network.exler)
     implementation(projects.models)
     implementation(projects.shared)
     implementation(projects.network.mai)
