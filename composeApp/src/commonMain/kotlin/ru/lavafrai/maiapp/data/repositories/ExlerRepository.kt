@@ -8,13 +8,14 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.platform.getPlatform
 
 class ExlerRepository(
     httpClient: HttpClient = baseHttpClient,
-    baseUrl: String = "https://mai-exler.ru",
+    baseUrl: String = API_BASE_URL,
 ): BaseRepository() {
     private val api = MaiApi(httpClient, baseUrl)
     private val cache = getPlatform().storage()

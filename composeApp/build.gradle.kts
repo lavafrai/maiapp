@@ -38,7 +38,7 @@ try {
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
     buildConfigField("VERSION_NAME", version)
-    buildConfigField("API_BASE_URL", "https://mai3.lavafrai.ru")
+    buildConfigField("API_BASE_URL", "https://maiapp.lavafrai.ru")
     buildConfigField("APPMETRICA_APIKEY", secretProperties["appmetrica.api_key"] as String)
 
 }
