@@ -5,6 +5,7 @@ import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherReview
 import ru.lavafrai.maiapp.utils.contextual
+import ru.lavafrai.maiapp.utils.modify
 
 suspend fun parseTeacherReviews(
     httpGet: HttpGet,
@@ -43,6 +44,7 @@ suspend fun parseTeacherReview(
         .also { if (it.contains("<table")) {println("skip table: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/vestyak/
         .also { if (it.contains("<b>ФРАЗЫ</b>")) {println("skip phrases: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/sharikov/
         .contextual(case = { trim().startsWith("small&gt;") }) { println("fix: $teacherId") ; replace("small&gt;", "<small>") } // cause: https://mai-exler.ru/prepods/02/uskova/
+        .modify() { replace("&nbsp;", " ") }
 
     val reviewMeta = "<small>([\\s\\S]+?)</font>".toRegex().find(normalizedText)?.groupValues?.get(1)?.trim() ?: run {
         throw RuntimeException("Failed to parse review meta")
@@ -50,7 +52,6 @@ suspend fun parseTeacherReview(
     val reviewMetaClear = Ksoup.parse(reviewMeta).wholeText()
     val reviewText = normalizedText
         .replace(reviewMeta, "")
-        .replace("&nbsp;", " ")
         .trim()
 
     val reviewAuthor = "<b>Автор(ы)?:</b> (.+?)<br>".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
