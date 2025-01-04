@@ -24,6 +24,10 @@ import kotlin.time.Duration.Companion.seconds
 class ExlerRepository(
     private val httpClient: HttpClient = HttpClientProvider.default,
 ) {
+    private val bannedTeacherReviews = listOf(
+        ""
+    )
+
     private var cachedTeachers: List<ExlerTeacher>? = null
     private var cachedTeachersTimestamp: Duration = 0.seconds
     private val cachedTeachersExpirationTime = 60.minutes
@@ -55,7 +59,9 @@ class ExlerRepository(
         val teachers = parseTeacherList(this::httpGet)
         cachedTeachers = teachers
         cachedTeachersTimestamp = LocalDateTime.now().toInstant(TimeZone.UTC).epochSeconds.seconds
-        return teachers
+        return teachers.filter {
+            it.path !in bannedTeacherReviews
+        }
     }
 
     suspend fun getExlerTeacherReviews(teacherId: ExlerTeacher): ExlerTeacherInfo {

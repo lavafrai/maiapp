@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.lavafrai.maiapp.network.exler.ExlerRepository
+import ru.lavafrai.maiapp.utils.mapAsync
 
 fun Route.exler(
     exlerRepository: ExlerRepository,
@@ -25,5 +26,9 @@ fun Route.exler(
         }
 
         call.respond(teacherInfo) /* TODO fetch teacher by name */
+
+        //val teachers = exlerRepository.getExlerTeachers()
+        //val reviews = teachers.mapAsync { exlerRepository.getExlerTeacherReviews(it) }
+        //call.respond(reviews)
     }
 }

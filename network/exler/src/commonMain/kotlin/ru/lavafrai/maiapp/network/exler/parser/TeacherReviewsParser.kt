@@ -4,6 +4,7 @@ import com.fleeksoft.ksoup.Ksoup
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherReview
+import ru.lavafrai.maiapp.utils.contextual
 
 suspend fun parseTeacherReviews(
     httpGet: HttpGet,
@@ -15,7 +16,10 @@ suspend fun parseTeacherReviews(
         .toRegex()
         .findAll(reviewsElement.toString())
         .map { it.groupValues[1] }.toList()
-    val reviews = reviewTexts.subList(1, reviewTexts.size).map { parseTeacherReview(httpGet, it, teacherId) }
+    val reviews = reviewTexts
+        .subList(1, reviewTexts.size)
+        .map { parseTeacherReview(httpGet, it, teacherId) }
+        .filterNotNull()
 
     val baseInfo = parseBaseTeacherInfo(
         httpGet,
@@ -33,15 +37,26 @@ suspend fun parseTeacherReview(
     httpGet: HttpGet,
     text: String,
     teacherId: ExlerTeacher,
-): ExlerTeacherReview {
-    val reviewMeta = "<small>(.+?)</small>".toRegex().find(text)?.groupValues?.get(1)?.trim()!!
-    val reviewText = text
-        .replace("<small>(.+?)</small>".toRegex(), "")
+): ExlerTeacherReview? {
+    val normalizedText = text
+        // .also { if (it.isBlank()) return null }
+        .also { if (it.contains("<table")) {println("skip table: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/vestyak/
+        .also { if (it.contains("<b>ФРАЗЫ</b>")) {println("skip phrases: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/sharikov/
+        .contextual(case = { trim().startsWith("small&gt;") }) { println("fix: $teacherId") ; replace("small&gt;", "<small>") } // cause: https://mai-exler.ru/prepods/02/uskova/
+
+    val reviewMeta = "<small>([\\s\\S]+?)</font>".toRegex().find(normalizedText)?.groupValues?.get(1)?.trim() ?: run {
+        throw RuntimeException("Failed to parse review meta")
+    }
+    val reviewMetaClear = Ksoup.parse(reviewMeta).wholeText()
+    val reviewText = normalizedText
+        .replace(reviewMeta, "")
         .replace("&nbsp;", " ")
         .trim()
 
+    val reviewAuthor = "<b>Автор(ы)?:</b> (.+?)<br>".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
+
     return ExlerTeacherReview(
-        author = "reviewMeta",
+        author = reviewAuthor,
         source = "reviewMeta",
         publishTime = "reviewMeta",
         hypertext = reviewText,
