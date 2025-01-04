@@ -35,7 +35,10 @@ suspend fun parseTeacherReview(
     teacherId: ExlerTeacher,
 ): ExlerTeacherReview {
     val reviewMeta = "<small>(.+?)</small>".toRegex().find(text)?.groupValues?.get(1)?.trim()!!
-    val reviewText = text.replace("<small>(.+?)</small>".toRegex(), "").trim()
+    val reviewText = text
+        .replace("<small>(.+?)</small>".toRegex(), "")
+        .replace("&nbsp;", "\u00A0")
+        .trim()
 
     return ExlerTeacherReview(
         author = "reviewMeta",
