@@ -38,7 +38,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.client.core)
-            implementation("com.fleeksoft.ksoup:ksoup:0.2.1")
+            implementation(libs.ksoup)
+            implementation(libs.kotlin.retry)
         }
     }
 }
