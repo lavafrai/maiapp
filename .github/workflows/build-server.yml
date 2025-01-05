@@ -10,6 +10,7 @@ on:
             - 'network/**'
             - 'gradle/libs.versions.toml'
             - '.github/workflows/build-server.yml'
+            - 'Dockerfile.server'
     workflow_dispatch:
 
 jobs:
