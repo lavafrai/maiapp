@@ -24,7 +24,7 @@ suspend fun parseTeacherReviews(
 
     val baseInfo = parseBaseTeacherInfo(
         httpGet,
-        defaultName = teacherId.name,
+        teacherId = teacherId,
         text = reviewTexts[0]
     )
     val info = baseInfo.copy(
@@ -71,7 +71,8 @@ suspend fun parseTeacherReview(
 
 suspend fun parseBaseTeacherInfo(
     httpGet: HttpGet,
-    defaultName: String,
+    teacherId: ExlerTeacher,
+    defaultName: String = teacherId.name,
     text: String,
 ): ExlerTeacherInfo {
     val baseInfoElementText = Ksoup.parse(text).wholeText()
@@ -84,5 +85,6 @@ suspend fun parseBaseTeacherInfo(
         department = department,
         photo = null,
         reviews = emptyList(),
+        link = "https://mai-exler.ru${teacherId.path}",
     )
 }
