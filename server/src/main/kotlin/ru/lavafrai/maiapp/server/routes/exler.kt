@@ -26,9 +26,5 @@ fun Route.exler(
         }
 
         call.respond(teacherInfo) /* TODO fetch teacher by name */
-
-        //val teachers = exlerRepository.getExlerTeachers()
-        //val reviews = teachers.mapAsync { exlerRepository.getExlerTeacherReviews(it) }
-        //call.respond(reviews)
     }
 }

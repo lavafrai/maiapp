@@ -40,26 +40,31 @@ suspend fun parseTeacherReview(
     teacherId: ExlerTeacher,
 ): ExlerTeacherReview? {
     val normalizedText = text
-        // .also { if (it.isBlank()) return null }
         .also { if (it.contains("<table")) {println("skip table: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/vestyak/
         .also { if (it.contains("<b>ФРАЗЫ</b>")) {println("skip phrases: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/sharikov/
         .contextual(case = { trim().startsWith("small&gt;") }) { println("fix: $teacherId") ; replace("small&gt;", "<small>") } // cause: https://mai-exler.ru/prepods/02/uskova/
         .modify() { replace("&nbsp;", " ") }
+        .modify() { replace("<small><font color=\"#666666\"> </font></small>", "") } // cause: https://mai-exler.ru/prepods/02/mikhailova/
 
-    val reviewMeta = "<small>([\\s\\S]+?)</font>".toRegex().find(normalizedText)?.groupValues?.get(1)?.trim() ?: run {
-        throw RuntimeException("Failed to parse review meta")
+    val reviewMeta = Ksoup.parse(normalizedText).select("small").joinToString("\n")
+    if (reviewMeta.isBlank()) {
+        return null
     }
-    val reviewMetaClear = Ksoup.parse(reviewMeta).wholeText()
+
     val reviewText = normalizedText
         .replace(reviewMeta, "")
         .trim()
 
-    val reviewAuthor = "<b>Автор(ы)?:</b> (.+?)<br>".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
+    val reviewAuthor = "<b>Автор(ы)?:\\s?+</b>([\\s\\S]+?)(<br>|</font>)".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
+        ?: "<b>Записал?:\\s?+</b>([\\s\\S]+?)(<br>|</font>)".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
+        ?: "<b>Прислал?:\\s?+</b>([\\s\\S]+?)(<br>|</font>)".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
+    val reviewSource = "<b>Источник(и)?:\\s?+</b>([\\s\\S]+?)(<br>|</font>)".toRegex().find(reviewMeta)?.groupValues?.get(2)?.trim()
+    val reviewPublishTime = "<b>Опубликовано:\\s?+</b>([\\s\\S]+?)(<br>|</font>)".toRegex().find(reviewMeta)?.groupValues?.get(1)?.trim()
 
     return ExlerTeacherReview(
         author = reviewAuthor,
-        source = "reviewMeta",
-        publishTime = "reviewMeta",
+        source = reviewSource,
+        publishTime = reviewPublishTime,
         hypertext = reviewText,
     )
 }

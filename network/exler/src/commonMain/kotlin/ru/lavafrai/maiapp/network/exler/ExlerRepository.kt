@@ -25,7 +25,9 @@ class ExlerRepository(
     private val httpClient: HttpClient = HttpClientProvider.default,
 ) {
     private val bannedTeacherReviews = listOf(
-        ""
+        "/prepods/03/chekanov/",
+        "/prepods/08/kunitsyn/",
+        "/prepods/war/pochuev/",
     )
 
     private var cachedTeachers: List<ExlerTeacher>? = null
