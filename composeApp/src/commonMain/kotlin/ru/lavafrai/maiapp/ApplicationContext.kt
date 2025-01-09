@@ -3,6 +3,7 @@ package ru.lavafrai.maiapp
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavController
 import ru.lavafrai.maiapp.models.schedule.Lesson
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.navigation.pages.LessonDetailsPage
 import ru.lavafrai.maiapp.navigation.pages.SafeDataCleanup
 import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
@@ -25,8 +26,14 @@ class ApplicationContext(
         navController.navigate(SafeDataCleanup)
     }
 
-    fun openLessonDetails(lesson: Lesson) {
-        navController.navigate(LessonDetailsPage(lesson))
+    fun openLessonDetails(
+        lesson: Lesson,
+        schedule: Schedule,
+    ) {
+        navController.navigate(LessonDetailsPage(
+            lesson = lesson,
+            schedule = schedule,
+        ))
     }
 }
 

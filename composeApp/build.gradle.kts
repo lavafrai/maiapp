@@ -111,7 +111,6 @@ kotlin {
             // implementation(libs.haze.materials) // Does not work idk why
 
             implementation(libs.libres)
-            // implementation(libs.mai.api) // TODO idk how but i need to import it
         }
 
         androidMain.dependencies {

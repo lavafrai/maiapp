@@ -79,7 +79,7 @@ fun ScheduleView(
                             .padding(vertical = 8.dp),
                         exlerTeachers = exlerTeachers,
                         annotations = filteredAnnotations,
-                        scheduleName = schedule.name,
+                        schedule = schedule,
                     )
                 }
             }

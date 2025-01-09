@@ -21,6 +21,7 @@ import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
 import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
 import ru.lavafrai.maiapp.models.schedule.Lesson
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
@@ -107,13 +108,16 @@ fun AppNavigation(
                 dialog<LessonDetailsPage>(
                     typeMap = mapOf(
                         typeOf<Lesson>() to navTypeOf<Lesson>(),
+                        typeOf<Schedule>() to navTypeOf<Schedule>(),
                     ),
                 ) { backStackEntry ->
                     val lesson = (backStackEntry.toRoute() as LessonDetailsPage).lesson
+                    val schedule = (backStackEntry.toRoute() as LessonDetailsPage).schedule
 
                     LessonDetailsDialog(
                         onNavigateBack = { navController.navigateUp() },
                         lesson = lesson,
+                        schedule = schedule,
                     )
                 }
 

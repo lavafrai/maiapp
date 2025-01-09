@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 
 @Composable
@@ -15,7 +16,7 @@ fun DayView(
     modifier: Modifier = Modifier,
     exlerTeachers: List<ExlerTeacher>?,
     annotations: List<LessonAnnotation>,
-    scheduleName: String,
+    schedule: Schedule,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -26,7 +27,7 @@ fun DayView(
                 lesson = lesson,
                 exlerTeachers = exlerTeachers,
                 annotations = annotations.filter { it.lessonUid == lesson.getUid() },
-                scheduleName = scheduleName,
+                schedule = schedule,
             )
         }
     }

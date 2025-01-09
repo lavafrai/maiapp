@@ -45,6 +45,7 @@
     <string name="storage_usage">Использование хранилища</string>
     <string name="clear_application_data">Очистить данные приложения</string>
     <string name="ok">Окей</string>
+    <string name="done">Готово</string>
     <string name="mark_as">Пометить как</string>
     <string name="confirm">Подтвердить</string>
     <string name="cancel">Отменить</string>
