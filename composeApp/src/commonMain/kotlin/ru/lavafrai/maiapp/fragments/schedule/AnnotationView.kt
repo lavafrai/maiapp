@@ -46,7 +46,7 @@ fun AnnotationView(
             background = annotation.color(),
             color = backgroundColor,
             borderColor = backgroundColor,
-            borderWidth = 8.dp,
+            borderWidth = 4.dp,
         )
     }
 }

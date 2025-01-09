@@ -25,21 +25,21 @@ fun PairNumber(
     text: String = "1",
     background: Color = MaterialTheme.colorScheme.primary,
     color: Color = MaterialTheme.colorScheme.onPrimary,
+    size: Dp = 36.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = Color.Transparent,
     bold: Boolean = false
 ) {
     Box (
         modifier = modifier
-            .width(borderWidth.times(2f).plus(30.dp))
-            .height(borderWidth.times(2f).plus(30.dp))
+            .size(size)
             .clip(CircleShape)
             .background(borderColor),
     ) {
         Surface(
             modifier = Modifier
                 .clip(CircleShape)
-                .size(borderWidth.times(2f).plus(30.dp).minus(borderWidth))
+                .size(size.minus(borderWidth))
                 .align(Alignment.Center),
             color = background
         ) {
