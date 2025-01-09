@@ -55,7 +55,7 @@ fun LessonView(
                 val lessonAnnotations = annotations.filter { it.lessonUid == lesson.getUid() }
                 AnnotationsView(
                     annotations = lessonAnnotations,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
             Column(
