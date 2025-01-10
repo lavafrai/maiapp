@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cachingheaders.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.util.*
 import ru.lavafrai.maiapp.Constants
 
@@ -28,5 +29,11 @@ fun Application.configureCaching() {
                 else -> null
             }
         }
+    }
+
+    install(CORS) {
+        allowHost("maiapp.lavafrai.ru")
+        allowHost("mai3.lavafrai.ru")
+        allowHeader(HttpHeaders.ContentType)
     }
 }

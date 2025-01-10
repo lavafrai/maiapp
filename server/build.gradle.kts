@@ -32,4 +32,5 @@ dependencies {
     implementation(libs.ktor.server.serialization)
     implementation(libs.ktor.server.serialization.json)
     implementation(libs.ktor.client.core)
+    implementation(libs.ktor.server.cors)
 }

@@ -14,7 +14,7 @@ fun PhotosCarousel(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier
-        .height(200.dp)
+        .height(300.dp)
         .background(color = Color.Red)
     ) {
 
