@@ -3,7 +3,7 @@
 analytics = "7.5.0"
 glance = "1.1.1"
 kotlin = "2.1.0"
-agp = "8.5.2"
+agp = "8.7.3"
 coilCompose = "3.0.4"
 compose = "1.7.0"
 androidx-activityCompose = "1.9.3"

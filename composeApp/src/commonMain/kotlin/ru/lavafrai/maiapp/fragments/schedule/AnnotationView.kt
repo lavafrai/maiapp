@@ -18,6 +18,7 @@ fun AnnotationsView(
     annotations: List<LessonAnnotation>,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    onOpenAnnotations: () -> Unit = {},
 ) {
     Box(
         modifier = modifier,
@@ -27,6 +28,7 @@ fun AnnotationsView(
                 annotation,
                 topOffset = (annotations.size - index - 1) * 8,
                 backgroundColor = backgroundColor,
+                onOpenAnnotations = onOpenAnnotations,
             )
         }
     }
@@ -37,6 +39,7 @@ fun AnnotationView(
     annotation: LessonAnnotation,
     topOffset: Int = 0,
     backgroundColor: Color,
+    onOpenAnnotations: () -> Unit = {},
 ) {
     Column {
         Spacer(modifier = Modifier.height(topOffset.dp))
@@ -47,6 +50,7 @@ fun AnnotationView(
             color = backgroundColor,
             borderColor = backgroundColor,
             borderWidth = 4.dp,
+            onClick = onOpenAnnotations,
         )
     }
 }

@@ -1,6 +1,7 @@
 package ru.lavafrai.maiapp.fragments.schedule
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +29,8 @@ fun PairNumber(
     size: Dp = 36.dp,
     borderWidth: Dp = 1.dp,
     borderColor: Color = Color.Transparent,
-    bold: Boolean = false
+    bold: Boolean = false,
+    onClick: () -> Unit = {},
 ) {
     Box (
         modifier = modifier
@@ -38,8 +40,9 @@ fun PairNumber(
     ) {
         Surface(
             modifier = Modifier
-                .clip(CircleShape)
                 .size(size.minus(borderWidth))
+                .clickable(onClick = onClick)
+                .clip(CircleShape)
                 .align(Alignment.Center),
             color = background
         ) {

@@ -56,6 +56,7 @@ fun LessonView(
                 AnnotationsView(
                     annotations = lessonAnnotations,
                     modifier = Modifier.padding(top = 4.dp),
+                    onOpenAnnotations = { appContext.openLessonDetails(lesson, schedule) },
                 )
             }
             Column(
