@@ -1,17 +1,14 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package ru.lavafrai.maiapp.viewmodels.teacherReview
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.PageColumn
+import ru.lavafrai.maiapp.fragments.media.PhotosCarousel
 import ru.lavafrai.maiapp.fragments.schedule.TeacherReviewView
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
-import ru.lavafrai.maiapp.platform.getPlatform
 
 
 data class CarouselItem(
@@ -23,16 +20,10 @@ data class CarouselItem(
 fun ColumnScope.TeacherReviewsView(
     teacherInfo: ExlerTeacherInfo,
 ) {
-    val openUrl = { url: String ->
-        val platform = getPlatform()
-        val defaultUrl = "https://mai-exler.ru"
-        val fullUrl = if (url.startsWith("http")) url else "$defaultUrl$url"
-        platform.openUrl(fullUrl)
-    }
     val appContext = LocalApplicationContext.current
-    val photos = teacherInfo.photo
+    val photos = teacherInfo.photos
         ?.filter { !it.endsWith("Jeremy-Hillary-Boob-PhD_form-header.png") }
-        ?.mapIndexed { index, it -> CarouselItem(index, it) } ?: emptyList()
+        ?.mapIndexed { index, it -> it } ?: emptyList()
 
     PageColumn (
         modifier = Modifier
@@ -40,6 +31,14 @@ fun ColumnScope.TeacherReviewsView(
             .weight(1f),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        if (photos.isNotEmpty()) {
+            PhotosCarousel(
+                photos = photos,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
+
         teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->
             TeacherReviewView(review)
         }

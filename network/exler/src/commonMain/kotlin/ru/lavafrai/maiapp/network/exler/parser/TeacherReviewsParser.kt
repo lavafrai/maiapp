@@ -5,13 +5,15 @@ import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherReview
 import ru.lavafrai.maiapp.utils.contextual
+import ru.lavafrai.maiapp.utils.globalUrl
 import ru.lavafrai.maiapp.utils.modify
 
 suspend fun parseTeacherReviews(
     httpGet: HttpGet,
     teacherId: ExlerTeacher,
 ): ExlerTeacherInfo {
-    val reviewsPage = httpGet("https://mai-exler.ru${teacherId.path}")
+    val pageUrl = "https://mai-exler.ru${teacherId.path}"
+    val reviewsPage = httpGet(pageUrl)
     val reviewsElement = Ksoup.parse(reviewsPage).select("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td")
     val reviewTexts = "<!--subscribeBegin-->([\\s\\S]+?)<!--subscribeEnd-->"
         .toRegex()
@@ -21,14 +23,20 @@ suspend fun parseTeacherReviews(
         .subList(1, reviewTexts.size)
         .map { parseTeacherReview(httpGet, it, teacherId) }
         .filterNotNull()
+    val photos = reviewsElement.select("img")
+        .toList()
+        .map { it.attr("src") }
+        .filterNot { it.contains("Jeremy-Hillary-Boob-PhD_form-header.png") }
+        .map { globalUrl(baseUrl = pageUrl, path = it) }
 
     val baseInfo = parseBaseTeacherInfo(
         httpGet,
         teacherId = teacherId,
-        text = reviewTexts[0]
+        text = reviewTexts[0],
     )
     val info = baseInfo.copy(
         reviews = reviews,
+        photos = photos,
     )
 
     return info
@@ -75,15 +83,17 @@ suspend fun parseBaseTeacherInfo(
     defaultName: String = teacherId.name,
     text: String,
 ): ExlerTeacherInfo {
-    val baseInfoElementText = Ksoup.parse(text).wholeText()
+    val baseInfoElement = Ksoup.parse(text)
+    val baseInfoElementText = baseInfoElement.wholeText()
     val name = "<font color=\"#006699\"><b>(.+?)</b></font>".toRegex().findAll(text).lastOrNull()?.groupValues?.get(1)?.trim() ?: defaultName
     val faculty = "Факультет:(.+?)\n".toRegex().findAll(baseInfoElementText).lastOrNull()?.groupValues?.get(1)?.trim()
     val department = "Кафедра:(.+?)\n".toRegex().findAll(baseInfoElementText).lastOrNull()?.groupValues?.get(1)?.trim()
+
     return ExlerTeacherInfo(
         name = name,
         faculty = faculty,
         department = department,
-        photo = null,
+        photos = null,
         reviews = emptyList(),
         link = "https://mai-exler.ru${teacherId.path}",
     )

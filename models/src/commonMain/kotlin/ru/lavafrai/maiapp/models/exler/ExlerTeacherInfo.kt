@@ -8,6 +8,6 @@ data class ExlerTeacherInfo (
     val link: String,
     val faculty: String?,
     val department: String?,
-    val photo: List<String>?,
+    val photos: List<String>?,
     val reviews: List<ExlerTeacherReview>,
 )
