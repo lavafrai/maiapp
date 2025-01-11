@@ -34,6 +34,8 @@ fun Application.configureCaching() {
     install(CORS) {
         allowHost("maiapp.lavafrai.ru")
         allowHost("mai3.lavafrai.ru")
+        allowHost("lavafrai.github.io")
+        allowHost("127.0.0.1:80")
         allowHeader(HttpHeaders.ContentType)
     }
 }

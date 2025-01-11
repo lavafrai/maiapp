@@ -24,6 +24,7 @@ dependencies {
     implementation(projects.models)
     implementation(projects.shared)
     implementation(projects.network.mai)
+    implementation(projects.network.github)
     implementation(libs.ktor.server.core)
     implementation(libs.kotlinx.datetime)
     implementation(libs.ktor.logback.classic)

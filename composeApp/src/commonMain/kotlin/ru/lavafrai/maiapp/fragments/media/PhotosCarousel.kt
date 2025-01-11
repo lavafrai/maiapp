@@ -17,6 +17,6 @@ fun PhotosCarousel(
         .height(300.dp)
         .background(color = Color.Red)
     ) {
-
+        /* TODO Implement photos carousel */
     }
 }
