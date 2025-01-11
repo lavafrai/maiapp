@@ -34,7 +34,7 @@ logback-classic = "1.5.11"
 
 android-compileSdk = "35"
 android-minSdk = "23"
-android-targetSdk = "53"
+android-targetSdk = "35"
 
 
 [libraries]
