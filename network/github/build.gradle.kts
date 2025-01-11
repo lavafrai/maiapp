@@ -40,7 +40,7 @@ kotlin {
 
             implementation(project.dependencies.platform(libs.kotlincrypto))
             implementation(libs.kotlincrypto.md)
-            implementation("com.ionspin.kotlin:bignum:0.3.10")
+            implementation(libs.bignum)
         }
     }
 }

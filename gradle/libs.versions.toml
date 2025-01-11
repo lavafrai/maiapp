@@ -1,6 +1,7 @@
 [versions]
 
 analytics = "7.5.0"
+bignum = "0.3.10"
 glance = "1.1.1"
 kotlin = "2.1.0"
 agp = "8.7.3"
@@ -16,6 +17,7 @@ androidx-lifecycle = "2.8.4"
 androidx-navigation = "2.8.0-alpha10"
 kotlinx-serialization = "1.7.3"
 koin = "4.0.0"
+ktorUtils = "3.0.3"
 libres = "1.2.3"
 materialKolor = "2.0.0"
 multiplatformSettings = "1.2.0"
@@ -43,6 +45,7 @@ analytics = { module = "io.appmetrica.analytics:analytics", version.ref = "analy
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 kotlin-retry = { module = "com.michael-bull.kotlin-retry:kotlin-retry", version.ref = "kotlinRetry" }
 kotlincrypto = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
 kotlincrypto-md = { module = "org.kotlincrypto.hash:md", version.ref = "kotlincrypto" }
@@ -70,6 +73,7 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorUtils" }
 libres = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatformSettings" }
