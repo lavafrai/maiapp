@@ -12,3 +12,8 @@ fun globalUrl(baseUrl: String, path: String): String {
         return "${protocol.name}://$host.${if (protocol.defaultPort == port) "" else ":$port"}$path"
     }
 }
+
+fun String.isUrlToImage(): Boolean {
+    val allowedImageExtensions = setOf("jpg", "jpeg", "png", "gif", "webp")
+    return this.substringAfterLast(".") in allowedImageExtensions
+}

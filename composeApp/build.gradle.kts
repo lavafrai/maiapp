@@ -111,6 +111,8 @@ kotlin {
             // implementation(libs.haze.materials) // Does not work idk why
 
             implementation(libs.libres)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor3)
         }
 
         androidMain.dependencies {

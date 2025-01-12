@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalEncodingApi::class, ExperimentalEncodingApi::class)
+@file:OptIn(ExperimentalEncodingApi::class)
 
 package ru.lavafrai.maiapp.models.github
 

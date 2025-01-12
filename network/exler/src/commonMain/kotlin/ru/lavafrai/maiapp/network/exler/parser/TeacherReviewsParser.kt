@@ -6,6 +6,7 @@ import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherReview
 import ru.lavafrai.maiapp.utils.contextual
 import ru.lavafrai.maiapp.utils.globalUrl
+import ru.lavafrai.maiapp.utils.isUrlToImage
 import ru.lavafrai.maiapp.utils.modify
 
 suspend fun parseTeacherReviews(
@@ -19,15 +20,34 @@ suspend fun parseTeacherReviews(
         .toRegex()
         .findAll(reviewsElement.toString())
         .map { it.groupValues[1] }.toList()
+
     val reviews = reviewTexts
         .subList(1, reviewTexts.size)
         .map { parseTeacherReview(httpGet, it, teacherId) }
         .filterNotNull()
+
     val photos = reviewsElement.select("img")
         .toList()
         .map { it.attr("src") }
         .filterNot { it.contains("Jeremy-Hillary-Boob-PhD_form-header.png") }
         .map { globalUrl(baseUrl = pageUrl, path = it) }
+
+    val largePhotos = reviewsElement.select("img")
+        .toList()
+        .filterNot { it.attr("src").contains("Jeremy-Hillary-Boob-PhD_form-header.png") }
+        .map {
+            it.attr("src") to if (
+                it.parent()?.hasAttr("href") == true &&
+                it.parent()?.attr("href")?.isUrlToImage() == true
+            ) {
+                it.parent()!!.attr("href")
+            } else {
+                it.attr("src")
+            }
+        }
+        .toMap()
+        .map { globalUrl(baseUrl = pageUrl, path = it.key) to globalUrl(baseUrl = pageUrl, path = it.value) }
+        .toMap()
 
     val baseInfo = parseBaseTeacherInfo(
         httpGet,
@@ -37,6 +57,7 @@ suspend fun parseTeacherReviews(
     val info = baseInfo.copy(
         reviews = reviews,
         photos = photos,
+        largePhotos = largePhotos,
     )
 
     return info
@@ -93,7 +114,8 @@ suspend fun parseBaseTeacherInfo(
         name = name,
         faculty = faculty,
         department = department,
-        photos = null,
+        photos = emptyList(),
+        largePhotos = emptyMap(),
         reviews = emptyList(),
         link = "https://mai-exler.ru${teacherId.path}",
     )
