@@ -25,19 +25,21 @@ fun ColumnScope.TeacherReviewsView(
         ?.filter { !it.endsWith("Jeremy-Hillary-Boob-PhD_form-header.png") }
         ?.mapIndexed { index, it -> it } ?: emptyList()
 
+    if (photos.isNotEmpty()) {
+        PhotosCarousel(
+            photos = photos,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+    }
+
     PageColumn (
         modifier = Modifier
             .fillMaxWidth()
             .weight(1f),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        if (photos.isNotEmpty()) {
-            PhotosCarousel(
-                photos = photos,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-        }
+
 
         teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->
             TeacherReviewView(review)
