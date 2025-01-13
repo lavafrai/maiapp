@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
@@ -21,12 +22,13 @@ import coil3.compose.AsyncImage
 fun PhotosCarousel(
     photos: List<String>,
     modifier: Modifier = Modifier,
+    innerImagesPadding: Dp = 8.dp,
+    horizontalImagesPadding: Dp = 0.dp,
+    height: Dp = 300.dp,
 ) {
-    val pagerState = rememberPagerState(pageCount = { photos.size })
-
     Box(modifier = modifier
-        .height(300.dp)
-        .background(color = Color.Red)
+        .height(height)
+        //.background(color = Color.Red)
     ) {
         Row(
             modifier = Modifier
@@ -37,8 +39,10 @@ fun PhotosCarousel(
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
                     .fillMaxHeight(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(innerImagesPadding),
             ) {
+                Spacer(Modifier.width(horizontalImagesPadding))
+
                 photos.forEach { photoUrl ->
                     AsyncImage(
                         model = photoUrl,
@@ -52,6 +56,8 @@ fun PhotosCarousel(
                         onSuccess = { /* TODO */ },
                     )
                 }
+
+                Spacer(Modifier.width(horizontalImagesPadding))
             }
         }
     }

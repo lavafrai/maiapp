@@ -25,26 +25,33 @@ fun ColumnScope.TeacherReviewsView(
         ?.filter { !it.endsWith("Jeremy-Hillary-Boob-PhD_form-header.png") }
         ?.mapIndexed { index, it -> it } ?: emptyList()
 
-    if (photos.isNotEmpty()) {
-        PhotosCarousel(
-            photos = photos,
-            modifier = Modifier
-                .fillMaxWidth()
-        )
-    }
 
     PageColumn (
         modifier = Modifier
             .fillMaxWidth()
-            .weight(1f),
+            .weight(1f)
+            .padding(top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        paddings = false,
     ) {
-
-
-        teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->
-            TeacherReviewView(review)
+        if (photos.isNotEmpty()) {
+            PhotosCarousel(
+                photos = photos,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
         }
 
-        Box(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->
+                TeacherReviewView(review)
+            }
+
+            Box(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+        }
     }
 }
