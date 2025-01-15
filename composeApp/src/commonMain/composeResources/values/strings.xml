@@ -9,6 +9,8 @@
     <string name="sign_in">Войти</string>
     <string name="retry">Повторить</string>
     <string name="copy_stacktrace">Скопировать ошибку</string>
+    <string name="copy">Скопировать</string>
+    <string name="share">Поделиться</string>
     <string name="go_next">Продолжить</string>
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="some_data_must_be_loaded">Нужно кое-что загрузить…</string>

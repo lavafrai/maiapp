@@ -103,6 +103,9 @@ kotlin {
             implementation(libs.material.motion)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
+            implementation(libs.compose.shimmer)
+            implementation(libs.zoomimage.compose.coil3)
+            implementation(libs.zoomimage.compose)
             // api(libs.webview) // Does not work on WEB
             implementation(libs.sonner)
             implementation(libs.multiplatform.settings.test)

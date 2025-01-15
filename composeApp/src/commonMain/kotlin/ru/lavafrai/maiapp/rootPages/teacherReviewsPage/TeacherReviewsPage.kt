@@ -35,8 +35,8 @@ import ru.lavafrai.maiapp.viewmodels.teacherReview.TeacherReviewsView
 fun TeacherReviewsPage(
     teacherId: String,
     onNavigateBack: () -> Unit,
-    //sharedTransitionScope: SharedTransitionScope,
-    //animatedContentScope: AnimatedContentScope,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
 ) {
     val viewModel: TeacherReviewViewModel = viewModel(factory = TeacherReviewViewModel.Factory(teacherId))
     val viewState by viewModel.state.collectAsState()
@@ -63,6 +63,8 @@ fun TeacherReviewsPage(
 
                 BaseLoadableStatus.Actual -> TeacherReviewsView(
                     teacherInfo = viewState.teacherInfo.data!!,
+                    sharedTransitionScope,
+                    animatedContentScope,
                 )
             }
         }

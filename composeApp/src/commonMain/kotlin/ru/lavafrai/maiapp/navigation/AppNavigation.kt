@@ -1,9 +1,6 @@
 package ru.lavafrai.maiapp.navigation
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +24,7 @@ import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
+import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 import kotlin.reflect.typeOf
@@ -134,12 +132,28 @@ fun AppNavigation(
                         color = MaterialTheme.colorScheme.background,
                     ) {
                         TeacherReviewsPage(
-                            //sharedTransitionScope = this@SharedTransitionLayout,
-                            //animatedContentScope = this@dialog,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedContentScope = this@composable,
                             onNavigateBack = { navController.navigateUp() },
                             teacherId = loginData.teacherId,
                         )
                     }
+                }
+
+                composable<ImageViewPage>(
+                    enterTransition = { fadeIn() },
+                    exitTransition = { fadeOut() },
+                    popExitTransition = { fadeOut() },
+                    popEnterTransition = { fadeIn() },
+                ) { backStackEntry ->
+                    val imageData: ImageViewPage = backStackEntry.toRoute()
+
+                    ImageViewPage(
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
+                        url = imageData.url,
+                        onNavigateBack = { navController.navigateUp() },
+                    )
                 }
             }
         }

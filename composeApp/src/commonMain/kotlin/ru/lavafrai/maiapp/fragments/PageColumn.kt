@@ -30,7 +30,7 @@ fun PageColumn(
     ) {
         if (paddings) Spacer(Modifier.height(8.dp))
         Column(
-            modifier = Modifier.pageColumnPaddings(),
+            modifier = Modifier.pageColumnPaddings(horizontal = paddings),
             content = content,
             horizontalAlignment = horizontalAlignment,
             verticalArrangement = verticalArrangement,

@@ -39,4 +39,19 @@ class AndroidPlatform: Platform {
             )
         }
     }
+
+    override fun supportsShare() = true
+    override fun shareText(text: String) {
+        val context = AndroidApplication.instance()
+        val intent = Intent(Intent.ACTION_SEND)
+            .setType("text/plain")
+            .putExtra(Intent.EXTRA_SUBJECT, "My application name")
+            .putExtra(Intent.EXTRA_TEXT, text)
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val chooser = Intent.createChooser(intent, "Share via")
+        chooser.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+        context.startActivity(chooser)
+    }
 }

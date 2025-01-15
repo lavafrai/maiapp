@@ -1,14 +1,17 @@
 package ru.lavafrai.maiapp
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavController
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.navigation.pages.ImageViewPage
 import ru.lavafrai.maiapp.navigation.pages.LessonDetailsPage
 import ru.lavafrai.maiapp.navigation.pages.SafeDataCleanup
 import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
 import ru.lavafrai.maiapp.utils.UrlHandler
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 class ApplicationContext(
     val navController: NavController,
     val panicCleanup: () -> Unit,
@@ -24,6 +27,10 @@ class ApplicationContext(
 
     fun requestSafeDataClean() {
         navController.navigate(SafeDataCleanup)
+    }
+
+    fun openImageView(url: String) {
+        navController.navigate(ImageViewPage(url = url))
     }
 
     fun openLessonDetails(

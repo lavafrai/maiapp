@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package ru.lavafrai.maiapp.viewmodels.teacherReview
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,12 +24,12 @@ data class CarouselItem(
 @Composable
 fun ColumnScope.TeacherReviewsView(
     teacherInfo: ExlerTeacherInfo,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
 ) {
     val appContext = LocalApplicationContext.current
     val photos = teacherInfo.photos
-        ?.filter { !it.endsWith("Jeremy-Hillary-Boob-PhD_form-header.png") }
-        ?.mapIndexed { index, it -> it } ?: emptyList()
-
+    val fullSizeUrls = teacherInfo.largePhotos
 
     PageColumn (
         modifier = Modifier
@@ -37,8 +42,11 @@ fun ColumnScope.TeacherReviewsView(
         if (photos.isNotEmpty()) {
             PhotosCarousel(
                 photos = photos,
+                fullSizeUrls = fullSizeUrls,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
             )
         }
 
