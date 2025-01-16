@@ -48,8 +48,7 @@ fun TeacherPhoto(
             ImageLoader.Builder(context)
                 .memoryCachePolicy(CachePolicy.ENABLED)
                 .diskCachePolicy(CachePolicy.ENABLED)
-                .crossfade(200)
-                .crossfade(true)
+                .crossfade(false)
                 .build()
         }
 

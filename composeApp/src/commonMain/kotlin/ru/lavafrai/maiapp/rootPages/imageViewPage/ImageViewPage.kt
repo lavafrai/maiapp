@@ -47,8 +47,7 @@ fun ImageViewPage(
         ImageLoader.Builder(context)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
-            .crossfade(200)
-            .crossfade(true)
+            .crossfade(false)
             .build()
     }
 
@@ -82,11 +81,13 @@ fun ImageViewPage(
             }
 
             if (state == LoadableStatus.Loading) CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            if (state == LoadableStatus.Error) Icon(
-                imageVector = FeatherIcons.Repeat,
-                contentDescription = "repeat",
-                modifier = Modifier.align(Alignment.Center),
-            )
+            if (state == LoadableStatus.Error) IconButton(onClick = { retryHash++ }) {
+                Icon(
+                    imageVector = FeatherIcons.Repeat,
+                    contentDescription = "repeat",
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
             ImageViewControls(
                 visible = controlsVisible,
                 onNavigateBack = onNavigateBack,
