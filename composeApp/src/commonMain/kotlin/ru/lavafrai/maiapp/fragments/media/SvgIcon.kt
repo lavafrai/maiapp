@@ -17,7 +17,7 @@ import io.ktor.utils.io.core.*
 
 @Composable
 fun SvgIcon(
-    svg: ByteArray,
+    svg: String,
     contentDescription: String? = null,
     modifier: Modifier = Modifier.size(24.dp),
     tint: Color? = null,
@@ -30,7 +30,7 @@ fun SvgIcon(
         .build()
 
     AsyncImage(
-        model = remember(svg) { svg },
+        model = remember(svg) { svg.toByteArray() },
         contentDescription = contentDescription,
         imageLoader = imageLoader,
         onError = { error ->

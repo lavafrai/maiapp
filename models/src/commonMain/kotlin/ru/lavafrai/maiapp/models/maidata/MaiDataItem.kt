@@ -11,7 +11,7 @@ data class MaiDataItem(
     val leadingIcon: String? = null,
     val category: String? = null,
     val asset: String? = null,
-    val icon: ByteArray? = null,
+    val icon: String? = null,
     @SerialName("asset-night") val assetNight: String? = null,
 ) {
     
