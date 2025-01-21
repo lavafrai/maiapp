@@ -2,9 +2,7 @@
 
 package ru.lavafrai.maiapp.fragments.schedule
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -53,6 +52,7 @@ fun TeacherPhoto(
         }
 
         var state by remember { mutableStateOf(LoadableStatus.Loading) }
+        var width by remember { mutableStateOf(100f) }
 
         Box(modifier = Modifier.fillMaxHeight()) {
             AsyncImage(
@@ -62,24 +62,29 @@ fun TeacherPhoto(
                 modifier = modifier
                     .fillMaxHeight()
                     .clip(MaterialTheme.shapes.medium)
+                    .widthIn(min = width.dp)
                     .conditional(state == LoadableStatus.Loading) { shimmer(customShimmer = shimmerInstance) }
-                    .conditional(state != LoadableStatus.Actual) { widthIn(min = 200.dp) }
                     .conditional(state == LoadableStatus.Actual) { clickable { appContext.openImageView(fullSizeUrl) } }
                     .conditional(state == LoadableStatus.Error) { clickable { retryHash++ } }
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentScale = ContentScale.FillHeight,
+                    .conditional(state != LoadableStatus.Actual) { background(MaterialTheme.colorScheme.surfaceVariant) },
+                contentScale = ContentScale.Fit,
                 onError = { state = LoadableStatus.Error },
                 onLoading = { state = LoadableStatus.Loading },
-                onSuccess = { state = LoadableStatus.Actual },
+                onSuccess = { painter ->
+                    state = LoadableStatus.Actual
+                    val sizes = painter.painter.intrinsicSize
+                    width = (sizes.width / sizes.height * 300)
+                },
             )
 
-            if (state == LoadableStatus.Error) Icon(
-                FeatherIcons.Repeat,
-                "Retry",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clickable { retryHash++ }
-            )
+            if (state == LoadableStatus.Error) IconButton(onClick = { retryHash++ }) {
+                Icon(
+                    FeatherIcons.Repeat,
+                    "Retry",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                )
+            }
 
             if (state == LoadableStatus.Loading) CircularProgressIndicator(
                 modifier = Modifier
