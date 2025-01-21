@@ -103,6 +103,7 @@ kotlin {
             implementation(libs.material.motion)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
+            implementation(libs.coil.svg)
             implementation(libs.compose.shimmer)
             implementation(libs.zoomimage.compose.coil3)
             implementation(libs.zoomimage.compose)

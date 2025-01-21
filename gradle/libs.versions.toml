@@ -48,6 +48,7 @@ androidx-activityCompose = { module = "androidx.activity:activity-compose", vers
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coilCompose" }
 compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "composeShimmer" }
 kotlin-retry = { module = "com.michael-bull.kotlin-retry:kotlin-retry", version.ref = "kotlinRetry" }
 kotlincrypto = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypto" }
