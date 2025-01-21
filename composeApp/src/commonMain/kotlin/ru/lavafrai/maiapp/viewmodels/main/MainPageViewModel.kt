@@ -8,6 +8,7 @@ import kotlinx.coroutines.*
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
+import ru.lavafrai.maiapp.data.repositories.MaiDataRepository
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
@@ -29,7 +30,8 @@ class MainPageViewModel(
             LessonType.LABORATORY,
             LessonType.EXAM,
         ),
-        exlerTeachers = Loadable.loading()
+        exlerTeachers = Loadable.loading(),
+        maidata = Loadable.loading(),
     )
 ) {
     private val scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
@@ -38,6 +40,10 @@ class MainPageViewModel(
         baseUrl = API_BASE_URL
     )
     private val exlerRepository = ExlerRepository(
+        httpClient = httpClient,
+        baseUrl = API_BASE_URL
+    )
+    private val maidataRepository = MaiDataRepository(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
     )
@@ -71,6 +77,10 @@ class MainPageViewModel(
                 e.printStackTrace()
                 emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = e as Exception)))
             }
+            val maidataHandler = CoroutineExceptionHandler { _, e ->
+                e.printStackTrace()
+                emit(stateValue.copy(maidata = stateValue.maidata.copy(error = e as Exception)))
+            }
 
             supervisorScope {
                 // Download schedule
@@ -85,6 +95,11 @@ class MainPageViewModel(
                 launch(exlerHandler) {
                     val exlerTeachers = exlerRepository.getTeachers()
                     emit(stateValue.copy(exlerTeachers = Loadable.actual(exlerTeachers)))
+                }
+
+                launch(maidataHandler) {
+                    val maidata = maidataRepository.getData()
+                    emit(stateValue.copy(maidata = Loadable.actual(maidata)))
                 }
             }
         }

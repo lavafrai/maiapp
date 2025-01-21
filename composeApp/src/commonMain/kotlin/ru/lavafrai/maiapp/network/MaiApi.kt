@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.group.Group
+import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherId
 
@@ -32,4 +33,12 @@ class MaiApi(
     suspend fun exlerTeacherInfo(teacherId: String): ExlerTeacherInfo = httpClient.get {
         url("$baseUrl/api/v1/exler-teacher/$teacherId")
     }.body<ExlerTeacherInfo>()
+
+    suspend fun data() = httpClient.get {
+        url("$baseUrl/api/v1/data")
+    }.body<List<MaiDataItem>>()
+
+    suspend fun asset(path: String) = httpClient.get {
+        url("$baseUrl/api/v1/asset/$path")
+    }.body<Any>()
 }

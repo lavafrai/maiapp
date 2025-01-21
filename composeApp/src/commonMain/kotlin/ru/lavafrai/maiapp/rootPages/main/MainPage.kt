@@ -8,6 +8,7 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import maiapp.composeapp.generated.resources.Res
@@ -20,6 +21,7 @@ import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
+import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
@@ -83,8 +85,16 @@ fun MainPage(
             },
         ) { page ->
             when (page) {
-                MainNavigationPageId.INFORMATION -> Column(Modifier.fillMaxSize()) {
-                    // InformationPage()
+                MainNavigationPageId.INFORMATION -> when (viewState.maidata.status) {
+                    LoadableStatus.Loading -> CircularProgressIndicator()
+                    LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> MaiDataView(
+                        data = viewState.maidata.data!!,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    LoadableStatus.Error -> ErrorView(
+                        error = viewState.maidata.error,
+                        onRetry = { viewModel.startLoading() },
+                    )
                 }
 
                 MainNavigationPageId.WORKS -> {
