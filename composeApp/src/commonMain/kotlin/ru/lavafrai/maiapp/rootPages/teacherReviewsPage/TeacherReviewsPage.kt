@@ -7,6 +7,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +28,7 @@ import maiapp.composeapp.generated.resources.reviews
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
 import ru.lavafrai.maiapp.fragments.ErrorView
+import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.rootPages.main.MainPageTitle
 import ru.lavafrai.maiapp.viewmodels.teacherReview.TeacherReviewViewModel
 import ru.lavafrai.maiapp.viewmodels.teacherReview.TeacherReviewsView
@@ -48,25 +50,16 @@ fun TeacherReviewsPage(
             leftButton = { IconButton(onNavigateBack) { Icon(FeatherIcons.ArrowLeft, "Back icon") } },
         )
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+        LoadableView(
+            state = viewState.teacherInfo,
+            retry = viewModel::startLoading,
+            modifier = Modifier.fillMaxSize(),
         ) {
-            when (viewState.teacherInfo.baseStatus) {
-                BaseLoadableStatus.Loading -> CircularProgressIndicator()
-
-                BaseLoadableStatus.Error -> ErrorView(
-                    error = viewState.teacherInfo.error,
-                    onRetry = viewModel::startLoading,
-                )
-
-                BaseLoadableStatus.Actual -> TeacherReviewsView(
-                    teacherInfo = viewState.teacherInfo.data!!,
-                    sharedTransitionScope,
-                    animatedContentScope,
-                )
-            }
+            TeacherReviewsView(
+                teacherInfo = it,
+                sharedTransitionScope,
+                animatedContentScope,
+            )
         }
     }
 }

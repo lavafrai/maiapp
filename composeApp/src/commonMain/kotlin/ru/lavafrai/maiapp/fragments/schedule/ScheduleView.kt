@@ -69,7 +69,7 @@ fun ScheduleView(
     }
 
     PageColumn(scrollState = null) {
-        if (filteredDays.isNotEmpty()) LazyColumn(
+        if (filteredLessons.isNotEmpty()) LazyColumn(
             modifier = modifier,
             state = lazyColumnState,
         ) {
@@ -98,8 +98,12 @@ fun ScheduleView(
             item {
                 Spacer(Modifier.height(16.dp))
             }
-        } else EmptyScheduleView(
-            dateRange = dateRange,
-        )
+        } else {
+            if (filteredDays.isEmpty()) EmptyScheduleView(
+                dateRange = dateRange,
+            ) else if (filteredLessons.isEmpty()) NoLessonsFoundView(
+                dateRange = dateRange,
+            )
+        }
     }
 }

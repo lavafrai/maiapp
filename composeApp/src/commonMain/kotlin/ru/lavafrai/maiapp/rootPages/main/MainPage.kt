@@ -17,6 +17,7 @@ import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.ErrorView
+import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
@@ -84,47 +85,34 @@ fun MainPage(
             },
         ) { page ->
             when (page) {
-                MainNavigationPageId.INFORMATION -> when (viewState.maidata.status) {
-                    LoadableStatus.Loading -> CircularProgressIndicator()
-                    LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> MaiDataView(
-                        data = viewState.maidata.data!!,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    LoadableStatus.Error -> ErrorView(
-                        error = viewState.maidata.error,
-                        onRetry = { viewModel.startLoading() },
-                    )
+                MainNavigationPageId.INFORMATION -> {
+                    LoadableView(state = viewState.maidata, retry = viewModel::startLoading) {
+                        MaiDataView(
+                            data = viewState.maidata.data!!,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
                 }
 
                 MainNavigationPageId.WORKS -> {
-                    when (viewState.schedule.status) {
-                        LoadableStatus.Loading -> CircularProgressIndicator()
-                        LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> ScheduleView(
+                    LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
+                        ScheduleView(
                             schedule = viewState.schedule.data!!,
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = null,
                             modifier = Modifier.fillMaxSize(),
                             selector = remember (viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() },
                         )
-                        LoadableStatus.Error -> ErrorView(
-                            error = viewState.schedule.error,
-                            onRetry = { viewModel.startLoading() },
-                        )
                     }
                 }
 
                 MainNavigationPageId.HOME -> {
-                    when (viewState.schedule.status) {
-                        LoadableStatus.Loading -> CircularProgressIndicator()
-                        LoadableStatus.Actual, LoadableStatus.Updating, LoadableStatus.Offline -> ScheduleView(
+                    LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
+                        ScheduleView(
                             schedule = viewState.schedule.data!!,
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
-                        )
-                        LoadableStatus.Error -> ErrorView(
-                            error = viewState.schedule.error,
-                            onRetry = { viewModel.startLoading() },
                         )
                     }
                 }
