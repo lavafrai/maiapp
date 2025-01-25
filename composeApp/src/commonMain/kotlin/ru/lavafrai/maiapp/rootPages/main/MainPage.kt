@@ -8,13 +8,11 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.data.settings.rememberSettings
@@ -23,6 +21,7 @@ import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
+import ru.lavafrai.maiapp.utils.anySelector
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
 @Composable
@@ -105,7 +104,7 @@ fun MainPage(
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = null,
                             modifier = Modifier.fillMaxSize(),
-                            selector = remember (viewState.workTypeSelected) {{ _, lesson -> lesson.type in viewState.workTypeSelected }}
+                            selector = remember (viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() },
                         )
                         LoadableStatus.Error -> ErrorView(
                             error = viewState.schedule.error,
@@ -163,9 +162,10 @@ fun MainPage(
     if (viewState.schedule.hasData()) LessonTypeSelector(
         expanded = workTypeSelectorExpanded,
         onDismissRequest = { workTypeSelectorExpanded = false },
-        selectedLessonTypes = viewState.workTypeSelected,
-        onLessonTypeSelected = { lessonTypes ->
-            viewModel.setSelectedWorkTypes(lessonTypes)
+
+        currentLessonSelectors = viewState.workLessonSelectors,
+        onSelectorsChanged = { lessonTypes ->
+            viewModel.setWorksLessonSelector(lessonTypes)
         },
     )
 }

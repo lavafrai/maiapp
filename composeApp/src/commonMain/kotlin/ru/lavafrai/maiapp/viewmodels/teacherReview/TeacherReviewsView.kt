@@ -34,11 +34,12 @@ fun ColumnScope.TeacherReviewsView(
     PageColumn (
         modifier = Modifier
             .fillMaxWidth()
-            .weight(1f)
-            .padding(top = 8.dp),
+            .weight(1f),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         paddings = false,
     ) {
+        Spacer(Modifier.height(8.dp))
+
         if (photos.isNotEmpty()) {
             PhotosCarousel(
                 photos = photos,

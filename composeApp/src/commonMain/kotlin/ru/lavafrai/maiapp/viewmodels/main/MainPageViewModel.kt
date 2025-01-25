@@ -15,6 +15,7 @@ import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
+import ru.lavafrai.maiapp.utils.LessonSelector
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
@@ -26,10 +27,7 @@ class MainPageViewModel(
         page = MainNavigationPageId.HOME,
         schedule = Loadable.loading(),
         selectedWeek = DateRange.currentWeek(),
-        workTypeSelected = listOf(
-            LessonType.LABORATORY,
-            LessonType.EXAM,
-        ),
+        workLessonSelectors = listOf(LessonSelector.default()),
         exlerTeachers = Loadable.loading(),
         maidata = Loadable.loading(),
     )
@@ -126,9 +124,9 @@ class MainPageViewModel(
         }
     }
 
-    fun setSelectedWorkTypes(lessonTypes: List<LessonType>) {
+    fun setWorksLessonSelector(lessonTypes: List<LessonSelector>) {
         viewModelScope.launch(dispatchers.IO) {
-            emit(stateValue.copy(workTypeSelected = lessonTypes))
+            emit(stateValue.copy(workLessonSelectors = lessonTypes))
         }
     }
 

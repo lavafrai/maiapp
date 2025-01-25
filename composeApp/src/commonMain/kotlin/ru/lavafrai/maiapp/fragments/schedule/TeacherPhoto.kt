@@ -52,7 +52,7 @@ fun TeacherPhoto(
         }
 
         var state by remember { mutableStateOf(LoadableStatus.Loading) }
-        var width by remember { mutableStateOf(100f) }
+        var width by remember { mutableStateOf(150f) }
 
         Box(modifier = Modifier.fillMaxHeight()) {
             AsyncImage(
@@ -77,12 +77,10 @@ fun TeacherPhoto(
                 },
             )
 
-            if (state == LoadableStatus.Error) IconButton(onClick = { retryHash++ }) {
+            if (state == LoadableStatus.Error) IconButton(onClick = { retryHash++ }, modifier = Modifier.align(Alignment.Center)) {
                 Icon(
                     FeatherIcons.Repeat,
-                    "Retry",
-                    modifier = Modifier
-                        .align(Alignment.Center)
+                    "Retry"
                 )
             }
 

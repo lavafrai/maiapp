@@ -13,16 +13,42 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.localizers.localized
+import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
+import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
 import ru.lavafrai.maiapp.models.schedule.LessonType
+import ru.lavafrai.maiapp.utils.LessonSelector
 
 @Composable
 fun LessonTypeSelector(
-    selectedLessonTypes: List<LessonType>,
-    allowedLessonTypes: List<LessonType> = listOf(LessonType.LABORATORY, LessonType.EXAM),
-    onLessonTypeSelected: (List<LessonType>) -> Unit,
+    currentLessonSelectors: List<LessonSelector>,
+    allowedLessonTypes: List<LessonType> = listOf(
+        LessonType.LABORATORY,
+        LessonType.EXAM
+    ),
+    allowedLessonAnnotations: List<LessonAnnotationType> = listOf(
+        LessonAnnotation.HomeWork,
+        LessonAnnotation.Colloquium,
+        LessonAnnotation.FinalTest,
+        LessonAnnotation.ControlWork,
+    ),
+    onSelectorsChanged: (List<LessonSelector>) -> Unit,
     onDismissRequest: () -> Unit,
     expanded: Boolean,
 ) {
+    var selectedLessonTypes by remember { mutableStateOf(allowedLessonTypes) }
+    var selectedLessonAnnotations by remember { mutableStateOf(allowedLessonAnnotations) }
+    LaunchedEffect(selectedLessonAnnotations, selectedLessonTypes) {
+        val selectors = mutableListOf<LessonSelector>()
+        selectedLessonTypes.forEach { lessonType ->
+            selectors.add(LessonSelector.type(lessonType))
+        }
+        selectedLessonAnnotations.forEach { lessonAnnotation ->
+            selectors.add(LessonSelector.annotation(lessonAnnotation))
+        }
+
+        onSelectorsChanged(selectors)
+    }
+
     var visible by remember { mutableStateOf(expanded) }
     val scope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(
@@ -52,23 +78,51 @@ fun LessonTypeSelector(
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             allowedLessonTypes.forEach { lessonType ->
-                val isSelected = selectedLessonTypes.contains(lessonType)
-                ListItem(
-                    headlineContent = { Text(lessonType.localized()) },
-                    trailingContent = {
-                        Checkbox(
-                            checked = isSelected,
-                            onCheckedChange = {
-                                if (isSelected) {
-                                    onLessonTypeSelected(selectedLessonTypes - lessonType)
-                                } else {
-                                    onLessonTypeSelected(selectedLessonTypes + lessonType)
-                                }
-                            }
-                        )
+                LessonTypeSelectorItem(
+                    title = lessonType.localized(),
+                    isSelected = lessonType in selectedLessonTypes,
+                    onSelectedChanged = {
+                        selectedLessonTypes = if (it) {
+                            selectedLessonTypes + lessonType
+                        } else {
+                            selectedLessonTypes - lessonType
+                        }
+                    }
+                )
+            }
+
+            allowedLessonAnnotations.forEach { lessonAnnotation ->
+                LessonTypeSelectorItem(
+                    title = lessonAnnotation.localized(),
+                    isSelected = lessonAnnotation in selectedLessonAnnotations,
+                    onSelectedChanged = {
+                        selectedLessonAnnotations = if (it) {
+                            selectedLessonAnnotations + lessonAnnotation
+                        } else {
+                            selectedLessonAnnotations - lessonAnnotation
+                        }
                     }
                 )
             }
         }
     }
+}
+
+@Composable
+fun LessonTypeSelectorItem(
+    title: String,
+    isSelected: Boolean,
+    onSelectedChanged: (Boolean) -> Unit,
+) {
+    ListItem(
+        headlineContent = { Text(title) },
+        trailingContent = {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = {
+                    onSelectedChanged(it)
+                }
+            )
+        }
+    )
 }

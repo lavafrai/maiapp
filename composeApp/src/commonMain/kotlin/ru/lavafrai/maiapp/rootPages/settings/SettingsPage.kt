@@ -38,6 +38,7 @@ fun SettingsPage() {
     val settings by rememberSettings()
 
     PageColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Spacer(Modifier.height(8.dp))
         SettingsSection(title = stringResource(Res.string.appearance)) {
             ThemeSelectButton { themeId ->
                 ApplicationSettings.setTheme(themeId)

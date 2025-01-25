@@ -28,7 +28,7 @@ fun PageColumn(
                 this.verticalScroll(scrollState!!)
             }
     ) {
-        if (paddings) Spacer(Modifier.height(8.dp))
+        // if (paddings) Spacer(Modifier.height(8.dp))
         Column(
             modifier = Modifier.pageColumnPaddings(horizontal = paddings),
             content = content,
