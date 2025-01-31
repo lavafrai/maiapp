@@ -16,6 +16,10 @@ fun Route.schedule(
             maiRepository.getGroupSchedule(group)
         } catch (e: NotFoundException) { null } ?: try {
             maiRepository.getTeacherSchedule(group)
+        } catch (e: NotFoundException) { null } ?: try {
+            val teachers = maiRepository.getTeachers()
+            val teacher = teachers.find { it.name == group } ?: throw NotFoundException("schedule($group) not found")
+            maiRepository.getTeacherSchedule(teacher.uid)
         } catch (e: NotFoundException) {
             call.respondText("schedule($group) not found", status = HttpStatusCode.NotFound)
             return@get
