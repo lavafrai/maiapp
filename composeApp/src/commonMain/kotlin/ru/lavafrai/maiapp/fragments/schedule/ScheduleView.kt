@@ -12,17 +12,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.data.repositories.LessonAnnotationsRepository
 import ru.lavafrai.maiapp.fragments.PageColumn
-import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
-import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.utils.LessonSelector
@@ -36,11 +32,11 @@ fun ScheduleView(
     selector: LessonSelector = LessonSelector.default(),
 ) {
     val lessonAnnotationRepository = remember { LessonAnnotationsRepository }
-    val filteredDays = remember(dateRange) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
+    val filteredDays = remember(dateRange, schedule) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
     val lazyColumnState: LazyListState = rememberLazyListState()
     val annotations by lessonAnnotationRepository.follow(schedule.name).collectAsState()
 
-    val filteredLessons = remember(dateRange, selector, annotations) {
+    val filteredLessons = remember(dateRange, selector, annotations, schedule, filteredDays) {
         filteredDays.map { day -> day.copy(lessons=day.lessons.filter { lesson ->
             selector.test(day, lesson, lessonAnnotationRepository.loadAnnotations(schedule.name).filter { it.lessonUid == lesson.getUid() })
         }) }.filter { it.lessons.isNotEmpty() }
@@ -50,7 +46,7 @@ fun ScheduleView(
     }
 
     // var lastScrollHash = rememberSaveable { 0 }
-    LaunchedEffect(dateRange, selector) {
+    LaunchedEffect(dateRange, selector, schedule.id) {
         val hash = dateRange.hashCode() + selector.hashCode()
         // if (lastScrollHash == hash) return@LaunchedEffect
         // lastScrollHash = hash

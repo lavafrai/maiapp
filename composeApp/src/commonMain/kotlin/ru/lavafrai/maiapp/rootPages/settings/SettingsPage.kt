@@ -39,6 +39,9 @@ fun SettingsPage() {
 
     PageColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Spacer(Modifier.height(8.dp))
+
+        SchedulesSettings()
+
         SettingsSection(title = stringResource(Res.string.appearance)) {
             ThemeSelectButton { themeId ->
                 ApplicationSettings.setTheme(themeId)

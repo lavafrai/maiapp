@@ -22,6 +22,7 @@ import ru.lavafrai.maiapp.theme.themes.SystemTheme
 @Serializable
 data class ApplicationSettingsData(
     val selectedSchedule: BaseScheduleId? = null,
+    val savedSchedules: List<BaseScheduleId> = emptyList(),
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
 ) {
@@ -74,6 +75,38 @@ object ApplicationSettings {
         mutex.withLock {
             val current = getCurrent()
             update(current.copy(selectedSchedule = group))
+        }
+    }
+
+    suspend fun addSavedGroup(group: BaseScheduleId) {
+        mutex.withLock {
+            val current = getCurrent()
+            val newSavedGroups = current.savedSchedules
+                .toMutableList()
+                .apply { add(group) }
+                .distinctBy { it.scheduleId }
+            update(current.copy(savedSchedules = newSavedGroups))
+        }
+    }
+
+    suspend fun removeSavedGroup(group: BaseScheduleId) {
+        mutex.withLock {
+            val current = getCurrent()
+            val newSavedGroups = current.savedSchedules
+                .toMutableList()
+                .apply { remove(group) }
+                .distinctBy { it.id }
+            update(current.copy(savedSchedules = newSavedGroups))
+        }
+    }
+
+    suspend fun setSelectedSchedule(schedule: BaseScheduleId) {
+        val tmp = getCurrent()
+        if (tmp.selectedSchedule != null) addSavedGroup(tmp.selectedSchedule)
+
+        mutex.withLock {
+            val current = getCurrent()
+            update(current.copy(selectedSchedule = schedule))
         }
     }
 }

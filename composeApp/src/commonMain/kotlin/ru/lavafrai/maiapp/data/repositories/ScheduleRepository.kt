@@ -22,6 +22,7 @@ class ScheduleRepository(
 
     suspend fun getSchedule(name: ScheduleId) = withCache("schedule:${name.scheduleId}") { api.schedule(name.scheduleId) }
     suspend fun getScheduleFromCacheOrNull(name: ScheduleId) = fromCache<Schedule>("schedule:${name.scheduleId}")
+    suspend fun getScheduleSizeInCache(name: ScheduleId) = cache.getStringOrNull("schedule:${name.scheduleId}")?.length?.toLong() ?: 0L
 
     private suspend inline fun <reified T>withCache(key: String, block: () -> @Serializable T): T {
         val data = block()

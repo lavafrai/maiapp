@@ -105,6 +105,7 @@ class LoginPageViewModel(
     private fun doFinishAction(selected: Nameable) {
         if (loginData.target == LoginTarget.ADD_SCHEDULE) {
             viewModelScope.launch(dispatchers.Default) {
+                ApplicationSettings.addSavedGroup(BaseScheduleId(selected.name))
                 ApplicationSettings.setSelectedGroup(BaseScheduleId(selected.name))
             }
         }

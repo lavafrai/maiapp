@@ -6,6 +6,11 @@ import ru.lavafrai.maiapp.models.StringSerializer
 @Serializable(with = ScheduleIdSerializer::class)
 abstract class ScheduleId {
     abstract val scheduleId: String
+
+    override fun equals(other: Any?): Boolean = other is ScheduleId && scheduleId == other.scheduleId
+    override fun hashCode(): Int {
+        return scheduleId.hashCode()
+    }
 }
 
 class ScheduleIdSerializer: StringSerializer<ScheduleId>() {

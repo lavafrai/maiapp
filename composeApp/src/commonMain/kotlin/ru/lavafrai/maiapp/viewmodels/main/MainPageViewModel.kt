@@ -13,6 +13,8 @@ import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.models.schedule.LessonType
+import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
 import ru.lavafrai.maiapp.utils.LessonSelector
@@ -32,7 +34,7 @@ class MainPageViewModel(
         maidata = Loadable.loading(),
     )
 ) {
-    private val scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
+    private var scheduleName: ScheduleId = ApplicationSettings.getCurrent().selectedSchedule!!
     private val scheduleRepository = ScheduleRepository(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
@@ -63,9 +65,37 @@ class MainPageViewModel(
         }
     }
 
-    fun startLoading() {
+    fun reloadSchedule(scheduleId: ScheduleId? = null) {
         viewModelScope.launch(dispatchers.IO) {
-            emit(initialState)
+            if (scheduleId != null) {
+                scheduleName = scheduleId
+            }
+
+            val scheduleHandler = CoroutineExceptionHandler { _, e ->
+                e.printStackTrace()
+                emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e as Exception)))
+            }
+
+            supervisorScope {
+                // Download schedule
+                launch(scheduleHandler) {
+                    val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
+                    if (cachedSchedule != null) emit(stateValue.copy(schedule = Loadable.updating(cachedSchedule)))
+                    else emit(stateValue.copy(schedule = Loadable.loading()))
+                }.invokeOnCompletion {
+                    launch(scheduleHandler) {
+                        val schedule = scheduleRepository.getSchedule(scheduleName)
+                        emit(stateValue.copy(schedule = Loadable.actual(schedule)))
+                    }
+                }
+            }
+        }
+    }
+
+    fun startLoading() {
+        scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
+        viewModelScope.launch(dispatchers.IO) {
+            emit(initialState.copy(page = stateValue.page))
 
             val scheduleHandler = CoroutineExceptionHandler { _, e ->
                 e.printStackTrace()

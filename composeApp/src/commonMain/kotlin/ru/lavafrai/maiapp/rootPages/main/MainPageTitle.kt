@@ -19,7 +19,7 @@ import ru.lavafrai.maiapp.utils.asDp
 
 @Composable
 fun MainPageTitle(
-    modifier: Modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+    modifier: Modifier = Modifier,
     titleText: @Composable () -> Unit,
     subtitleText: @Composable () -> Unit = { Text("") },
     leftButton: @Composable () -> Unit = {},
@@ -27,6 +27,7 @@ fun MainPageTitle(
     subtitleIcon: @Composable (Dp) -> Unit = {},
 ) {
     Column(modifier
+        .windowInsetsPadding(WindowInsets.statusBars)
         .fillMaxWidth()
         .padding(horizontal = 8.dp)
         .padding(top = 4.dp)

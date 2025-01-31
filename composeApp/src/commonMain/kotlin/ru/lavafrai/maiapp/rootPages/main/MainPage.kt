@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
@@ -45,6 +46,9 @@ fun MainPage(
         )
     )
 
+    LaunchedEffect(settings.selectedSchedule) {
+        viewModel.reloadSchedule(settings.selectedSchedule)
+    }
     val viewState by viewModel.state.collectAsState()
 
     Column {
@@ -72,14 +76,18 @@ fun MainPage(
                         onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
 
-                    MainNavigationPageId.ACCOUNT -> MainPageTitle(
-                        titleText = { Text(stringResource(Res.string.account)) },
-                        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
+                    MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(
+                        title = stringResource(Res.string.account),
+                        schedule = viewState.schedule,
+                        buttonText = stringResource(Res.string.select_week),
+                        onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
 
-                    MainNavigationPageId.SETTINGS -> MainPageTitle(
-                        titleText = { Text(stringResource(Res.string.settings)) },
-                        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
+                    MainNavigationPageId.SETTINGS -> MainPageHomeTitle(
+                        title = stringResource(Res.string.settings),
+                        schedule = viewState.schedule,
+                        buttonText = stringResource(Res.string.select_week),
+                        onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
                 }
             },
