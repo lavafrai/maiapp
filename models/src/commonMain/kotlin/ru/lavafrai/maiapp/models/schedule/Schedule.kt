@@ -15,16 +15,16 @@ data class Schedule(
 ) {
     val weeks: List<DateRange>
         get() {
-            var firstWeek = days.minByOrNull { it.date }?.date?.week()
-            val lastWeek = days.maxByOrNull { it.date }?.date?.week()
-            if (firstWeek == null || lastWeek == null) return emptyList()
+            var firstWeek = days.minByOrNull { it.date }?.date?.week() ?: return emptyList()
+            val lastWeek = days.maxByOrNull { it.date }?.date?.week() ?: return emptyList()
+            // if (firstWeek == null || lastWeek == null) return emptyList()
 
             val weeks = mutableListOf<DateRange>()
             weeks.add(firstWeek)
             do {
-                firstWeek = firstWeek!!.plusDays(7)
+                firstWeek = firstWeek.plusDays(7)
                 weeks.add(firstWeek)
-            } while (firstWeek != lastWeek)
+            } while (firstWeek.startDate < lastWeek.endDate)
 
             return weeks
         }
