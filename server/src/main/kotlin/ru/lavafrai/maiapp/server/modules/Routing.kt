@@ -15,6 +15,7 @@ fun Application.configureRouting(
         data()
         groups(maiRepository)
         schedule(maiRepository)
+        teachers(maiRepository)
         exler(exlerRepository)
     }
 }

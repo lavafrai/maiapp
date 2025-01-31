@@ -24,6 +24,8 @@ class MaiRepository(
     private val teachersAccess = Mutex()
     private val teachers = mutableListOf<TeacherId>()
 
+    suspend fun getTeachers() = teachers
+
     suspend fun getGroups() = httpClient
         .get("https://public.mai.ru/schedule/data/groups.json")
         .body<List<Group>>()
@@ -42,6 +44,12 @@ class MaiRepository(
                 }
             }
         }
+
+    suspend fun getTeacherSchedule(teacherUid: String) = httpClient
+        .get("https://public.mai.ru/schedule/data/${teacherUid}.json")
+        .apply { if (this.status == HttpStatusCode.NotFound) throw NotFoundException("Failed to get schedule($teacherUid): Not found") }
+        .bodyAsText()
+        .parseRawSchedule()
 }
 
 

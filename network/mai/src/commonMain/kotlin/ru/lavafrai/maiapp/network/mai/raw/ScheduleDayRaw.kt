@@ -15,18 +15,28 @@ data class ScheduleDayRaw (
     @SerialName("day") val dayOfWeek: DayOfWeek,
     @SerialName("pairs") val lessons: Map<String, JsonObject>
 ) {
-    fun toScheduleDay(json: Json, dateText: String): ScheduleDay {
+    fun toScheduleDay(json: Json, dateText: String, teacherLessons: Boolean = false): ScheduleDay {
         val date: LocalDate = json.decodeFromString(
             deserializer = LocalDateIso8601Serializer,
             dateText.split('.').reversed().joinToString("-")
         )
-        return ScheduleDay(
+        return if (teacherLessons) ScheduleDay(
             // if (date != null) { { Date.parseMaiFormat(date)} errorCase {Date.parse(date)} } else null,
             date = date,
             dayOfWeek = dayOfWeek,
             lessons = lessons.map {
-                json.decodeFromJsonElement<LessonRaw>(it.value.values.first()).toLesson(
+                json.decodeFromJsonElement<TeacherLessonRaw>(it.value).toLesson(
                     it.value.keys.first(),
+                    date,
+                )
+            }
+        )
+        else ScheduleDay(
+            date = date,
+            dayOfWeek = dayOfWeek,
+            lessons = lessons.map {
+                json.decodeFromJsonElement<LessonRaw>(it.value.values.first()).toLesson(
+                    it.key,
                     date,
                 )
             }
