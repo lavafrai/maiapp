@@ -9,8 +9,12 @@ import kotlinx.browser.window
 import org.w3c.dom.Navigator
 import ru.lavafrai.maiapp.platform.WebHapticFeedback
 
+external fun alert(msg: String)
+
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+    alert("the site is under development 1")
+
     val body = document.body ?: return
     val webHapticFeedback = WebHapticFeedback()
     ComposeViewport(body) {
@@ -18,5 +22,7 @@ fun main() {
             App()
         }
     }
-    consoleLog("Navigator.userAgent: ${(window.navigator as Navigator).userAgent}")
+
+
+    alert("the site is under development 2")
 }
