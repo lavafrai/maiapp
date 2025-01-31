@@ -11,7 +11,7 @@ import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.models.Nameable
-import ru.lavafrai.maiapp.models.schedule.AbstractScheduleId
+import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
@@ -105,7 +105,7 @@ class LoginPageViewModel(
     private fun doFinishAction(selected: Nameable) {
         if (loginData.target == LoginTarget.ADD_SCHEDULE) {
             viewModelScope.launch(dispatchers.Default) {
-                ApplicationSettings.setSelectedGroup(AbstractScheduleId(selected.name))
+                ApplicationSettings.setSelectedGroup(BaseScheduleId(selected.name))
             }
         }
     }

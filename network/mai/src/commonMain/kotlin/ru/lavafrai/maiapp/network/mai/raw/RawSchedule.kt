@@ -3,7 +3,7 @@ package ru.lavafrai.maiapp.network.mai.raw
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.*
 import ru.lavafrai.maiapp.JsonProvider
-import ru.lavafrai.maiapp.models.schedule.AbstractScheduleId
+import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.utils.contextual
@@ -22,7 +22,7 @@ fun String.parseRawSchedule(): Schedule {
 
     return Schedule(
         name = name,
-        id = AbstractScheduleId(name),
+        id = BaseScheduleId(name),
         Clock.System.now().epochSeconds,
         0,
         if (teacherMode) scheduleObject.parseRawTeacherSchedule(json) else scheduleObject.parseRawSchedule(json),

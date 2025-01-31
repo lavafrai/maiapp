@@ -17,13 +17,16 @@ import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
 import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
+import ru.lavafrai.maiapp.models.schedule.GroupName
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
+import ru.lavafrai.maiapp.rootPages.schedule.SchedulePage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -93,14 +96,24 @@ fun AppNavigation(
                     )
                 }
 
-                composable<ru.lavafrai.maiapp.navigation.pages.Schedule> { backStackEntry ->
-                    val schedule: ru.lavafrai.maiapp.navigation.pages.Schedule = backStackEntry.toRoute()
+                composable<ScheduleId>(
+                    typeMap = mapOf(
+                        typeOf<ScheduleId>() to navTypeOf<ScheduleId>(),
+                        typeOf<GroupName>() to navTypeOf<GroupName>(),
+                    ),
+                ) { backStackEntry ->
+                    val scheduleId: ScheduleId = backStackEntry.toRoute()
 
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-
+                        SchedulePage(
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedContentScope = this@composable,
+                            onNavigateBack = { navController.navigateUp() },
+                            scheduleId = scheduleId,
+                        )
                     }
 
                 }

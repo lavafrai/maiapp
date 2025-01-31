@@ -29,7 +29,7 @@ import ru.lavafrai.maiapp.localizers.localizedGenitiveNonContext
 import ru.lavafrai.maiapp.localizers.localizedNonContext
 import ru.lavafrai.maiapp.localizers.localizedShortNonContext
 import ru.lavafrai.maiapp.localizers.toApplication
-import ru.lavafrai.maiapp.models.schedule.AbstractScheduleId
+import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
@@ -69,7 +69,7 @@ class ScheduleWidget: GlanceAppWidget() {
 
 @Composable
 fun ScheduleWidgetContent(
-    group: AbstractScheduleId?,
+    group: BaseScheduleId?,
     schedule: Schedule?,
 ) {
     ScheduleWidgetHeader()

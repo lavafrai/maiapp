@@ -5,18 +5,15 @@ package ru.lavafrai.maiapp.data.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.serialization.decodeValueOrNull
-import com.russhwolf.settings.serialization.encodeValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import ru.lavafrai.maiapp.models.schedule.AbstractScheduleId
+import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
@@ -24,7 +21,7 @@ import ru.lavafrai.maiapp.theme.themes.SystemTheme
 
 @Serializable
 data class ApplicationSettingsData(
-    val selectedSchedule: AbstractScheduleId? = null,
+    val selectedSchedule: BaseScheduleId? = null,
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
 ) {
@@ -73,7 +70,7 @@ object ApplicationSettings {
         update(current.copy(colorSchema = colorSchemaId))
     }
 
-    suspend fun setSelectedGroup(group: AbstractScheduleId) {
+    suspend fun setSelectedGroup(group: BaseScheduleId) {
         mutex.withLock {
             val current = getCurrent()
             update(current.copy(selectedSchedule = group))
