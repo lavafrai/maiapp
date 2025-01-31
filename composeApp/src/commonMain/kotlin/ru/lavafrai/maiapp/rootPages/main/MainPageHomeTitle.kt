@@ -1,31 +1,41 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 
 package ru.lavafrai.maiapp.rootPages.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.CloudOff
 import compose.icons.feathericons.DownloadCloud
 import kotlinx.coroutines.launch
+import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.utils.contextual
 
 @Composable
 fun MainPageHomeTitle(
     title: String,
     schedule: Loadable<Schedule>,
-    buttonText: String,
-    onButtonClick: () -> Unit,
+    buttonText: String? = null,
+    onButtonClick: () -> Unit = { },
 ) {
+    val haptic = LocalHapticFeedback.current
+    val appContext = LocalApplicationContext.current
     val settings by rememberSettings()
     val otherSchedules =
         remember(settings) { settings.savedSchedules.filter { it.scheduleId != settings.selectedSchedule?.scheduleId } }
@@ -35,7 +45,7 @@ fun MainPageHomeTitle(
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = {
-            if (otherSchedules.isNotEmpty()) expanded = !expanded
+
         },
     ) {
         MainPageTitle(
@@ -43,6 +53,12 @@ fun MainPageHomeTitle(
             subtitleText = {
                 Text(
                     settings.selectedSchedule!!.toString(),
+                    modifier = Modifier
+                        .padding(end = 2.dp)
+                        .clip(MaterialTheme.shapes.small)
+                        .contextual(otherSchedules.isNotEmpty() && schedule.status == LoadableStatus.Actual) {
+                            clickable { expanded = true }
+                        },
                 )
 
                 ExposedDropdownMenu(
@@ -53,23 +69,51 @@ fun MainPageHomeTitle(
                 ) {
                     //Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                     otherSchedules.forEach { schedule ->
-                        DropdownMenuItem(
+                        /*DropdownMenuItem(
                             text = { Text(schedule.toString()) },
-                            onClick = {
-                                expanded = false
-                                scope.launch {
-                                    ApplicationSettings.setSelectedGroup(schedule)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            onClick = {},
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .combinedClickable(
+                                    onClick = {
+                                        expanded = false
+                                        scope.launch {
+                                            ApplicationSettings.setSelectedGroup(schedule)
+                                        }
+                                    },
+                                    onLongClick = {
+
+                                    }
+                                )
+                        )*/
+
+                        Row(
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        expanded = false
+                                        scope.launch {
+                                            ApplicationSettings.setSelectedGroup(schedule)
+                                        }
+                                    },
+                                    onLongClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        appContext.openSchedule(schedule)
+                                        expanded = false
+                                    }
+                                )
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                        ) {
+                            Text(schedule.toString(), style = MaterialTheme.typography.labelLarge)
+                        }
                     }
                     //}
 
                 }
             },
             rightButton = {
-                TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {
+                if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {
                     Text(buttonText)
                 }
             },

@@ -59,6 +59,7 @@ fun LessonTypeSelector(
             modalBottomSheetState.hide()
         }.invokeOnCompletion {
             visible = false
+            onDismissRequest()
         }
     }
 

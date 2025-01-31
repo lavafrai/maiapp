@@ -47,6 +47,7 @@ fun WeekSelector(
             modalBottomSheetState.hide()
         }.invokeOnCompletion {
             visible = false
+            onDismissRequest()
         }
     }
 

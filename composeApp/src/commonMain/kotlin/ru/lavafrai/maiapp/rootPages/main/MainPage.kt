@@ -73,21 +73,17 @@ fun MainPage(
                         title = stringResource(Res.string.schedule),
                         schedule = viewState.schedule,
                         buttonText = stringResource(Res.string.select_week),
-                        onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
+                        onButtonClick = { weekSelectorExpanded = true },
                     )
 
                     MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(
                         title = stringResource(Res.string.account),
                         schedule = viewState.schedule,
-                        buttonText = stringResource(Res.string.select_week),
-                        onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
 
                     MainNavigationPageId.SETTINGS -> MainPageHomeTitle(
                         title = stringResource(Res.string.settings),
                         schedule = viewState.schedule,
-                        buttonText = stringResource(Res.string.select_week),
-                        onButtonClick = { weekSelectorExpanded = !weekSelectorExpanded },
                     )
                 }
             },

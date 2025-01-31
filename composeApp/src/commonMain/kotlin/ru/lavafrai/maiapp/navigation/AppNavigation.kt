@@ -17,7 +17,6 @@ import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
 import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
-import ru.lavafrai.maiapp.models.schedule.GroupName
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
@@ -96,13 +95,12 @@ fun AppNavigation(
                     )
                 }
 
-                composable<ScheduleId>(
+                composable<DedicatedSchedulePage>(
                     typeMap = mapOf(
                         typeOf<ScheduleId>() to navTypeOf<ScheduleId>(),
-                        typeOf<GroupName>() to navTypeOf<GroupName>(),
                     ),
                 ) { backStackEntry ->
-                    val scheduleId: ScheduleId = backStackEntry.toRoute()
+                    val scheduleId: ScheduleId = backStackEntry.toRoute<DedicatedSchedulePage>().scheduleId
 
                     Surface(
                         modifier = Modifier.fillMaxSize(),
