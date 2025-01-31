@@ -9,12 +9,10 @@ import kotlinx.browser.window
 import org.w3c.dom.Navigator
 import ru.lavafrai.maiapp.platform.WebHapticFeedback
 
-external fun alert(msg: String)
+external fun onWasmLoaded()
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    alert("the site is under development 1")
-
     val body = document.body ?: return
     val webHapticFeedback = WebHapticFeedback()
     ComposeViewport(body) {
@@ -23,6 +21,9 @@ fun main() {
         }
     }
 
+    hidePreloader()
+}
 
-    alert("the site is under development 2")
+fun hidePreloader() {
+    onWasmLoaded()
 }

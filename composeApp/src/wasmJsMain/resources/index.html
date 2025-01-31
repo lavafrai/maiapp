@@ -12,14 +12,136 @@
                 margin: 0;
                 padding: 0;
                 overflow: hidden;
-                background: black;
+                background: var(--background);
+                --background: #0f0f0f;
+                --primary: #b0dcff;
+                --loader-size: 75px;
+            }
+        </style>
+
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+            #preloader {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background: var(--background);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                opacity: 1;
+                transition: opacity 0.3s;
+            }
+
+            #preloader-content {
+                width: var(--loader-size);
+                height: var(--loader-size);
+                background: white;
+                border-radius: 50%;
+                display: inline-block;
+                justify-content: center;
+                align-items: center;
+
+                &:before {
+                    content: "";
+                    width: var(--loader-size);
+                    height: var(--loader-size);
+                    position: absolute;
+                    display: inline-block;
+                    background: var(--background);
+                    border-radius: 50%;
+                    animation: ease-in-out 1s infinite loading;
+                }
+
+                &:after {
+                    content: "";
+                    width: var(--loader-size);
+                    height: var(--loader-size);
+                    position: absolute;
+                    display: inline-block;
+                    background: white;
+                    border-radius: 50%;
+                    animation: ease-in-out 1s infinite loading-inner;
+                }
+            }
+
+            @keyframes loading {
+                from {
+                    scale: 0 0;
+                }
+
+                to {
+                    scale: 1 1;
+                }
+            }
+
+            @keyframes loading-inner {
+                from {
+                    scale: 0 0;
+                }
+
+                30% {
+                    scale: 0 0;
+                }
+
+                95% {
+                    scale: 1 1;
+                }
+
+                to {
+                    scale: 1 1;
+                }
+            }
+
+            #preloader-label {
+                position: absolute;
+                top: calc(var(--loader-size) + 50%);
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+                font-family: "JetBrains Mono", serif;
+                font-optical-sizing: auto;
+                font-style: normal;
+            }
+
+            #copyright-label {
+                position: absolute;
+                bottom: 10px;
+                color: white;
+                font-size: 14px;
+                font-weight: lighter;
+                opacity: 0.8;
+                font-family: "JetBrains Mono", serif;
+                font-optical-sizing: auto;
+                font-style: normal;
             }
         </style>
     </head>
     <body>
         <div id="preloader">
-
+            <div id="preloader-content">
+            </div>
+            <div id="preloader-label">
+                Loading…
+            </div>
+            <div id="copyright-label">
+                MAIapp by. lava_frai
+            </div>
         </div>
     </body>
+    <script>
+        function onWasmLoaded() {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = "0";
+            setTimeout(() => {
+                preloader.style.display = "none";
+            }, 300);
+        }
+    </script>
+
     <script src="composeApp.js"></script>
 </html>
