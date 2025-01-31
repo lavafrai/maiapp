@@ -36,6 +36,7 @@ fun Application.configureCaching() {
         allowHost("mai3.lavafrai.ru")
         allowHost("lavafrai.github.io")
         allowHost("127.0.0.1:80")
+        allowHost("localhost:8080")
         allowHeader(HttpHeaders.ContentType)
     }
 }

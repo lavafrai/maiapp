@@ -2,6 +2,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.window.ComposeViewport
+import co.touchlab.kermit.consoleLog
 import ru.lavafrai.maiapp.App
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -17,4 +18,5 @@ fun main() {
             App()
         }
     }
+    consoleLog("Navigator.userAgent: ${(window.navigator as Navigator).userAgent}")
 }
