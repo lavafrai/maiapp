@@ -20,11 +20,11 @@ import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.navigation.pages.*
+import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
-import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 import kotlin.reflect.typeOf
@@ -91,6 +91,18 @@ fun AppNavigation(
                             }
                         },
                     )
+                }
+
+                composable<ru.lavafrai.maiapp.navigation.pages.Schedule> { backStackEntry ->
+                    val schedule: ru.lavafrai.maiapp.navigation.pages.Schedule = backStackEntry.toRoute()
+
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background,
+                    ) {
+
+                    }
+
                 }
 
                 dialog<SafeDataCleanup> {

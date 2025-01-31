@@ -6,6 +6,9 @@ import ru.lavafrai.maiapp.models.Nameable
 
 @Serializable
 data class TeacherId(
-    @SerialName("name") override val name: String,
-    @SerialName("uid") val uid: String,
-): Nameable
+    @SerialName("name") val teacherName: TeacherName,
+    @SerialName("uid") val uid: TeacherUid,
+): Nameable {
+    override val name: String
+        get() = teacherName.name
+}

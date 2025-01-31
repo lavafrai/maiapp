@@ -9,6 +9,7 @@ import ru.lavafrai.maiapp.models.time.week
 @Serializable
 data class Schedule(
     @SerialName("name") val name: String,
+    @SerialName("id") val id: AbstractScheduleId,
     @SerialName("created") val created: Long,
     @SerialName("cached") val cached: Long,
     @SerialName("days") val days: List<ScheduleDay>,

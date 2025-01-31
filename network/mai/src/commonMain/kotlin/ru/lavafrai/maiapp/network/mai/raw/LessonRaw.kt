@@ -3,10 +3,7 @@ package ru.lavafrai.maiapp.network.mai.raw
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.lavafrai.maiapp.models.schedule.Classroom
-import ru.lavafrai.maiapp.models.schedule.Lesson
-import ru.lavafrai.maiapp.models.schedule.LessonType
-import ru.lavafrai.maiapp.models.schedule.TeacherId
+import ru.lavafrai.maiapp.models.schedule.*
 import ru.lavafrai.maiapp.utils.capitalizeWords
 
 @Serializable
@@ -25,7 +22,7 @@ data class LessonRaw(
             name = name,
             timeStart = timeStart.toTime(),
             timeEnd = timeEnd.toTime(),
-            lectors = lector.map { TeacherId(it.value.capitalizeWords(), it.key) },
+            lectors = lector.map { TeacherId(TeacherName(it.value.capitalizeWords()), TeacherUid(it.key)) },
             type = type.map { it.key }.first(),
             day = day,
             rooms = room.map { Classroom(it.value, it.key) },

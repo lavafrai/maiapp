@@ -55,7 +55,7 @@ fun MainPage(
                 when (page) {
                     MainNavigationPageId.INFORMATION -> MainPageTitle(
                         titleText = { Text(stringResource(Res.string.information)) },
-                        subtitleText = { Text(settings.selectedSchedule!!) },
+                        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
                     )
 
                     MainNavigationPageId.WORKS -> MainPageHomeTitle(
@@ -74,12 +74,12 @@ fun MainPage(
 
                     MainNavigationPageId.ACCOUNT -> MainPageTitle(
                         titleText = { Text(stringResource(Res.string.account)) },
-                        subtitleText = { Text(settings.selectedSchedule!!) },
+                        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
                     )
 
                     MainNavigationPageId.SETTINGS -> MainPageTitle(
                         titleText = { Text(stringResource(Res.string.settings)) },
-                        subtitleText = { Text(settings.selectedSchedule!!) },
+                        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
                     )
                 }
             },

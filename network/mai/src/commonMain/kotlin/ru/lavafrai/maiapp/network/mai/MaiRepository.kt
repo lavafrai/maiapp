@@ -13,10 +13,9 @@ import kotlinx.coroutines.sync.withLock
 import ru.lavafrai.maiapp.HttpClientProvider
 import ru.lavafrai.maiapp.exceptions.NotFoundException
 import ru.lavafrai.maiapp.models.group.Group
-import ru.lavafrai.maiapp.models.schedule.Schedule
-import ru.lavafrai.maiapp.models.schedule.TeacherId
 import ru.lavafrai.maiapp.network.mai.raw.parseRawSchedule
 import org.kotlincrypto.hash.md.MD5
+import ru.lavafrai.maiapp.models.schedule.*
 
 class MaiRepository(
     private val httpClient: HttpClient = HttpClientProvider.default,
@@ -31,22 +30,22 @@ class MaiRepository(
         .body<List<Group>>()
         .filter { it.name != "Для внеучебных мероприятий (служебная)" }
 
-    suspend fun getGroupSchedule(group: String) = httpClient
-        .get("https://public.mai.ru/schedule/data/${md5(group.uppercase())}.json")
+    suspend fun getGroupSchedule(group: GroupName) = httpClient
+        .get("https://public.mai.ru/schedule/data/${md5(group.name.uppercase())}.json")
         .apply { if (this.status == HttpStatusCode.NotFound) throw NotFoundException("Failed to get schedule($group): Not found") }
         .bodyAsText()
         .parseRawSchedule()
         .also {
             teachersAccess.withLock {
                 it.bypassTeachers { teacher ->
-                    if (teacher.uid == "00000000-0000-0000-0000-000000000000") return@bypassTeachers
+                    if (teacher.uid == TeacherUid("00000000-0000-0000-0000-000000000000")) return@bypassTeachers
                     if (!teachers.any { teacher.uid == it.uid }) teachers.add(teacher)
                 }
             }
         }
 
-    suspend fun getTeacherSchedule(teacherUid: String) = httpClient
-        .get("https://public.mai.ru/schedule/data/${teacherUid}.json")
+    suspend fun getTeacherSchedule(teacherUid: TeacherUid) = httpClient
+        .get("https://public.mai.ru/schedule/data/${teacherUid.uid}.json")
         .apply { if (this.status == HttpStatusCode.NotFound) throw NotFoundException("Failed to get schedule($teacherUid): Not found") }
         .bodyAsText()
         .parseRawSchedule()

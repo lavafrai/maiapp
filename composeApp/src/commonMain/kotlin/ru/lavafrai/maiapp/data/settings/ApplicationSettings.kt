@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import ru.lavafrai.maiapp.models.schedule.AbstractScheduleId
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
@@ -23,7 +24,7 @@ import ru.lavafrai.maiapp.theme.themes.SystemTheme
 
 @Serializable
 data class ApplicationSettingsData(
-    val selectedSchedule: String? = null,
+    val selectedSchedule: AbstractScheduleId? = null,
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
 ) {
@@ -72,7 +73,7 @@ object ApplicationSettings {
         update(current.copy(colorSchema = colorSchemaId))
     }
 
-    suspend fun setSelectedGroup(group: String) {
+    suspend fun setSelectedGroup(group: AbstractScheduleId) {
         mutex.withLock {
             val current = getCurrent()
             update(current.copy(selectedSchedule = group))

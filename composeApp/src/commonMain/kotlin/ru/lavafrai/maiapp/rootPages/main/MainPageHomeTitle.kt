@@ -27,7 +27,7 @@ fun MainPageHomeTitle(
     val settings by rememberSettings()
     MainPageTitle(
         titleText = { Text(title) },
-        subtitleText = { Text(settings.selectedSchedule!!) },
+        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
         rightButton = {
             TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {
                 Text(buttonText)
