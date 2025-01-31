@@ -12,23 +12,24 @@ import ru.lavafrai.maiapp.models.schedule.TeacherId
 data class TeacherLessonRaw(
     @SerialName("time_start") val timeStart: TimeRaw,
     @SerialName("time_end") val timeEnd: TimeRaw,
+    val name: String,
     // val lector: Map<String, String>,
     val groups: List<String>,
     val types: List<LessonType>,
     val rooms: Map<String, String>,
 ) {
-    fun toLesson(name: String, day: LocalDate): Lesson {
+    fun toLesson(day: LocalDate): Lesson {
         return Lesson(
-            name,
-            timeStart.toTime(),
-            timeEnd.toTime(),
-            groups.map { TeacherId(it, it) },
-            types.first(),
-            day,
-            rooms.map { Classroom(it.value, it.key) },
-            "",
-            "",
-            "",
+            name = name,
+            timeStart = timeStart.toTime(),
+            timeEnd = timeEnd.toTime(),
+            lectors = groups.map { TeacherId(it, it) },
+            type = types.first(),
+            day = day,
+            rooms = rooms.map { Classroom(it.value, it.key) },
+            lms = "",
+            teams = "",
+            other = "",
         )
     }
 }

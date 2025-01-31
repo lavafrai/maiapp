@@ -26,7 +26,6 @@ data class ScheduleDayRaw (
             dayOfWeek = dayOfWeek,
             lessons = lessons.map {
                 json.decodeFromJsonElement<TeacherLessonRaw>(it.value).toLesson(
-                    it.value.keys.first(),
                     date,
                 )
             }
@@ -36,7 +35,7 @@ data class ScheduleDayRaw (
             dayOfWeek = dayOfWeek,
             lessons = lessons.map {
                 json.decodeFromJsonElement<LessonRaw>(it.value.values.first()).toLesson(
-                    it.key,
+                    it.value.keys.first(),
                     date,
                 )
             }

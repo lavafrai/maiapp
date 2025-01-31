@@ -22,16 +22,16 @@ data class LessonRaw(
 ) {
     fun toLesson(name: String, day: LocalDate): Lesson {
         return Lesson(
-            name,
-            timeStart.toTime(),
-            timeEnd.toTime(),
-            lector.map { TeacherId(it.value.capitalizeWords(), it.key) },
-            type.map { it.key }.first(),
-            day,
-            room.map { Classroom(it.value, it.key) },
-            lms,
-            teams,
-            other,
+            name = name,
+            timeStart = timeStart.toTime(),
+            timeEnd = timeEnd.toTime(),
+            lectors = lector.map { TeacherId(it.value.capitalizeWords(), it.key) },
+            type = type.map { it.key }.first(),
+            day = day,
+            rooms = room.map { Classroom(it.value, it.key) },
+            lms = lms,
+            teams = teams,
+            other = other,
         )
     }
 }
