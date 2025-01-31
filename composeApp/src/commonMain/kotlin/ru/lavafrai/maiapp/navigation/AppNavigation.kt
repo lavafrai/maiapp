@@ -25,7 +25,7 @@ import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
-import ru.lavafrai.maiapp.rootPages.schedule.SchedulePage
+import ru.lavafrai.maiapp.rootPages.schedule.DedicatedSchedulePage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -106,7 +106,7 @@ fun AppNavigation(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,
                     ) {
-                        SchedulePage(
+                        DedicatedSchedulePage(
                             sharedTransitionScope = this@SharedTransitionLayout,
                             animatedContentScope = this@composable,
                             onNavigateBack = { navController.navigateUp() },
