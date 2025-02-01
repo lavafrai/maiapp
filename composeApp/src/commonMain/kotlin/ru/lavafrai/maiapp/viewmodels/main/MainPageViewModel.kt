@@ -96,7 +96,10 @@ class MainPageViewModel(
                     emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it as Exception)))
                 }
             ) {
-                emit(stateValue.copy(schedule = Loadable.updating(stateValue.schedule.data!!)))
+                val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
+                if (cachedSchedule != null) emit(stateValue.copy(schedule = Loadable.updating(cachedSchedule)))
+                else emit(stateValue.copy(schedule = Loadable.loading()))
+
                 val schedule = scheduleRepository.getSchedule(scheduleName)
                 emit(stateValue.copy(schedule = Loadable.actual(schedule)))
             }
