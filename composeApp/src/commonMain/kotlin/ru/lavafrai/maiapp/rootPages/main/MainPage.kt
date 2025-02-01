@@ -5,19 +5,16 @@ package ru.lavafrai.maiapp.rootPages.main
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import co.touchlab.kermit.Logger
-import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
-import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.data.settings.rememberSettings
-import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
@@ -117,6 +114,7 @@ fun MainPage(
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
+                            onRefresh = viewModel::reloadSchedule,
                         )
                     }
                 }

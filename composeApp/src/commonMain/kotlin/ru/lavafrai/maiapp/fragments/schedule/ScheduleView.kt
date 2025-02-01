@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalFoundationApi::class)
+@file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 
 package ru.lavafrai.maiapp.fragments.schedule
 
@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.data.repositories.LessonAnnotationsRepository
 import ru.lavafrai.maiapp.fragments.PageColumn
@@ -22,6 +26,7 @@ import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.utils.LessonSelector
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ScheduleView(
@@ -30,16 +35,24 @@ fun ScheduleView(
     exlerTeachers: List<ExlerTeacher>? = null,
     modifier: Modifier = Modifier,
     selector: LessonSelector = LessonSelector.default(),
+    onRefresh: (() -> Unit)? = null,
 ) {
     val lessonAnnotationRepository = remember { LessonAnnotationsRepository }
-    val filteredDays = remember(dateRange, schedule) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
+    val filteredDays =
+        remember(dateRange, schedule) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
     val lazyColumnState: LazyListState = rememberLazyListState()
     val annotations by lessonAnnotationRepository.follow(schedule.name).collectAsState()
 
     val filteredLessons = remember(dateRange, selector, annotations, schedule, filteredDays) {
-        filteredDays.map { day -> day.copy(lessons=day.lessons.filter { lesson ->
-            selector.test(day, lesson, lessonAnnotationRepository.loadAnnotations(schedule.name).filter { it.lessonUid == lesson.getUid() })
-        }) }.filter { it.lessons.isNotEmpty() }
+        filteredDays.map { day ->
+            day.copy(lessons = day.lessons.filter { lesson ->
+                selector.test(
+                    day,
+                    lesson,
+                    lessonAnnotationRepository.loadAnnotations(schedule.name)
+                        .filter { it.lessonUid == lesson.getUid() })
+            })
+        }.filter { it.lessons.isNotEmpty() }
     }
     val filteredAnnotations = remember(annotations, dateRange) {
         annotations.filter { it.lessonUid in filteredLessons.flatMap { it.lessons.map { it.getUid() } } }
@@ -58,48 +71,64 @@ fun ScheduleView(
 
             lazyColumnState.scrollToItem((index * 2).coerceIn(0, Int.MAX_VALUE))
             return@LaunchedEffect
-        }
-
-        else lazyColumnState.scrollToItem(0)
+        } else lazyColumnState.scrollToItem(0)
 
     }
 
+    val scope = rememberCoroutineScope()
+    var refreshing by remember { mutableStateOf(false) }
+    val refresh = suspend {
+        if (onRefresh != null) onRefresh()
+        delay(1.seconds)
+        refreshing = false
+    }
+
     PageColumn(scrollState = null) {
-        if (filteredLessons.isNotEmpty()) LazyColumn(
-            modifier = modifier,
-            state = lazyColumnState,
-        ) {
-            for (day in filteredLessons) {
-                stickyHeader {
-                    DayHeader(
-                        day = day,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(vertical = 8.dp),
-                    )
-                }
+        val content = @Composable {
+            if (filteredLessons.isNotEmpty())
+                LazyColumn(
+                    modifier = modifier,
+                    state = lazyColumnState,
+                ) {
+                    for (day in filteredLessons) {
+                        stickyHeader {
+                            DayHeader(
+                                day = day,
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .padding(vertical = 8.dp),
+                            )
+                        }
 
-                item {
-                    DayView(
-                        day = day,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp),
-                        exlerTeachers = exlerTeachers,
-                        annotations = filteredAnnotations,
-                        schedule = schedule,
-                    )
-                }
-            }
+                        item {
+                            DayView(
+                                day = day,
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp),
+                                exlerTeachers = exlerTeachers,
+                                annotations = filteredAnnotations,
+                                schedule = schedule,
+                            )
+                        }
+                    }
 
-            item {
-                Spacer(Modifier.height(16.dp))
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                    }
+                } else {
+                if (filteredDays.isEmpty()) EmptyScheduleView(
+                    dateRange = dateRange,
+                ) else if (filteredLessons.isEmpty()) NoLessonsFoundView(
+                    dateRange = dateRange,
+                )
             }
-        } else {
-            if (filteredDays.isEmpty()) EmptyScheduleView(
-                dateRange = dateRange,
-            ) else if (filteredLessons.isEmpty()) NoLessonsFoundView(
-                dateRange = dateRange,
-            )
         }
+
+        if (onRefresh != null) PullToRefreshBox(
+            onRefresh = { refreshing = true ; scope.launch { refresh() } },
+            isRefreshing = refreshing,
+        ) {
+            content()
+        } else content()
     }
 }

@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
@@ -12,8 +15,6 @@ import ru.lavafrai.maiapp.data.repositories.MaiDataRepository
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
-import ru.lavafrai.maiapp.models.schedule.LessonType
-import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
@@ -71,7 +72,7 @@ class MainPageViewModel(
                 scheduleName = scheduleId
             }
 
-            val scheduleHandler = CoroutineExceptionHandler { _, e ->
+            /*val scheduleHandler = CoroutineExceptionHandler { _, e ->
                 e.printStackTrace()
                 emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e as Exception)))
             }
@@ -88,6 +89,16 @@ class MainPageViewModel(
                         emit(stateValue.copy(schedule = Loadable.actual(schedule)))
                     }
                 }
+            }*/
+
+            launchCatching(
+                onError = {
+                    emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it as Exception)))
+                }
+            ) {
+                emit(stateValue.copy(schedule = Loadable.updating(stateValue.schedule.data!!)))
+                val schedule = scheduleRepository.getSchedule(scheduleName)
+                emit(stateValue.copy(schedule = Loadable.actual(schedule)))
             }
         }
     }
