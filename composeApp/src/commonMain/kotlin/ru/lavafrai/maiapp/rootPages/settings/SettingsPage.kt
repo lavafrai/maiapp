@@ -61,6 +61,16 @@ fun SettingsPage(
                     ApplicationSettings.setColorScheme(schemaId)
                 },
                 itemContent = {
+                    Text(it.readableName(), fontSize = 18.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(it.buildColorScheme(ThemeProvider.findThemeById(settings.theme)).primary)
+                            .size(18.spAsDp)
+                    )
+                },
+                selectedContent = {
                     Box(
                         modifier = Modifier
                             .clip(CircleShape)

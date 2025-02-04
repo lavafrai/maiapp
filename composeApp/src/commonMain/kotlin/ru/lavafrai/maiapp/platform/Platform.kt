@@ -1,7 +1,9 @@
 package ru.lavafrai.maiapp.platform
 
+import androidx.compose.runtime.Composable
 import io.ktor.client.engine.*
 import com.russhwolf.settings.Settings
+import ru.lavafrai.maiapp.theme.ApplicationColorSchema
 
 interface Platform {
     fun name(): String
@@ -15,4 +17,7 @@ interface Platform {
 
     fun supportsShare(): Boolean = false
     fun shareText(text: String): Unit = error("Share isn't supported on this platform")
+
+    fun doesPlatformSupportsMonet(): Boolean = false
+    fun getMonet(): ApplicationColorSchema = error("Monet theme isn't supported on this platform")
 }

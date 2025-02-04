@@ -24,51 +24,60 @@ fun <T>SettingsDropdownItem(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.End,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
     ) {
-        Text(text=title, modifier = Modifier.weight(1f), fontSize = 18.sp)
+        Text(text=title, modifier = Modifier, fontSize = 18.sp)
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {
                 expanded = !expanded
             },
             modifier = Modifier
+                .weight(1f)
         ) {
-            SettingsDropdownLabel(
-                selected = { selectedContent(selected) },
-                expanded = expanded,
-                onExpandedChanged = {
-                    expanded = it
-                },
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = {
-                    expanded = false
-                },
+                horizontalArrangement = Arrangement.End,
             ) {
-                Column {//(modifier = Modifier.width(IntrinsicSize.Max)) {
-                    items.forEach { item ->
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    itemContent(item)
-                                }
-                            },
-                            onClick = {
-                                onItemSelected(item)
-                                expanded = false
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                SettingsDropdownLabel(
+                    selected = { selectedContent(selected) },
+                    expanded = expanded,
+                    onExpandedChanged = {
+                        expanded = it
+                    },
+                    modifier = Modifier,
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    },
+                ) {
+                    Column {//(modifier = Modifier.width(IntrinsicSize.Max)) {
+                        items.forEach { item ->
+                            DropdownMenuItem(
+                                text = {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        itemContent(item)
+                                    }
+                                },
+                                onClick = {
+                                    onItemSelected(item)
+                                    expanded = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
