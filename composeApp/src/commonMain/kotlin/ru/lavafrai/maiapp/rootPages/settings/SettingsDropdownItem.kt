@@ -51,7 +51,7 @@ fun <T>SettingsDropdownItem(
                     expanded = false
                 },
             ) {
-                Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+                Column {//(modifier = Modifier.width(IntrinsicSize.Max)) {
                     items.forEach { item ->
                         DropdownMenuItem(
                             text = {
@@ -67,6 +67,7 @@ fun <T>SettingsDropdownItem(
                                 onItemSelected(item)
                                 expanded = false
                             },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
