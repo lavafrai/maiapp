@@ -39,6 +39,7 @@ android-compileSdk = "35"
 android-minSdk = "23"
 android-targetSdk = "35"
 zoomimage = "1.1.0"
+runtimeSaveableAndroid = "1.7.7"
 
 
 [libraries]
@@ -101,6 +102,7 @@ ktor-server-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-
 ktor-server-caching = { module = "io.ktor:ktor-server-caching-headers", version.ref = "ktor" }
 zoomimage-compose = { module = "io.github.panpf.zoomimage:zoomimage-compose", version.ref = "zoomimage" }
 zoomimage-compose-coil3 = { module = "io.github.panpf.zoomimage:zoomimage-compose-coil3", version.ref = "zoomimage" }
+androidx-runtime-saveable-android = { group = "androidx.compose.runtime", name = "runtime-saveable-android", version.ref = "runtimeSaveableAndroid" }
 
 [plugins]
 

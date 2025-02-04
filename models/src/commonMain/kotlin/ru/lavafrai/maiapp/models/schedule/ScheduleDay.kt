@@ -15,4 +15,10 @@ data class ScheduleDay(
     fun isFinished(): Boolean {
         return lessons.all { it.isFinished() }
     }
+
+    override fun hashCode(): Int {
+        return lessons.fold(date.hashCode() * 31 + dayOfWeek.hashCode()) { acc, lesson ->
+            acc * 31 + lesson.getUid()
+        }
+    }
 }
