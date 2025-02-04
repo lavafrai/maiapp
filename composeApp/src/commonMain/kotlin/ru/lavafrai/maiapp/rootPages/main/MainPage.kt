@@ -124,7 +124,7 @@ fun MainPage(
                 }
 
                 MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {
-                    SettingsPage()
+                    SettingsPage(schedule = viewState.schedule)
                 }
             }
         }

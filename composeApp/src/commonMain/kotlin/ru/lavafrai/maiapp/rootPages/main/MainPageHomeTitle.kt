@@ -56,7 +56,7 @@ fun MainPageHomeTitle(
                     modifier = Modifier
                         .padding(end = 2.dp)
                         .clip(MaterialTheme.shapes.small)
-                        .contextual(otherSchedules.isNotEmpty() && schedule.status == LoadableStatus.Actual) {
+                        .contextual(otherSchedules.isNotEmpty() && schedule.isNotLoading()) {
                             clickable { expanded = true }
                         },
                 )

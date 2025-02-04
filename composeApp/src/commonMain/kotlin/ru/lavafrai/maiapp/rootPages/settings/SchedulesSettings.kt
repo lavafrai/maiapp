@@ -20,25 +20,22 @@ import compose.icons.feathericons.ChevronDown
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import maiapp.composeapp.generated.resources.*
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.add_schedule
-import maiapp.composeapp.generated.resources.schedule
-import maiapp.composeapp.generated.resources.unknown
 import org.jetbrains.compose.resources.stringResource
-import ru.lavafrai.maiapp.App
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
-import ru.lavafrai.maiapp.fragments.settings.SettingsDropdownLabel
-import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.utils.conditional
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
 @Composable
-fun SchedulesSettings() = SettingsSection(title = stringResource(Res.string.schedule)) {
+fun SchedulesSettings(
+    schedule: Loadable<Schedule>,
+) = SettingsSection(title = stringResource(Res.string.schedule)) {
     val scheduleRepository = ScheduleRepository()
     val appContext = LocalApplicationContext.current
     val scope = rememberCoroutineScope()
@@ -71,7 +68,7 @@ fun SchedulesSettings() = SettingsSection(title = stringResource(Res.string.sche
                 disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
             trailingIcon = {
-                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }) {
+                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }, enabled = schedule.isNotLoading()) {
                     Icon(
                         imageVector = FeatherIcons.ChevronDown,
                         contentDescription = stringResource(Res.string.schedule),

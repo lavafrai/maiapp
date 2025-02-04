@@ -23,10 +23,12 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.fragments.settings.ThemeSelectButton
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.ThemeProvider
 import ru.lavafrai.maiapp.utils.formatBinarySize
@@ -34,13 +36,15 @@ import ru.lavafrai.maiapp.utils.getStorageUsage
 import ru.lavafrai.maiapp.utils.spAsDp
 
 @Composable
-fun SettingsPage() {
+fun SettingsPage(
+    schedule: Loadable<Schedule>,
+) {
     val settings by rememberSettings()
 
     PageColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Spacer(Modifier.height(8.dp))
 
-        SchedulesSettings()
+        SchedulesSettings(schedule = schedule)
 
         SettingsSection(title = stringResource(Res.string.appearance)) {
             ThemeSelectButton { themeId ->

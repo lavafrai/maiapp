@@ -7,6 +7,8 @@ data class Loadable<T>(
 ) {
     fun hasData() = data != null
     fun hasError() = error != null
+    fun isNotLoading() = status !in listOf(LoadableStatus.Loading, LoadableStatus.Updating)
+
 
     val status: LoadableStatus
         get() = when {
