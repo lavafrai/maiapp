@@ -47,6 +47,7 @@ fun MainPage(
         viewModel.reloadSchedule(settings.selectedSchedule)
     }
     val viewState by viewModel.state.collectAsState()
+    val requestRefresh = { viewModel.reloadSchedule(settings.selectedSchedule) }
 
     Column {
         MainPageNavigation(
@@ -54,9 +55,10 @@ fun MainPage(
             setPage = { page -> viewModel.setPage(page) },
             header = { page ->
                 when (page) {
-                    MainNavigationPageId.INFORMATION -> MainPageTitle(
-                        titleText = { Text(stringResource(Res.string.information)) },
-                        subtitleText = { Text(settings.selectedSchedule!!.toString()) },
+                    MainNavigationPageId.INFORMATION -> MainPageHomeTitle(
+                        title = stringResource(Res.string.information),
+                        schedule = viewState.schedule,
+                        onRequestRefresh = requestRefresh,
                     )
 
                     MainNavigationPageId.WORKS -> MainPageHomeTitle(
@@ -64,6 +66,7 @@ fun MainPage(
                         schedule = viewState.schedule,
                         buttonText = stringResource(Res.string.work_type),
                         onButtonClick = { workTypeSelectorExpanded = !workTypeSelectorExpanded },
+                        onRequestRefresh = requestRefresh,
                     )
 
                     MainNavigationPageId.HOME -> MainPageHomeTitle(
@@ -71,16 +74,19 @@ fun MainPage(
                         schedule = viewState.schedule,
                         buttonText = stringResource(Res.string.select_week),
                         onButtonClick = { weekSelectorExpanded = true },
+                        onRequestRefresh = requestRefresh,
                     )
 
                     MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(
                         title = stringResource(Res.string.account),
                         schedule = viewState.schedule,
+                        onRequestRefresh = requestRefresh,
                     )
 
                     MainNavigationPageId.SETTINGS -> MainPageHomeTitle(
                         title = stringResource(Res.string.settings),
                         schedule = viewState.schedule,
+                        onRequestRefresh = requestRefresh,
                     )
                 }
             },

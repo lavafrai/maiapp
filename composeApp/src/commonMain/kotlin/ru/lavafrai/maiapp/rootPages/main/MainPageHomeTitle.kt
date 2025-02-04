@@ -33,6 +33,7 @@ fun MainPageHomeTitle(
     schedule: Loadable<Schedule>,
     buttonText: String? = null,
     onButtonClick: () -> Unit = { },
+    onRequestRefresh: () -> Unit = { },
 ) {
     val haptic = LocalHapticFeedback.current
     val appContext = LocalApplicationContext.current
@@ -121,7 +122,10 @@ fun MainPageHomeTitle(
                 if (schedule.status == LoadableStatus.Offline) Icon(
                     imageVector = FeatherIcons.CloudOff,
                     contentDescription = "offline",
-                    modifier = Modifier.size(size).alpha(0.7f),
+                    modifier = Modifier
+                        .size(size)
+                        .alpha(0.7f)
+                        .clickable(onClick = onRequestRefresh),
                 )
                 if (schedule.status == LoadableStatus.Updating) Icon(
                     imageVector = FeatherIcons.DownloadCloud,
