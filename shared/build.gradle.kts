@@ -37,7 +37,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.serialization)
-            implementation(libs.ktor.client.serialization.json)
+            implementation(libs.ktor.serialization.json)
         }
 
         androidMain.dependencies {
