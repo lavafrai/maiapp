@@ -6,8 +6,11 @@ import io.appmetrica.analytics.AppMetricaConfig
 import ru.lavafrai.maiapp.BuildConfig.APPMETRICA_APIKEY
 
 class AndroidApplication : android.app.Application() {
-    override fun onCreate() {
+    init {
         instance = this
+    }
+
+    override fun onCreate() {
         super.onCreate()
 
         try {

@@ -141,7 +141,17 @@
                 preloader.style.display = "none";
             }, 300);
         }
+
+        function onPanicError() {
+            alert("An error occurred while loading the application. Please try again later.");
+        }
+
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            // ... обработка ошибки ...
+            onPanicError();
+            return false;
+        }
     </script>
 
-    <script src="composeApp.js"></script>
+    <script src="composeApp.js" onerror="onPanicError()"></script>
 </html>

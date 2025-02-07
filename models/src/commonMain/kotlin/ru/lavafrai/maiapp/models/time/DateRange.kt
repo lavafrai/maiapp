@@ -33,7 +33,7 @@ data class DateRange(
     }
 
     override fun toString(): String {
-        return "$startDate - $endDate"
+        return "${startDate.toRussianFormatString()} - ${endDate.toRussianFormatString()}"
     }
 
     companion object {
@@ -82,4 +82,12 @@ data class DateRange(
             }
         }
         */
+}
+
+internal fun String.zFill(length: Int): String {
+    return this.padStart(length, '0')
+}
+
+fun LocalDate.toRussianFormatString(): String {
+    return "${dayOfMonth.toString().zFill(2)}.${monthNumber.toString().zFill(2)}.${year}"
 }

@@ -34,6 +34,7 @@ material-motion = "2.0.1"
 uiAndroid = "1.7.7"
 androidx-browser = "1.8.0"
 logback-classic = "1.5.11"
+recompose = "0.4.2"
 
 android-compileSdk = "35"
 android-minSdk = "23"
@@ -115,3 +116,4 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+recompose-highlighter = { id = "com.vk.recompose-highlighter", version.ref = "recompose" }
