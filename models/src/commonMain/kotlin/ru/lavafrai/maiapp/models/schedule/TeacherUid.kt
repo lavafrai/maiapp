@@ -2,7 +2,6 @@ package ru.lavafrai.maiapp.models.schedule
 
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.StringSerializer
-import kotlin.jvm.JvmInline
 
 @Serializable(with = TeacherUidSerializer::class)
 class TeacherUid(val uid: String): ScheduleId() {
@@ -17,6 +16,7 @@ class TeacherUid(val uid: String): ScheduleId() {
     companion object {
         private val uidRegex = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\$".toRegex()
         val isValid: (String) -> Boolean = { uidRegex.matches(it) }
+        val Empty: TeacherUid = TeacherUid("00000000-0000-0000-0000-000000000000")
     }
 }
 

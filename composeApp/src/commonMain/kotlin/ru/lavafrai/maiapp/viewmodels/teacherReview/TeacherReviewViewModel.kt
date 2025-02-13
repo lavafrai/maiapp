@@ -10,11 +10,13 @@ import kotlinx.coroutines.supervisorScope
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
+import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
 class TeacherReviewViewModel(
     val teacherId: String,
+    val teacherUid: TeacherUid,
 ): MaiAppViewModel<TeacherReviewsState>(
     TeacherReviewsState(
         teacherInfo = Loadable.loading()
@@ -49,9 +51,10 @@ class TeacherReviewViewModel(
 
     class Factory(
         private val teacherId: String,
+        private val teacherUid: TeacherUid,
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
-            return TeacherReviewViewModel(teacherId) as T
+            return TeacherReviewViewModel(teacherId, teacherUid) as T
         }
     }
 }

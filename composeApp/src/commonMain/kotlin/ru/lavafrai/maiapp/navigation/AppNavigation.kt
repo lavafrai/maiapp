@@ -20,6 +20,7 @@ import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
+import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
@@ -100,7 +101,8 @@ fun AppNavigation(
                         typeOf<ScheduleId>() to navTypeOf<ScheduleId>(),
                     ),
                 ) { backStackEntry ->
-                    val scheduleId: ScheduleId = backStackEntry.toRoute<DedicatedSchedulePage>().scheduleId
+                    val route = backStackEntry.toRoute<DedicatedSchedulePage>()
+                    val scheduleId: ScheduleId = route.scheduleId
 
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -111,6 +113,7 @@ fun AppNavigation(
                             animatedContentScope = this@composable,
                             onNavigateBack = { navController.navigateUp() },
                             scheduleId = scheduleId,
+                            title = route.title,
                         )
                     }
 
@@ -145,7 +148,8 @@ fun AppNavigation(
                 composable<TeacherReviewsPage>(
                     typeMap = mapOf(
                         typeOf<LoginType>() to navTypeOf<LoginType>(),
-                        typeOf<LoginTarget>() to navTypeOf<LoginTarget>()
+                        typeOf<LoginTarget>() to navTypeOf<LoginTarget>(),
+                        typeOf<TeacherUid>() to navTypeOf<TeacherUid>(),
                     ),
                 ) { backStackEntry ->
                     val loginData: TeacherReviewsPage = backStackEntry.toRoute()
@@ -159,6 +163,7 @@ fun AppNavigation(
                             animatedContentScope = this@composable,
                             onNavigateBack = { navController.navigateUp() },
                             teacherId = loginData.teacherId,
+                            teacherUid = loginData.teacherUid,
                         )
                     }
                 }

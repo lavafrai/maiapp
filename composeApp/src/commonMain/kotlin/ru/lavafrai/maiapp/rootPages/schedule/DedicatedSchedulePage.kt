@@ -30,13 +30,14 @@ fun DedicatedSchedulePage(
     animatedContentScope: AnimatedContentScope,
     onNavigateBack: () -> Unit,
     scheduleId: ScheduleId,
+    title: String? = null,
 ) {
     val viewModel: DedicatedScheduleViewModel = viewModel(factory = DedicatedScheduleViewModel.Factory(scheduleId))
     val viewState by viewModel.state.collectAsState()
     Column {
         MainPageTitle(
             titleText = { Text(stringResource(Res.string.schedule)) },
-            subtitleText = { Text(scheduleId.scheduleId) },
+            subtitleText = { Text(title ?: scheduleId.scheduleId) },
             leftButton = {
                 IconButton(onClick = onNavigateBack) {
                     Icon(FeatherIcons.ArrowLeft, "Back")

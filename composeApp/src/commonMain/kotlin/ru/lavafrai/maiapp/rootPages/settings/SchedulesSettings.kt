@@ -29,6 +29,7 @@ import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.utils.conditional
+import ru.lavafrai.maiapp.utils.formatBinarySize
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
@@ -98,7 +99,7 @@ fun SchedulesSettings(
                     trailingIcon = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = if (calculatedSize != null) "${calculatedSize!! / 1024L}КB" else "100hn",
+                                text = if (calculatedSize != null) calculatedSize!!.formatBinarySize() else "100hn",
                                 modifier = Modifier
                                     .alpha(0.7f)
                                     .conditional(calculatedSize == null) { shimmer() }

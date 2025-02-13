@@ -76,7 +76,7 @@ fun LessonView(
                         it.name,
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (areOnExler) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.conditional(areOnExler) { clickable { appContext.openTeacherReviews(it.name) } }
+                        modifier = Modifier.conditional(areOnExler) { clickable { appContext.openTeacherReviews(it.name, it.uid) } }
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
