@@ -7,7 +7,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,12 +14,14 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.data.settings.rememberSettings
+import ru.lavafrai.maiapp.fragments.account.AccountPage
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.utils.anySelector
+import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
 @Composable
@@ -42,6 +43,7 @@ fun MainPage(
             },
         )
     )
+    val accountViewModel: AccountViewModel = viewModel(factory = AccountViewModel.Factory())
 
     LaunchedEffect(settings.selectedSchedule) {
         viewModel.reloadSchedule(settings.selectedSchedule)
@@ -126,7 +128,10 @@ fun MainPage(
                 }
 
                 MainNavigationPageId.ACCOUNT -> Column(Modifier.fillMaxSize()) {
-                    // AccountPage()
+                    AccountPage(
+                        viewModel = accountViewModel,
+                        modifier = Modifier.fillMaxSize(),
+                    )
                 }
 
                 MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {

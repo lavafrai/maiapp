@@ -207,6 +207,8 @@ android {
 dependencies {
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.runtime.saveable.android)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.ui.text.android)
 }
 
 compose.desktop {

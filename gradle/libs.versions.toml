@@ -31,7 +31,7 @@ richeditorCompose = "1.0.0-rc10"
 sonner = "0.3.8"
 windowSize = "0.5.0"
 material-motion = "2.0.1"
-uiAndroid = "1.7.7"
+uiAndroid = "1.7.8"
 androidx-browser = "1.8.0"
 logback-classic = "1.5.11"
 recompose = "0.4.2"
@@ -40,7 +40,9 @@ android-compileSdk = "35"
 android-minSdk = "23"
 android-targetSdk = "35"
 zoomimage = "1.1.0"
-runtimeSaveableAndroid = "1.7.7"
+runtimeSaveableAndroid = "1.7.8"
+foundationAndroid = "1.7.8"
+uiTextAndroid = "1.7.8"
 
 
 [libraries]
@@ -103,6 +105,8 @@ ktor-server-caching = { module = "io.ktor:ktor-server-caching-headers", version.
 zoomimage-compose = { module = "io.github.panpf.zoomimage:zoomimage-compose", version.ref = "zoomimage" }
 zoomimage-compose-coil3 = { module = "io.github.panpf.zoomimage:zoomimage-compose-coil3", version.ref = "zoomimage" }
 androidx-runtime-saveable-android = { group = "androidx.compose.runtime", name = "runtime-saveable-android", version.ref = "runtimeSaveableAndroid" }
+androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
 
 [plugins]
 

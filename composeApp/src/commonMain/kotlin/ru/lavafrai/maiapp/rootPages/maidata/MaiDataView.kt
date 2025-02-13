@@ -1,7 +1,6 @@
 package ru.lavafrai.maiapp.rootPages.maidata
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +18,7 @@ fun MaiDataView(
     data: List<MaiDataItem>,
     modifier: Modifier = Modifier,
 ) {
+    // TODO before release maidata should be done or removed!!!
     val categories = remember(data) { data.groupBy { it.category }}
 
     PageColumn(
