@@ -91,7 +91,7 @@ object LessonAnnotationsRepository: BaseRepository() {
             LessonAnnotation.ControlWork,
             LessonAnnotation.Colloquium,
             LessonAnnotation.HomeWork,
-            LessonAnnotation.Comment,
+            // LessonAnnotation.Comment,
         )
     }
 }
