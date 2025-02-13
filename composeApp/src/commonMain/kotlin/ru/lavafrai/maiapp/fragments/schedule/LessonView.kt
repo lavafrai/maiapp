@@ -25,6 +25,7 @@ import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.theme.LinkColor
 import ru.lavafrai.maiapp.utils.conditional
 
@@ -72,11 +73,17 @@ fun LessonView(
 
                 lesson.lectors.forEach {
                     val areOnExler = remember(exlerTeachers) { exlerTeachers?.any { exler -> exler.name == it.name } ?: false }
+                    val hasSchedule = remember(it) { it.uid != TeacherUid.Empty }
+                    val clickable = areOnExler || hasSchedule
+
                     Text(
                         it.name,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (areOnExler) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.conditional(areOnExler) { clickable { appContext.openTeacherReviews(it.name, it.uid) } }
+                        color = if (clickable) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.conditional(clickable) { clickable {
+                            if (areOnExler) appContext.openTeacherReviews(it.name, it.uid)
+                            else if (hasSchedule) appContext.openSchedule(it.uid, it.name)
+                        }}
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))

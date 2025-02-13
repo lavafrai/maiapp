@@ -13,6 +13,13 @@ class TeacherUid(val uid: String): ScheduleId() {
     override val scheduleId: String
         get() = uid
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is TeacherUid) return false
+
+        return uid == other.uid
+    }
+
     companion object {
         private val uidRegex = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\$".toRegex()
         val isValid: (String) -> Boolean = { uidRegex.matches(it) }
