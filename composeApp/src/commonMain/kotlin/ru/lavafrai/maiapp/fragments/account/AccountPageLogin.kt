@@ -19,12 +19,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.fragments.PageColumn
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.autofill.ContentType
-import androidx.compose.ui.platform.LocalAutofill
-import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.semantics.contentType
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -51,7 +46,7 @@ fun AccountPageLogin(
     var login by remember { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by remember { mutableStateOf(true) }
-    val autofillManager = LocalAutofillManager.current
+    //val autofillManager = LocalAutofillManager.current
 
     Spacer(Modifier.height(16.dp))
     Text(stringResource(Res.string.profile), style = MaterialTheme.typography.headlineMedium)
@@ -63,10 +58,8 @@ fun AccountPageLogin(
         singleLine = true,
         enabled = !loading,
         modifier = Modifier
-            .fillMaxWidth()
-            .semantics {
-                contentType = ContentType.Username
-            },
+            .fillMaxWidth(),
+            //.semantics { contentType = ContentType.Username },
         isError = error != null,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
     )
@@ -78,8 +71,8 @@ fun AccountPageLogin(
         singleLine = true,
         enabled = !loading,
         modifier = Modifier
-            .fillMaxWidth()
-            .semantics { contentType = ContentType.Password },
+            .fillMaxWidth(),
+            //.semantics { contentType = ContentType.Password },
         isError = error != null,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
@@ -106,7 +99,7 @@ fun AccountPageLogin(
             focusManager.clearFocus()
             loading = true
             error = null
-            autofillManager?.commit()
+            //autofillManager?.commit()
             viewModel.signIn(login, password) { result ->
                 loading = false
                 error = result
