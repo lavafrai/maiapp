@@ -32,8 +32,9 @@ fun AccountPageView(
     LoadableView(viewState.person, retry = viewModel::refresh) { person ->
         if (person == null) UnsupportedAccountView()
         else Column {
-            Text(person.firstname)
-            Text(person.phone)
+            AppCard {
+
+            }
         }
     }
 }
