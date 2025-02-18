@@ -2,6 +2,7 @@ package ru.lavafrai.maiapp.fragments.account
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +20,7 @@ import ru.lavafrai.maiapp.fragments.PageColumn
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 
 @Composable
@@ -59,6 +61,7 @@ fun AccountPageLogin(
         enabled = !loading,
         modifier = Modifier.fillMaxWidth(),
         isError = error != null,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     )
     AnimatedVisibility(visible = error != null) {
         Text(

@@ -41,6 +41,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.kotlincrypto))
             implementation(libs.kotlincrypto.md)
             implementation(libs.bignum)
+            implementation(libs.ksoup)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }

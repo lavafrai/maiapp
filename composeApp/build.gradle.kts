@@ -73,6 +73,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.models)
+            implementation(projects.network.mymai)
             implementation(projects.shared)
             implementation(compose.runtime)
             implementation(compose.foundation)

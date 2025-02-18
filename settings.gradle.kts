@@ -38,6 +38,7 @@ dependencyResolutionManagement {
 }
 include(":models")
 include(":shared")
+include(":network:mymai")
 include(":network:mai")
 include(":network:exler")
 include(":network:github")

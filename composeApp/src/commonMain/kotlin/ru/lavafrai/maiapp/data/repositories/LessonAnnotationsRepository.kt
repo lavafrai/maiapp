@@ -14,7 +14,7 @@ import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.platform.getPlatform
 
 object LessonAnnotationsRepository: BaseRepository() {
-    val storage = getPlatform().storage()
+    // val storage = getPlatform().storage()
     private val mutex = Mutex()
     private val flows: MutableMap<String, MutableStateFlow<List<LessonAnnotation>>> = mutableMapOf()
 

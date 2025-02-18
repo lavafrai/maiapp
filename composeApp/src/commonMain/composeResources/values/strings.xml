@@ -70,6 +70,7 @@
     <string name="safe_data_cleanup_warning">Вы уверены?</string>
     <string name="safe_data_cleanup_warning_description">Вы точно хотите удалить все данные приложения с устройства? Среди них находятся все настройки и загруженные расписания.\n\nПриложение будет перезапущено.</string>
     <string name="account_login_info">Пожалуйста, введите данные для авторизации на сайте my.mai.ru\nВсе учетные данные будут храниться локально на вашем устройстве, будут доступны только вам и не будут отправлены на сервера приложения.</string>
+    <string name="account_unsupported">Сервер не вернул информацию о пользователе</string>
 
     <string name="final_test">Зачет</string>
     <string name="control_work">Контрольная</string>

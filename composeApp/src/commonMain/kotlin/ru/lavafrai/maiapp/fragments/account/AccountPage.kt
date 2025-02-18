@@ -27,10 +27,13 @@ fun AccountPage(
         MaterialSharedAxisY(
             targetState = if (viewState.loggedIn) AccountPageState.Logged else AccountPageState.Unlogged,
             forward = true,
-        ) {
-            when (viewState.loggedIn) {
-                true -> Text("Logged in")
-                false -> AccountPageLogin(
+        ) { state ->
+            when (state) {
+                AccountPageState.Logged -> AccountPageView(
+                    viewModel = viewModel,
+                    viewState = viewState,
+                )
+                AccountPageState.Unlogged -> AccountPageLogin(
                     viewModel = viewModel,
                 )
             }
