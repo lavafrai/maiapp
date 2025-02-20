@@ -43,6 +43,23 @@ kotlin {
             implementation(libs.bignum)
             implementation(libs.ksoup)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.cryptography.core)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.cryptography.provider.jdk)
+        }
+
+        appleMain.dependencies {
+            implementation(libs.cryptography.provider.apple)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.cryptography.provider.jdk)
+        }
+
+        wasmJsMain.dependencies {
+            implementation(libs.cryptography.provider.webcrypto)
         }
     }
 }

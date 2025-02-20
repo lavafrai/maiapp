@@ -1,26 +1,37 @@
 package ru.lavafrai.maiapp.network.mymai
 
 import com.fleeksoft.ksoup.Ksoup
+import dev.whyoleg.cryptography.CryptographyProvider
+import dev.whyoleg.cryptography.DelicateCryptographyApi
+import dev.whyoleg.cryptography.algorithms.AES
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
-import io.ktor.client.request.headers
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.serialization.SerializationException
 import ru.lavafrai.maiapp.HttpClientProvider
 import ru.lavafrai.maiapp.JsonProvider
 import ru.lavafrai.maiapp.models.account.*
+import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.network.mymai.exceptions.AuthenticationServerException
 import ru.lavafrai.maiapp.network.mymai.exceptions.InvalidLoginOrPasswordException
-import kotlinx.serialization.SerializationException
+import kotlin.random.Random
 
+@OptIn(ExperimentalStdlibApi::class, DelicateCryptographyApi::class)
 class MyMaiApi(
     private val credentials: MyMaiCredentials,
     private val httpClient: HttpClient = HttpClientProvider.default,
 ) {
     private suspend inline fun <reified T>method(methodName: String, urlQueryParams: Map<String, String> = mapOf()): T {
+        val signatures = getSignatures()
         val response = client.get {
             url {
                 protocol = URLProtocol.HTTPS
@@ -33,6 +44,7 @@ class MyMaiApi(
             }
             headers {
                 append("Cookie", "kk_access=${credentials.accessToken}")
+                append("Signature", signatures)
             }
         }
 
@@ -52,6 +64,25 @@ class MyMaiApi(
         }
     }
     suspend fun person() = applicants().person
+    private suspend fun getSignatures(): String {
+        // TODO: Fetch secret from webpage
+        val secret = "rEAQVc6s0bqyTCQWbglqC0VTsxwhqRLJ83c17z7GGAk="
+        val secretBytes = secret.decodeBase64Bytes()
+        val timestamp = LocalDateTime.now().toInstant(TimeZone.UTC).toEpochMilliseconds().toString()
+        val iv = ByteArray(16).also {
+            Random(0).nextBytes(it)
+        }
+        val aes = CryptographyProvider.Default
+            .get(AES.CTR)
+        val key = aes.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, secretBytes)
+
+        val encryptedBytes = key.cipher().encryptWithIv(iv = iv, plaintext = timestamp.toByteArray())
+
+        val ivHex = iv.toHexString()
+        val encryptedHex = encryptedBytes.toHexString()
+
+        return "$ivHex:$encryptedHex"
+    }
 
     companion object {
         val client = HttpClientProvider.default

@@ -21,7 +21,7 @@ class AccountViewModel(
 ): MaiAppViewModel<AccountViewState>(
     initialState = AccountViewState(
         loggedIn = accountRepository.hasCredentials(),
-        person = Loadable.loading(),
+        studentInfo = Loadable.loading(),
     )
 ) {
     init {
@@ -31,16 +31,16 @@ class AccountViewModel(
     fun refresh() {
         emit(AccountViewState(
             loggedIn = accountRepository.hasCredentials(),
-            person = Loadable.loading(),
+            studentInfo = Loadable.loading(),
         ))
 
         val credentials = accountRepository.getCredentials() ?: return
 
-        launchCatching(onError = { emit(stateValue.copy(person = Loadable.error(it as Exception))) }) {
+        launchCatching(onError = { emit(stateValue.copy(studentInfo = Loadable.error(it as Exception))) }) {
             val session = MyMaiApi.authorize(credentials.login, credentials.password)
 
-            val person = session.person()
-            emit(stateValue.copy(person = Loadable.actual(person)))
+            val studentInfo = session.studentInfo()
+            emit(stateValue.copy(studentInfo = Loadable.actual(studentInfo)))
         }
     }
 

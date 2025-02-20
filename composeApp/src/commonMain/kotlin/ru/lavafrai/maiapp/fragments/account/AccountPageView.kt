@@ -29,11 +29,11 @@ fun AccountPageView(
     horizontalAlignment = Alignment.CenterHorizontally,
     paddings = true,
 ) {
-    LoadableView(viewState.person, retry = viewModel::refresh) { person ->
-        if (person == null) UnsupportedAccountView()
+    LoadableView(viewState.studentInfo, retry = viewModel::refresh) { studentInfo ->
+        if (studentInfo == null) UnsupportedAccountView()
         else Column {
             AppCard {
-
+                studentInfo.lastname?.let { Text("Lastname: $it") }
             }
         }
     }
