@@ -14,7 +14,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.skeptick.libres.compose.painterResource
+import maiapp.composeapp.generated.resources.*
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.ic_award
+import maiapp.composeapp.generated.resources.ic_info
+import maiapp.composeapp.generated.resources.ic_info_filled
+import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.painterResource
 import ru.lavafrai.maiapp.LibRes
 import ru.lavafrai.maiapp.fragments.AnimatedIcon
 import soup.compose.material.motion.MaterialMotion
@@ -26,8 +32,8 @@ val mainNavigationItems = listOf(
         id = MainNavigationPageId.INFORMATION,
         // icon = { selected -> Icon(painterResource(if (selected) LibRes.image.info_filled else LibRes.image.info), "Info") },
         icon = { selected -> AnimatedIcon(
-            iconPainter = painterResource(LibRes.image.info),
-            enabledIconPainter = painterResource(LibRes.image.info_filled),
+            iconPainter = painterResource(Res.drawable.ic_info),
+            enabledIconPainter = painterResource(Res.drawable.ic_info_filled),
             contentDescription = "Info",
             enabled = selected,
         )},
@@ -36,8 +42,8 @@ val mainNavigationItems = listOf(
     MainNavigationItem(
         id = MainNavigationPageId.WORKS,
         icon = { selected -> AnimatedIcon(
-            iconPainter = painterResource(LibRes.image.award),
-            enabledIconPainter = painterResource(LibRes.image.award_filled),
+            iconPainter = painterResource(Res.drawable.ic_award),
+            enabledIconPainter = painterResource(Res.drawable.ic_award_filled),
             contentDescription = "Works",
             enabled = selected,
         )},
@@ -46,8 +52,8 @@ val mainNavigationItems = listOf(
     MainNavigationItem(
         id = MainNavigationPageId.HOME,
         icon = { selected -> AnimatedIcon(
-            iconPainter = painterResource(LibRes.image.home),
-            enabledIconPainter = painterResource(LibRes.image.home_filled),
+            iconPainter = painterResource(Res.drawable.ic_home),
+            enabledIconPainter = painterResource(Res.drawable.ic_home_filled),
             contentDescription = "Home",
             enabled = selected,
         )},
@@ -56,8 +62,8 @@ val mainNavigationItems = listOf(
     MainNavigationItem(
         id = MainNavigationPageId.ACCOUNT,
         icon = { selected -> AnimatedIcon(
-            iconPainter = painterResource(LibRes.image.user),
-            enabledIconPainter = painterResource(LibRes.image.user_filled),
+            iconPainter = painterResource(Res.drawable.ic_user),
+            enabledIconPainter = painterResource(Res.drawable.ic_user_filled),
             contentDescription = "Account",
             enabled = selected,
         )},
@@ -66,8 +72,8 @@ val mainNavigationItems = listOf(
     MainNavigationItem(
         id = MainNavigationPageId.SETTINGS,
         icon = { selected -> AnimatedIcon(
-            iconPainter = painterResource(LibRes.image.settings),
-            enabledIconPainter = painterResource(LibRes.image.settings_filled),
+            iconPainter = painterResource(Res.drawable.ic_settings),
+            enabledIconPainter = painterResource(Res.drawable.ic_settings_filled),
             contentDescription = "Settings",
             enabled = selected,
         )},
