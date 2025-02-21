@@ -3,7 +3,7 @@ package ru.lavafrai.maiapp.models.schedule
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.StringSerializer
 
-@Serializable(with = TeacherNameSerializer::class)
+@Serializable//(with = TeacherNameSerializer::class)
 class TeacherName(val name: String): ScheduleId() {
     init {
         // require(name.isNotBlank())

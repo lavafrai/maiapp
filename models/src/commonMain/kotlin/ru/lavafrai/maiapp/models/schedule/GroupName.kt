@@ -3,7 +3,7 @@ package ru.lavafrai.maiapp.models.schedule
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.StringSerializer
 
-@Serializable(with = GroupNameSerializer::class)
+@Serializable//(with = GroupNameSerializer::class)
 class GroupName(val name: String): ScheduleId() {
     override val scheduleId: String
         get() = name

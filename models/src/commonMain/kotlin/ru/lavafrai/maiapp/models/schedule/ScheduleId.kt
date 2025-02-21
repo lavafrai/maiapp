@@ -3,8 +3,8 @@ package ru.lavafrai.maiapp.models.schedule
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.StringSerializer
 
-@Serializable(with = ScheduleIdSerializer::class)
-abstract class ScheduleId {
+@Serializable//(with = ScheduleIdSerializer::class)
+abstract sealed class ScheduleId {
     abstract val scheduleId: String
 
     override fun equals(other: Any?): Boolean = other is ScheduleId && scheduleId == other.scheduleId

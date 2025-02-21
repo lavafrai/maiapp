@@ -11,6 +11,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
@@ -39,8 +40,11 @@ object ApplicationSettings {
 
     fun getCurrent(): ApplicationSettingsData {
         val settings = try {
-            val settingsSerialized = storage.getStringOrNull("settings") ?: return ApplicationSettingsData()
+            val settingsSerialized =
+                storage.getStringOrNull("settings") ?: return ApplicationSettingsData()
             Json.decodeFromString<ApplicationSettingsData>(settingsSerialized)
+        } catch (e: SerializationException) {
+            return ApplicationSettingsData()
         } catch (e: Exception) {
             e.printStackTrace()
             ApplicationSettingsData()
