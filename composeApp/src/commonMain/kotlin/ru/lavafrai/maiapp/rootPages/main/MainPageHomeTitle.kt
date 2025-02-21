@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.CloudOff
@@ -42,6 +44,7 @@ fun MainPageHomeTitle(
         remember(settings) { settings.savedSchedules.filter { it.scheduleId != settings.selectedSchedule?.scheduleId } }
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val localClipboardManager = LocalClipboardManager.current
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -125,7 +128,13 @@ fun MainPageHomeTitle(
                     modifier = Modifier
                         .size(size)
                         .alpha(0.7f)
-                        .clickable(onClick = onRequestRefresh),
+                        .combinedClickable(
+                            onClick = onRequestRefresh,
+                            onLongClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                localClipboardManager.setText(buildAnnotatedString { append(schedule.error!!.stackTraceToString()) })
+                            }
+                        ),
                 )
                 if (schedule.status == LoadableStatus.Updating) Icon(
                     imageVector = FeatherIcons.DownloadCloud,
