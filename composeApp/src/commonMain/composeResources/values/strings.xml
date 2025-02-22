@@ -7,6 +7,7 @@
     <string name="wait_a_minute">Подождите минутку…</string>
     <string name="network_error">Сетевая ошибка</string>
     <string name="sign_in">Войти</string>
+    <string name="sign_out">Выйти</string>
     <string name="retry">Повторить</string>
     <string name="copy_stacktrace">Скопировать ошибку</string>
     <string name="copy">Скопировать</string>

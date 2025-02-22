@@ -33,18 +33,13 @@ fun AccountPageView(
     paddings = true,
 ) {
     val settings by rememberSettings()
-    var selectedStudent by remember { mutableStateOf(null as Student?) }
-    LaunchedEffect(selectedStudent) {
-        if (selectedStudent != null) viewModel.reloadMarks(selectedStudent!!)
-    }
+    val selectedStudent = viewState.student.data
 
     LoadableView(viewState.studentInfo, retry = viewModel::refresh) { studentInfo ->
         AppCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (studentInfo.students.isEmpty()) {
                 UnsupportedAccountView()
             } else {
-                selectedStudent = studentInfo.students.firstOrNull { it.id == settings.selectedStudentId }
-                    ?: studentInfo.students.first()
 
                 Text(stringResource(Res.string.student), style = MaterialTheme.typography.titleLarge)
 
@@ -53,9 +48,9 @@ fun AccountPageView(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                StudentSelector(
+                if (selectedStudent != null) StudentSelector(
                     students = studentInfo.students,
-                    selected = selectedStudent!!,
+                    selected = selectedStudent,
                     onSelectedChange = { viewModel.setSelectedStudent(it) },
                 )
 
@@ -67,12 +62,15 @@ fun AccountPageView(
                         Text("${selectedStudent?.educationLevel}")
                     }
                 }
+
+                Button(onClick = viewModel::signOut, modifier = Modifier.align(Alignment.End)) {
+                    Text(stringResource(Res.string.sign_out))
+                }
             }
         }
-
     }
 
-    if (selectedStudent != null) MarksView(viewState.marks, retry = { viewModel.reloadMarks(selectedStudent!!) })
+    if (selectedStudent != null) MarksView(viewState.marks, retry = { viewModel.reloadMarks(selectedStudent) })
 }
 
 @Composable

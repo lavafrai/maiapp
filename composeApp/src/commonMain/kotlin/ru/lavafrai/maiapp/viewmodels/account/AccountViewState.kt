@@ -10,5 +10,6 @@ import ru.lavafrai.maiapp.models.account.StudentMarks
 data class AccountViewState(
     val loggedIn: Boolean,
     val studentInfo: Loadable<StudentInfo>,
+    val student: Loadable<Student?>,
     val marks: Loadable<StudentMarks>,
 )

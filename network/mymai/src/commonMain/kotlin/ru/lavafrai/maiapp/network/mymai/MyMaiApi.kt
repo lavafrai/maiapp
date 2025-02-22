@@ -17,6 +17,8 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.HttpClientProvider
 import ru.lavafrai.maiapp.JsonProvider
 import ru.lavafrai.maiapp.models.account.*
@@ -24,6 +26,7 @@ import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.network.mymai.exceptions.AuthenticationServerException
 import ru.lavafrai.maiapp.network.mymai.exceptions.InvalidLoginOrPasswordException
 import kotlin.random.Random
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalStdlibApi::class, DelicateCryptographyApi::class)
 class MyMaiApi(
@@ -92,7 +95,9 @@ class MyMaiApi(
         suspend fun authorize(login: String, password: String): MyMaiApi {
             val cookieResponse =
                 client.get("https://esia.mai.ru/auth/realms/lk_mai/protocol/openid-connect/auth?client_id=proxy&redirect_uri=https%3A%2F%2Fmy.mai.ru%2F&response_type=code&scope=openid&nonce=850dea0b-baac-42bd-a922-1acc62f52fdb&state=f1832d85-94f6-45eb-9009-d00da51fda60")
-            val cookies = cookieResponse.headers.getAll("Set-Cookie") ?: throw AuthenticationServerException()
+            val cookies = (cookieResponse.headers.getAll("Set-Cookie") ?: throw AuthenticationServerException())
+                .map { it.split(", ") }
+                .flatten()
 
             val authSessionId = cookies.first { it.startsWith("AUTH_SESSION_ID") }.split(";")[0]
             val authSessionIdLegacy = cookies.first { it.startsWith("AUTH_SESSION_ID_LEGACY") }.split(";")[0]
