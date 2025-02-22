@@ -51,7 +51,7 @@ open class MaiAppViewModel<T>(
 
     protected fun launchCatching(onError: (Throwable) -> Unit, block: suspend CoroutineScope.() -> Unit) {
         val handler = CoroutineExceptionHandler { _, e ->
-            // e.printStackTrace()
+            e.printStackTrace()
             onError(e)
         }
 
