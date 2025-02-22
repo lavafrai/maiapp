@@ -26,6 +26,9 @@ data class ApplicationSettingsData(
     val savedSchedules: List<BaseScheduleId> = emptyList(),
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
+
+    // official account
+    val selectedStudentId: Int? = null,
 ) {
     fun hasSelectedGroup() = selectedSchedule != null
 }
@@ -112,6 +115,11 @@ object ApplicationSettings {
             val current = getCurrent()
             update(current.copy(selectedSchedule = schedule))
         }
+    }
+
+    fun setSelectedStudentId(student: Int) {
+        val current = getCurrent()
+        update(current.copy(selectedStudentId = student))
     }
 }
 

@@ -9,6 +9,8 @@ import kotlinx.coroutines.launch
 import kotlinx.io.IOException
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.AccountRepository
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
+import ru.lavafrai.maiapp.models.account.Student
 import ru.lavafrai.maiapp.network.mymai.MyMaiApi
 import ru.lavafrai.maiapp.network.mymai.exceptions.AuthenticationServerException
 import ru.lavafrai.maiapp.network.mymai.exceptions.InvalidLoginOrPasswordException
@@ -22,6 +24,7 @@ class AccountViewModel(
     initialState = AccountViewState(
         loggedIn = accountRepository.hasCredentials(),
         studentInfo = Loadable.loading(),
+        marks = Loadable.loading(),
     )
 ) {
     init {
@@ -32,6 +35,7 @@ class AccountViewModel(
         emit(AccountViewState(
             loggedIn = accountRepository.hasCredentials(),
             studentInfo = Loadable.loading(),
+            marks = Loadable.loading(),
         ))
 
         val credentials = accountRepository.getCredentials() ?: return
@@ -41,6 +45,15 @@ class AccountViewModel(
 
             val studentInfo = session.studentInfo()
             emit(stateValue.copy(studentInfo = Loadable.actual(studentInfo)))
+        }
+    }
+
+    fun reloadMarks(student: Student) {
+        launchCatching(onError = { emit(stateValue.copy(marks = Loadable.error(it as Exception))) }) {
+            emit(stateValue.copy(marks = Loadable.loading()))
+            val session = MyMaiApi.authorize(accountRepository.getCredentials()!!.login, accountRepository.getCredentials()!!.password)
+            val marks = session.studentMarks(student.studentCode)
+            emit(stateValue.copy(marks = Loadable.actual(marks)))
         }
     }
 
@@ -83,6 +96,11 @@ class AccountViewModel(
 
     fun signOut() {
         accountRepository.clearCredentials()
+        refresh()
+    }
+
+    fun setSelectedStudent(student: Student) {
+        ApplicationSettings.setSelectedStudentId(student.id)
         refresh()
     }
 

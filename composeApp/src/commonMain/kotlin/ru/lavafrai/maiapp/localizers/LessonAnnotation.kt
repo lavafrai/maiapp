@@ -57,7 +57,7 @@ fun LessonAnnotationType.localized(): String {
     return when (this) {
         LessonAnnotation.FinalTest -> stringResource(Res.string.final_test)
         LessonAnnotation.ControlWork -> stringResource(Res.string.control_work)
-        LessonAnnotation.Colloquium -> stringResource(Res.string.сolloquium)
+        LessonAnnotation.Colloquium -> stringResource(Res.string.colloquium)
         LessonAnnotation.HomeWork -> stringResource(Res.string.home_work)
         LessonAnnotation.Comment -> stringResource(Res.string.comment)
         else -> stringResource(Res.string.unknown)
