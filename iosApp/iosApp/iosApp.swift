@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         let appmetricaApiKey = IosPlatformDependencyKt.getAppmetricaKey()
-        if let configuration = AppMetricaConfiguration(apiKey: "") {
+        if let configuration = AppMetricaConfiguration(apiKey: appmetricaApiKey) {
             configuration.areLogsEnabled = true
             AppMetrica.activate(with: configuration)
         }
