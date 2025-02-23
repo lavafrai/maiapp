@@ -61,6 +61,7 @@
     <string name="confirm">Подтвердить</string>
     <string name="cancel">Отменить</string>
     <string name="data">Данные</string>
+    <string name="from_n_attempt">С %n попытки</string>
     <string name="widget">Виджет</string>
     <string name="widget_unsupported_on_platform">Виджет не поддерживается</string>
     <string name="add_widget">Создать</string>
@@ -68,6 +69,7 @@
     <string name="update_dialog_scam">Как насчет того, чтобы поддержать разработчика монеткой?)</string>
     <string name="schedule_is_empty">Здесь нет ни одного занятия, можете отдыхать!</string>
     <string name="open_on_exler">Открыть на Экслере</string>
+    <string name="semester">Семестр</string>
     <string name="widget_description">Приложение поддерживает вывод расписания в виджет. Попробуйте добавить его на главный экран и пользоваться.</string>
     <string name="safe_data_cleanup_warning">Вы уверены?</string>
     <string name="safe_data_cleanup_warning_description">Вы точно хотите удалить все данные приложения с устройства? Среди них находятся все настройки и загруженные расписания.\n\nПриложение будет перезапущено.</string>
@@ -80,12 +82,19 @@
     <string name="statistics">Статистика</string>
     <string name="average_mark">Средняя оценка</string>
     <string name="academic_debt_count">Количество долгов</string>
+    <string name="academic_debt">Долг</string>
+    <string name="attempts">Попытки</string>
+    <string name="hours_genitive">Часов</string>
 
     <string name="final_test">Зачет</string>
     <string name="control_work">Контрольная</string>
     <string name="colloquium">Коллоквиум</string>
     <string name="home_work">Домашняя работа</string>
     <string name="comment">Заметка</string>
+    <string name="assessment">Зачет</string>
+    <string name="assessment_with_mark">Зачет с оценкой</string>
+    <string name="rating">Рейтинг</string>
+    <string name="coursework">Курсовая работа</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>

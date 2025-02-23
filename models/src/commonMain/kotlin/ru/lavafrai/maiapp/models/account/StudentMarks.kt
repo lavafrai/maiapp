@@ -11,12 +11,16 @@ data class StudentMarks(
 ) {
     fun averageMark(): Double {
         val sum = marks
-            .mapNotNull { it.value.toDoubleOrNull() }
+            .map { it.value }
+            .map { it.replace("Ня", "2") }
+            .map { it.replace("Нзч", "2") }
+            .map { it.replace("Зч", "5") }
+            .mapNotNull { it.toDoubleOrNull() }
             .average()
         return sum
     }
 
     fun debtCount(): Int {
-        return marks.count { it.value == "2" }
+        return marks.count { it.isDebt }
     }
 }

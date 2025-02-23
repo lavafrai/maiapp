@@ -23,3 +23,16 @@ fun LessonType.localizedShortNonContext() = when (this) {
     LessonType.EXAM -> "ЭК"
     LessonType.UNKNOWN -> "ХЗ"
 }
+
+@Composable
+fun String.localizeTypeControlName(): String {
+    return when(this) {
+        "Зч" -> stringResource(Res.string.assessment)
+        "Зо" -> stringResource(Res.string.assessment_with_mark)
+        "Э" -> stringResource(Res.string.exam)
+        "Р" -> stringResource(Res.string.rating)
+        "КР" -> stringResource(Res.string.coursework)
+
+        else -> stringResource(Res.string.unknown)
+    }
+}

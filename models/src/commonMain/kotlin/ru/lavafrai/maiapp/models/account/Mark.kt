@@ -13,4 +13,7 @@ data class Mark(
     @SerialName("course") val course: Int,
     @SerialName("hours") val hours: Int,
     @SerialName("lecturer") val lecturer: String,
-)
+) {
+    val isDebt
+        get() = value in listOf("Нзч", "Ня", "2")
+}
