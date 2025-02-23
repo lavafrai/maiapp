@@ -8,6 +8,7 @@
     <string name="network_error">Сетевая ошибка</string>
     <string name="sign_in">Войти</string>
     <string name="sign_out">Выйти</string>
+    <string name="no_data">Нет данных</string>
     <string name="retry">Повторить</string>
     <string name="copy_stacktrace">Скопировать ошибку</string>
     <string name="copy">Скопировать</string>
@@ -70,7 +71,7 @@
     <string name="widget_description">Приложение поддерживает вывод расписания в виджет. Попробуйте добавить его на главный экран и пользоваться.</string>
     <string name="safe_data_cleanup_warning">Вы уверены?</string>
     <string name="safe_data_cleanup_warning_description">Вы точно хотите удалить все данные приложения с устройства? Среди них находятся все настройки и загруженные расписания.\n\nПриложение будет перезапущено.</string>
-    <string name="account_login_info">Пожалуйста, введите данные для авторизации на сайте my.mai.ru\nВсе учетные данные будут храниться локально на вашем устройстве, будут доступны только вам и не будут отправлены на сервера приложения.</string>
+    <string name="account_login_info">Пожалуйста, введите данные для авторизации на сайте my.mai.ru\nВсе учетные данные будут храниться локально на вашем устройстве, будут доступны только вам и сайту my.mai.ru, они не будут отправлены на сервера приложения.</string>
     <string name="account_unsupported">Сервер не вернул информацию о пользователе</string>
     <string name="recordbook">Зачетная книжка</string>
     <string name="course">Курс</string>

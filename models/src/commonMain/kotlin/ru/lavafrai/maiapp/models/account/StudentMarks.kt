@@ -8,4 +8,15 @@ data class StudentMarks(
     @SerialName("student") val student: Student,
     @SerialName("recordBook") val recordBook: String,
     @SerialName("marks") val marks: List<Mark>
-)
+) {
+    fun averageMark(): Double {
+        val sum = marks
+            .mapNotNull { it.value.toDoubleOrNull() }
+            .average()
+        return sum
+    }
+
+    fun debtCount(): Int {
+        return marks.count { it.value == "2" }
+    }
+}

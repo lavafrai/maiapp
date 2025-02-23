@@ -1,32 +1,31 @@
+@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalComposeUiApi::class)
+
 package ru.lavafrai.maiapp.fragments.account
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import maiapp.composeapp.generated.resources.*
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.login
-import maiapp.composeapp.generated.resources.password
-import maiapp.composeapp.generated.resources.profile
-import org.jetbrains.compose.resources.stringResource
-import ru.lavafrai.maiapp.fragments.PageColumn
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Eye
 import compose.icons.feathericons.EyeOff
+import maiapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.fragments.AnimatedIcon
+import ru.lavafrai.maiapp.fragments.PageColumn
+import ru.lavafrai.maiapp.utils.autofill
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 
 @Composable
@@ -46,7 +45,7 @@ fun AccountPageLogin(
     var login by remember { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by remember { mutableStateOf(true) }
-    //val autofillManager = LocalAutofillManager.current
+    val autofillManager = LocalAutofill.current
 
     Spacer(Modifier.height(16.dp))
     Text(stringResource(Res.string.profile), style = MaterialTheme.typography.headlineMedium)
@@ -58,7 +57,14 @@ fun AccountPageLogin(
         singleLine = true,
         enabled = !loading,
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .autofill(
+                autofillTypes = listOf(
+                    AutofillType.Username,
+                    AutofillType.EmailAddress
+                ),
+                onFill = { login = it },
+            ),
             //.semantics { contentType = ContentType.Username },
         isError = error != null,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -71,7 +77,13 @@ fun AccountPageLogin(
         singleLine = true,
         enabled = !loading,
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .autofill(
+                autofillTypes = listOf(
+                    AutofillType.Password
+                ),
+                onFill = { password = it },
+            ),
             //.semantics { contentType = ContentType.Password },
         isError = error != null,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -99,7 +111,6 @@ fun AccountPageLogin(
             focusManager.clearFocus()
             loading = true
             error = null
-            //autofillManager?.commit()
             viewModel.signIn(login, password) { result ->
                 loading = false
                 error = result

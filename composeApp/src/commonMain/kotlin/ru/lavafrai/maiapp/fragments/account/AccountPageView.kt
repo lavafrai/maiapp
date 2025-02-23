@@ -125,17 +125,18 @@ fun MarksView(
         Text(stringResource(Res.string.statistics), style = MaterialTheme.typography.titleLarge)
 
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
-            val academicDebtCount = remember(marks) { 0 } // TODO: calculate academic debt count
-            val averageMark = remember(marks) { 0.0 } // TODO: calculate average mark
+            val academicDebtCount = remember(marks) { marks.debtCount() }
+            val averageMark = remember(marks) { marks.averageMark() }
 
             Column {
                 Text("${stringResource(Res.string.recordbook)} ${marks.recordBook}")
                 //Text("${stringResource(Res.string.student)} ${marks.student.lastname} ${marks.student.firstname} ${marks.student.middlename}")
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("${stringResource(Res.string.average_mark)} ")
-                    MarkView(averageMark)
+                    if (!averageMark.isNaN()) MarkView(averageMark)
+                    else Text("- ${stringResource(Res.string.no_data).lowercase()}")
                 }
-                Text("${stringResource(Res.string.academic_debt_count)} $academicDebtCount")
+                Text("${stringResource(Res.string.academic_debt_count)} - $academicDebtCount")
             }
         }
     }
