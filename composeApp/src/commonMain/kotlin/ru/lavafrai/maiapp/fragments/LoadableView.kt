@@ -25,7 +25,7 @@ fun <T>LoadableView(
             when (status) {
                 BaseLoadableStatus.Loading -> loading()
                 BaseLoadableStatus.Error -> error(state.error, retry)
-                BaseLoadableStatus.Actual -> content(state.data!!)
+                BaseLoadableStatus.Actual -> if (state.data != null) content(state.data)
                 // else -> error(IllegalStateException("Unknown base status: $state")) { retry() }
             }
         }
