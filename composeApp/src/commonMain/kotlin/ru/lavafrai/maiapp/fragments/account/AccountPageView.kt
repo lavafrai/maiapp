@@ -17,7 +17,6 @@ import compose.icons.FeatherIcons
 import compose.icons.feathericons.AlertOctagon
 import compose.icons.feathericons.ChevronDown
 import compose.icons.feathericons.ChevronUp
-import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.Loadable
@@ -160,12 +159,15 @@ fun MarksView(
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             val marksBySemesters = remember(marks.marks) { marks.marks.groupBy { it.semester } }
+            val currentSemester = remember(marksBySemesters) { marksBySemesters.keys.maxOrNull() }
+
             marksBySemesters.keys.sorted().reversed().forEach { semester ->
                 val marksInSemester = marksBySemesters[semester]!!
 
                 SemesterMarksView(
                     semesterNumber = semester,
                     marks = marksInSemester,
+                    isCurrent = currentSemester == semester,
                 )
             }
         }
@@ -176,38 +178,42 @@ fun MarksView(
 fun SemesterMarksView(
     semesterNumber: Int,
     marks: List<Mark>,
-) = AppCard {
-    var isVisible by remember { mutableStateOf(false) }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text("${stringResource(Res.string.semester)} $semesterNumber", style = MaterialTheme.typography.titleLarge)
-        IconButton(
-            onClick = { isVisible = !isVisible },
-            modifier = Modifier.size(MaterialTheme.typography.titleLarge.fontSize.asDp)
-        ) {
-            AnimatedIcon(
-                iconPainter = FeatherIcons.ChevronUp,
-                enabledIconPainter = FeatherIcons.ChevronDown,
-                enabled = isVisible,
-            )
-        }
-    }
+    isCurrent: Boolean,
+) {
+    var opened by remember { mutableStateOf(isCurrent) }
 
-    AnimatedVisibility(visible = isVisible) {
-        Column {
-            Spacer(Modifier.height(16.dp))
-            marks.forEach { mark ->
-                Box(
-                    modifier = Modifier
-                        .alpha(0.1f)
-                        .background(LocalContentColor.current)
-                        .fillMaxWidth()
-                        .height(1.dp)
+    AppCard(onClick = { if (!opened) opened = true }) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("${stringResource(Res.string.semester)} $semesterNumber", style = MaterialTheme.typography.titleLarge)
+            IconButton(
+                onClick = { opened = !opened },
+                modifier = Modifier.size(MaterialTheme.typography.titleLarge.fontSize.asDp)
+            ) {
+                AnimatedIcon(
+                    iconPainter = FeatherIcons.ChevronUp,
+                    enabledIconPainter = FeatherIcons.ChevronDown,
+                    enabled = opened,
                 )
-                MarkInfoView(mark)
+            }
+        }
+
+        AnimatedVisibility(visible = opened) {
+            Column {
+                Spacer(Modifier.height(16.dp))
+                marks.forEach { mark ->
+                    Box(
+                        modifier = Modifier
+                            .alpha(0.1f)
+                            .background(LocalContentColor.current)
+                            .fillMaxWidth()
+                            .height(1.dp)
+                    )
+                    MarkInfoView(mark)
+                }
             }
         }
     }
@@ -243,8 +249,10 @@ fun MarkInfoView(mark: Mark) = Column(
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        AssistChip(onClick = {  }, label = { Text(mark.typeControlName.localizeTypeControlName()) })
-        if (mark.attempts > 1) AssistChip(onClick = {  }, label = { Text("${mark.attempts} ${stringResource(Res.string.attempts).lowercase()}") })
-        if (mark.isDebt) AssistChip(onClick = {  }, label = { Text(stringResource(Res.string.academic_debt)) })
+        AssistChip(onClick = { }, label = { Text(mark.typeControlName.localizeTypeControlName()) })
+        if (mark.attempts > 1) AssistChip(
+            onClick = { },
+            label = { Text("${mark.attempts} ${stringResource(Res.string.attempts).lowercase()}") })
+        if (mark.isDebt) AssistChip(onClick = { }, label = { Text(stringResource(Res.string.academic_debt)) })
     }
 }
