@@ -18,9 +18,10 @@ fun <T>LoadableView(
     retry: () -> Unit,
     alignment: Alignment = Alignment.Center,
     modifier: Modifier = Modifier.fillMaxSize(),
+    animated: Boolean = true,
     content: @Composable (T) -> Unit,
 ) {
-    MaterialSharedAxisY(targetState = state.baseStatus, forward = true) { status ->
+    if (animated) MaterialSharedAxisY(targetState = state.baseStatus, forward = true) { status ->
         Box(modifier = modifier, contentAlignment = alignment) {
             when (status) {
                 BaseLoadableStatus.Loading -> loading()
@@ -28,6 +29,14 @@ fun <T>LoadableView(
                 BaseLoadableStatus.Actual -> if (state.data != null) content(state.data)
                 // else -> error(IllegalStateException("Unknown base status: $state")) { retry() }
             }
+        }
+    }
+    else Box(modifier = modifier, contentAlignment = alignment) {
+        when (state.baseStatus) {
+            BaseLoadableStatus.Loading -> loading()
+            BaseLoadableStatus.Error -> error(state.error, retry)
+            BaseLoadableStatus.Actual -> if (state.data != null) content(state.data)
+            // else -> error(IllegalStateException("Unknown base status: $state")) { retry() }
         }
     }
 }

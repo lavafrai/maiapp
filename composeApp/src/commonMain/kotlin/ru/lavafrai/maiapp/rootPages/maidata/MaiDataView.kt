@@ -56,6 +56,7 @@ fun MaiDataView(
                 )
             }
         }
+        Spacer(Modifier.height(0.dp))
     }
 }
 

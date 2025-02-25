@@ -73,6 +73,7 @@ fun LoadableSvgIcon(
         error = { e, r -> LoadableSvgIconReload(reload, e) },
         alignment = Alignment.TopStart,
         modifier = Modifier.size(24.dp),
+        animated = false,
     ) { icon ->
         SvgIcon(
             icon,
