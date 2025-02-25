@@ -1,44 +1,123 @@
 package ru.lavafrai.maiapp.server.routes
 
-import io.ktor.http.*
+import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.MaiDataItemType
 import ru.lavafrai.maiapp.models.maidata.MaiDataManifest
+import ru.lavafrai.maiapp.models.maidata.asset.Asset
 
 fun Route.data() {
-    val manifest = MaiDataManifest(
-        version = 1,
-        data = listOf(
-            MaiDataItem(
-                type = MaiDataItemType.Builtin,
-                name = "О преподавателях",
-                forTeachers = false,
-                category = "Преподаватели",
-                icon = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"feather feather-at-sign\"><circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94\"></path></svg>"
-            ),
-            MaiDataItem(
-                type = MaiDataItemType.Builtin,
-                name = "Расписание преподавателей",
-                category = "Преподаватели",
-            ),
-            MaiDataItem(
-                type = MaiDataItemType.Map,
-                name = "План студгородка",
-                category = "Студгородок",
-                asset = "map/campus.png",
-                assetNight = "map/campus-night.png",
-            ),
-        ),
+    staticResources(
+        "assets",
+        "data/assets",
     )
 
     get("/data") {
-        call.respond(manifest.data)
-    }
+        val manifest = MaiDataManifest(
+            version = 1,
+            data = buildList {
+                campusData()
+                teachersData()
+                lifestyleData()
+            },
+        )
 
-    get("/asset/{asset}") {
-        val asset = call.parameters["asset"] ?: return@get call.respondText("Asset not found", status = HttpStatusCode.NotFound)
-        // call.respondFile("assets/$asset")
+        call.respond(manifest)
     }
+}
+
+fun MutableList<MaiDataItem>.teachersData() {
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Builtin,
+            name = "Расписания преподавателей",
+            category = "Преподаватели",
+            icon = Asset.relative("/assets/icons/users.svg"),
+            asset = Asset.text("teacher-schedule")
+        )
+    )
+
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Builtin,
+            name = "О преподавателях",
+            category = "Преподаватели",
+            icon = Asset.relative("/assets/icons/message-square.svg"),
+            asset = Asset.text("teacher-review")
+        )
+    )
+}
+
+fun MutableList<MaiDataItem>.campusData() {
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Map,
+            name = "План студгородка",
+            category = "Студгородок",
+            icon = Asset.relative("/assets/icons/map.svg"),
+            asset = Asset.relative("")
+        )
+    )
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Markup,
+            name = "Столовые и буфеты",
+            category = "Студгородок",
+            icon = Asset.relative("/assets/icons/coffee.svg"),
+            asset = Asset.relative("")
+        )
+    )
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Markup,
+            name = "Библиотеки",
+            category = "Студгородок",
+            icon = Asset.relative("/assets/icons/book-open.svg"),
+            asset = Asset.relative("")
+        )
+    )
+}
+
+fun MutableList<MaiDataItem>.lifestyleData() {
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Markup,
+            name = "Спортивные секции",
+            category = "Жизнь",
+            icon = Asset.relative("/assets/icons/biking-solid.svg"),
+            asset = Asset.relative("")
+        )
+    )
+
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Markup,
+            name = "Маёвский словарик",
+            category = "Жизнь",
+            icon = Asset.relative("/assets/icons/book-solid.svg"),
+            asset = Asset.relative("")
+        )
+    )
+
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Markup,
+            name = "Творческие коллективы",
+            category = "Жизнь",
+            icon = Asset.relative("/assets/icons/palette.svg"),
+            asset = Asset.relative("")
+        )
+    )
+
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.Markup,
+            name = "Студенческие организации",
+            category = "Жизнь",
+            icon = Asset.relative("/assets/icons/user-friends.svg"),
+            asset = Asset.relative("")
+        )
+    )
 }

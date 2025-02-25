@@ -17,6 +17,7 @@ import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
 import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
+import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
@@ -75,9 +76,25 @@ fun AppNavigation(
                         animatedContentScope = this@composable,
                         onNavigateBack = { navController.navigateUp() },
                         onLoginDone = {
-                            navController.popBackStack()
-                            navController.navigate(MainPage) {
-                                popUpTo(0)
+                            when (loginData.target) {
+                                LoginTarget.ADD_SCHEDULE -> {
+                                    navController.popBackStack()
+                                    navController.navigate (MainPage) {
+                                        popUpTo(0)
+                                    }
+                                }
+                                LoginTarget.OPEN_SCHEDULE -> {
+                                    //require(it is TeacherId)
+                                    navController.popBackStack()
+
+                                    if (loginData.type == LoginType.EXLER) {
+                                        val exlerTeacher = it as ExlerTeacher
+
+                                        appContext.openTeacherReviews(exlerTeacher.name, TeacherUid.Empty)
+                                        return@LoginPage
+                                    }
+                                    appContext.openSchedule(it as ScheduleId)
+                                }
                             }
                         },
                         loginData = loginData,

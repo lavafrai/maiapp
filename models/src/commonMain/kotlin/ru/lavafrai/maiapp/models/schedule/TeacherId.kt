@@ -8,7 +8,10 @@ import ru.lavafrai.maiapp.models.Nameable
 data class TeacherId(
     @SerialName("name") val teacherName: TeacherName,
     @SerialName("uid") val uid: TeacherUid,
-): Nameable {
+): Nameable, ScheduleId() {
     override val name: String
+        get() = teacherName.name
+
+    override val scheduleId: String
         get() = teacherName.name
 }

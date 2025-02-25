@@ -9,6 +9,7 @@ import ru.lavafrai.maiapp.navigation.pages.LoginPage
 data class LoginPageState(
     val groups: Loadable<List<Group>>,
     val teachers: Loadable<List<TeacherId>>,
+    val exler: Loadable<List<Nameable>>,
     val filteredData: List<Nameable>,
     private val loginData: LoginPage,
     val selected: Nameable?,
@@ -16,5 +17,6 @@ data class LoginPageState(
     val neededLoadable = when (loginData.type) {
         LoginType.STUDENT -> groups
         LoginType.TEACHER -> teachers
+        LoginType.EXLER -> exler
     }
 }

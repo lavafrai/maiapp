@@ -28,6 +28,8 @@ dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.kotlinx.datetime)
     implementation(libs.ktor.logback.classic)
+
+    // implementation(libs.ktor.server.staticContent)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.caching)
     implementation(libs.ktor.server.serialization)

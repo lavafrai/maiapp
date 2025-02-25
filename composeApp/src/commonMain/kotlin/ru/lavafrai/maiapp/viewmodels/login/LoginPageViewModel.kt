@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
@@ -25,6 +23,7 @@ class LoginPageViewModel(
     initialState = LoginPageState(
         groups = Loadable.loading(),
         teachers = Loadable.loading(),
+        exler = Loadable.loading(),
         filteredData = emptyList(),
         loginData = loginData,
         selected = null
@@ -43,27 +42,22 @@ class LoginPageViewModel(
         viewModelScope.launch(dispatchers.IO) {
             emit(initialState)
 
-            supervisorScope {
-                val groupsTask = async { api.groups() }
-                val teachersTask = async { api.teachers() }
+            launchCatching(onError = { e -> emit(stateValue.copy(groups = Loadable.error(e))) }) {
+                val groups = api.groups()
+                emit(stateValue.copy(groups = Loadable.actual(groups)))
+                if (loginData.type == LoginType.STUDENT) updateSearchQuery("")
+            }
 
-                try {
-                    val groups = groupsTask.await()
-                    emit(stateValue.copy(groups = Loadable.actual(groups)))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    emit(stateValue.copy(groups = Loadable.error(e)))
-                }
+            launchCatching(onError = { e -> emit(stateValue.copy(teachers = Loadable.error(e))) }) {
+                val teachers = api.teachers()
+                emit(stateValue.copy(teachers = Loadable.actual(teachers)))
+                if (loginData.type == LoginType.TEACHER) updateSearchQuery("")
+            }
 
-                try {
-                    val teachers = teachersTask.await()
-                    emit(stateValue.copy(teachers = Loadable.actual(teachers)))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    emit(stateValue.copy(teachers = Loadable.error(e)))
-                }
-
-                updateSearchQuery("")
+            launchCatching(onError = { e -> emit(stateValue.copy(exler = Loadable.error(e))) }) {
+                val exler = api.exlerTeachers()
+                emit(stateValue.copy(exler = Loadable.actual(exler)))
+                if (loginData.type == LoginType.EXLER) updateSearchQuery("")
             }
         }
     }
@@ -103,10 +97,15 @@ class LoginPageViewModel(
     }
 
     private fun doFinishAction(selected: Nameable) {
-        if (loginData.target == LoginTarget.ADD_SCHEDULE) {
-            viewModelScope.launch(dispatchers.Default) {
-                ApplicationSettings.addSavedGroup(BaseScheduleId(selected.name))
-                ApplicationSettings.setSelectedGroup(BaseScheduleId(selected.name))
+        when (loginData.target) {
+            LoginTarget.ADD_SCHEDULE -> {
+                viewModelScope.launch(dispatchers.Default) {
+                    ApplicationSettings.addSavedGroup(BaseScheduleId(selected.name))
+                    ApplicationSettings.setSelectedGroup(BaseScheduleId(selected.name))
+                }
+            }
+            LoginTarget.OPEN_SCHEDULE -> {
+
             }
         }
     }

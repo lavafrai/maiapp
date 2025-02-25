@@ -14,9 +14,9 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.data.settings.rememberSettings
-import ru.lavafrai.maiapp.fragments.account.AccountPage
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
+import ru.lavafrai.maiapp.fragments.account.AccountPage
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
@@ -97,7 +97,7 @@ fun MainPage(
                 MainNavigationPageId.INFORMATION -> {
                     LoadableView(state = viewState.maidata, retry = viewModel::startLoading) {
                         MaiDataView(
-                            data = viewState.maidata.data!!,
+                            manifest = viewState.maidata.data!!,
                             modifier = Modifier.fillMaxSize(),
                         )
                     }

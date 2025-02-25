@@ -2,12 +2,17 @@ package ru.lavafrai.maiapp
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavController
+import ru.lavafrai.maiapp.models.maidata.MaiDataItem
+import ru.lavafrai.maiapp.models.maidata.MaiDataItemType
+import ru.lavafrai.maiapp.models.maidata.asset.TextAsset
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.utils.UrlHandler
+import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
+import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
 class ApplicationContext(
     val navController: NavController,
@@ -51,6 +56,27 @@ class ApplicationContext(
             lesson = lesson,
             schedule = schedule,
         ))
+    }
+
+    private fun openBuiltinMaiData(item: MaiDataItem) {
+        require(item.type == MaiDataItemType.Builtin)
+        require(item.asset != null)
+        require(item.asset is TextAsset)
+
+        val intent = when ((item.asset as TextAsset).text) {
+            "teacher-schedule" -> LoginPage(type = LoginType.TEACHER, target = LoginTarget.OPEN_SCHEDULE)
+            "teacher-review" -> LoginPage(type = LoginType.EXLER, target = LoginTarget.OPEN_SCHEDULE)
+            else -> return
+        }
+
+        navController.navigate(intent)
+    }
+
+    fun openMaiDataItem(item: MaiDataItem) {
+        when (item.type) {
+            MaiDataItemType.Builtin -> openBuiltinMaiData(item)
+            else -> return
+        }
     }
 }
 

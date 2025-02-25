@@ -2,7 +2,7 @@ package ru.lavafrai.maiapp.data
 
 data class Loadable<T>(
     val data: T?,
-    val error: Exception?,
+    val error: Throwable?,
     val actual: Boolean,
 ) {
     fun hasData() = data != null
@@ -31,7 +31,7 @@ data class Loadable<T>(
 
     companion object {
         fun <T> loading() = Loadable<T>(null, null, false)
-        fun <T> error(error: Exception) = Loadable<T>(null, error, false)
+        fun <T> error(error: Throwable) = Loadable<T>(null, error, false)
         fun <T> actual(data: T) = Loadable(data, null, true)
         fun <T> updating(data: T) = Loadable(data, null, false)
         fun <T> offline(data: T) = Loadable(data, null, false)

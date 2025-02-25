@@ -85,6 +85,10 @@
     <string name="academic_debt">Долг</string>
     <string name="attempts">Попытки</string>
     <string name="hours_genitive">Часов</string>
+    <string name="unsupported_manifest_version">Манифест не поддерживается</string>
+    <string name="unsupported_manifest_version_description">Попробуйте обновить приложение до актуальной версии.</string>
+    <string name="supported_version">Поддерживаемая версия</string>
+    <string name="received_version">Полученная версия</string>
 
     <string name="final_test">Зачет</string>
     <string name="control_work">Контрольная</string>
