@@ -29,7 +29,7 @@ suspend fun parseTeachers(
         .selectFirst("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > ol")!!
         .children()
         .map { it.selectFirst("a")!! }
-        .map { ExlerTeacher(name = it.text(), path = it.attr("href"), faculty = faculty) }
+        .map { ExlerTeacher(internalName = it.text(), path = it.attr("href"), faculty = faculty) }
 
     return teachers
 }
