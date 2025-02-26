@@ -53,6 +53,7 @@ fun WebviewPage(
         }
     )
 
+    val background = MaterialTheme.colorScheme.background
     LoadableView(
         viewState.page,
         retry = viewModel::refresh,
@@ -64,6 +65,15 @@ fun WebviewPage(
         val css = buildCssStyles()
         val builtPage = "$page\n<style>\n$css\n</style>"
         val webViewState = rememberWebViewStateWithHTMLData(data = builtPage)
+        webViewState.webSettings.apply {
+            isJavaScriptEnabled = true
+            supportZoom = false
+
+            iOSWebSettings.apply {
+                opaque = true
+                backgroundColor = background
+            }
+        }
 
         WebView(
             state = webViewState,
