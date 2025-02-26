@@ -66,7 +66,7 @@ fun MutableList<MaiDataItem>.campusData() {
             name = "Столовые и буфеты",
             category = "Студгородок",
             icon = Asset.relative("/assets/icons/coffee.svg"),
-            asset = Asset.webview("")
+            asset = Asset.webview("markup/cafeterias.html")
         )
     )
     add(

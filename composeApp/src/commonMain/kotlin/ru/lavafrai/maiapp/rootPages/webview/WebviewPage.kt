@@ -73,6 +73,10 @@ fun WebviewPage(
                 opaque = true
                 backgroundColor = background
             }
+
+            desktopWebSettings.apply {
+                transparent = false
+            }
         }
 
         WebView(
