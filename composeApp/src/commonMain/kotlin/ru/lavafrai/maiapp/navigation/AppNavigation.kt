@@ -29,6 +29,7 @@ import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
 import ru.lavafrai.maiapp.rootPages.schedule.DedicatedSchedulePage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
+import ru.lavafrai.maiapp.rootPages.webview.WebviewPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 import kotlin.reflect.typeOf
@@ -199,6 +200,28 @@ fun AppNavigation(
                         url = imageData.url,
                         onNavigateBack = { navController.navigateUp() },
                     )
+                }
+
+                composable<WebviewPage>(
+                    typeMap = mapOf(
+                    ),
+                ) { backStackEntry ->
+                    val route = backStackEntry.toRoute<WebviewPage>()
+                    val url: String = route.url
+                    val title: String = route.title
+
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background,
+                    ) {
+                        WebviewPage(
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            animatedContentScope = this@composable,
+                            onNavigateBack = { navController.navigateUp() },
+                            url = url,
+                            title = title,
+                        )
+                    }
                 }
             }
         }

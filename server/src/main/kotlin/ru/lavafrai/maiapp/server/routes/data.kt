@@ -57,7 +57,7 @@ fun MutableList<MaiDataItem>.campusData() {
             name = "План студгородка",
             category = "Студгородок",
             icon = Asset.relative("/assets/icons/map.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("")
         )
     )
     add(
@@ -66,16 +66,16 @@ fun MutableList<MaiDataItem>.campusData() {
             name = "Столовые и буфеты",
             category = "Студгородок",
             icon = Asset.relative("/assets/icons/coffee.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("")
         )
     )
     add(
         MaiDataItem(
-            type = MaiDataItemType.Markup,
+            type = MaiDataItemType.Web,
             name = "Библиотеки",
             category = "Студгородок",
             icon = Asset.relative("/assets/icons/book-open.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("markup/libraries.html")
         )
     )
 }
@@ -87,7 +87,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             name = "Спортивные секции",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/biking-solid.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("")
         )
     )
 
@@ -97,7 +97,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             name = "Маёвский словарик",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/book-solid.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("")
         )
     )
 
@@ -107,7 +107,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             name = "Творческие коллективы",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/palette.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("")
         )
     )
 
@@ -117,7 +117,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             name = "Студенческие организации",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/user-friends.svg"),
-            asset = Asset.relative("")
+            asset = Asset.webview("")
         )
     )
 }

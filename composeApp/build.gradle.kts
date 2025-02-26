@@ -119,6 +119,7 @@ kotlin {
             implementation(libs.libres)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
+            implementation(libs.compose.webview)
         }
 
         androidMain.dependencies {

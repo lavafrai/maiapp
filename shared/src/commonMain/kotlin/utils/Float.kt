@@ -17,3 +17,7 @@ fun Double.toString(numOfDec: Int): String {
         return integerPart.toString()
     }
 }
+
+fun Float.toHex(length: Int): String {
+    return toInt().toString(16).padStart(length, '0')
+}

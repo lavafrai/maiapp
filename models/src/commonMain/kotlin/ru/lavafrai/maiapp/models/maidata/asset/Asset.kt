@@ -12,6 +12,7 @@ sealed class Asset {
         fun url(url: String): Asset = UrlAsset(url)
         fun text(text: String): Asset = TextAsset(text)
         fun raw(data: ByteArray): Asset = RawAsset(data)
+        fun webview(url: String): Asset = WebviewAsset(url)
     }
 }
 

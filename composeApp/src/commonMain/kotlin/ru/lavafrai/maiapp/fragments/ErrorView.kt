@@ -10,21 +10,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Copy
 import compose.icons.feathericons.Repeat
-import compose.icons.feathericons.Trash
 import compose.icons.feathericons.Trash2
 import maiapp.composeapp.generated.resources.*
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.copy_stacktrace
-import maiapp.composeapp.generated.resources.retry
-import maiapp.composeapp.generated.resources.something_went_wrong
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.models.exceptions.MaiAppException
 
 @Composable
 fun ErrorView(
@@ -35,6 +32,11 @@ fun ErrorView(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(stringResource(Res.string.something_went_wrong))
         Spacer(Modifier.height(4.dp))
+
+        if (error is MaiAppException) {
+            Text(error.getReadableDescription(), modifier = Modifier.alpha(0.7f))
+            Spacer(Modifier.height(4.dp))
+        }
 
         TextButton(onClick = onRetry) {
             Icon(FeatherIcons.Repeat, "Retry")

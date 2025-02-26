@@ -11,7 +11,7 @@ import ru.lavafrai.maiapp.data.Loadable
 import soup.compose.material.motion.MaterialSharedAxisY
 
 @Composable
-fun <T>LoadableView(
+fun <T> LoadableView(
     state: Loadable<T>,
     error: @Composable (Throwable?, () -> Unit) -> Unit = { e, onRetry -> ErrorView(e, onRetry) },
     loading: @Composable () -> Unit = { DefaultLoadingView() },
@@ -21,7 +21,11 @@ fun <T>LoadableView(
     animated: Boolean = true,
     content: @Composable (T) -> Unit,
 ) {
-    if (animated) MaterialSharedAxisY(targetState = state.baseStatus, forward = true) { status ->
+    if (animated) MaterialSharedAxisY(
+        targetState = state.baseStatus,
+        forward = true,
+        modifier = modifier,
+    ) { status ->
         Box(modifier = modifier, contentAlignment = alignment) {
             when (status) {
                 BaseLoadableStatus.Loading -> loading()

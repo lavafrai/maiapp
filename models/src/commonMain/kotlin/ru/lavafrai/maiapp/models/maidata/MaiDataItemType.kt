@@ -6,6 +6,7 @@ enum class MaiDataItemType {
     @SerialName("builtin") Builtin,
     // @SerialName("webpage") WebPage,
     @SerialName("map") Map,
-    @SerialName("cards") Cards,
+    // @SerialName("cards") Cards,
     @SerialName("markup") Markup,
+    @SerialName("web") Web,
 }

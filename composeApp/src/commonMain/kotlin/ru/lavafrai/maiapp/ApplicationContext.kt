@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.MaiDataItemType
 import ru.lavafrai.maiapp.models.maidata.asset.TextAsset
+import ru.lavafrai.maiapp.models.maidata.asset.WebviewAsset
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
@@ -72,9 +73,19 @@ class ApplicationContext(
         navController.navigate(intent)
     }
 
+    private fun openWebview(url: String, title: String) {
+        navController.navigate(WebviewPage(url = url, title = title))
+    }
+
     fun openMaiDataItem(item: MaiDataItem) {
         when (item.type) {
             MaiDataItemType.Builtin -> openBuiltinMaiData(item)
+            MaiDataItemType.Web -> {
+                require(item.asset is WebviewAsset)
+                val asset = item.asset as WebviewAsset
+                val title = item.name
+                openWebview("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
+            }
             else -> return
         }
     }
