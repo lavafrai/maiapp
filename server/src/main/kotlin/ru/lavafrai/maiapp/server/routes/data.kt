@@ -62,7 +62,7 @@ fun MutableList<MaiDataItem>.campusData() {
     )
     add(
         MaiDataItem(
-            type = MaiDataItemType.Markup,
+            type = MaiDataItemType.Web,
             name = "Столовые и буфеты",
             category = "Студгородок",
             icon = Asset.relative("/assets/icons/coffee.svg"),
@@ -83,7 +83,7 @@ fun MutableList<MaiDataItem>.campusData() {
 fun MutableList<MaiDataItem>.lifestyleData() {
     add(
         MaiDataItem(
-            type = MaiDataItemType.Markup,
+            type = MaiDataItemType.Web,
             name = "Спортивные секции",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/biking-solid.svg"),
@@ -93,7 +93,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
 
     add(
         MaiDataItem(
-            type = MaiDataItemType.Markup,
+            type = MaiDataItemType.Web,
             name = "Маёвский словарик",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/book-solid.svg"),
@@ -103,7 +103,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
 
     add(
         MaiDataItem(
-            type = MaiDataItemType.Markup,
+            type = MaiDataItemType.Web,
             name = "Творческие коллективы",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/palette.svg"),
@@ -113,7 +113,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
 
     add(
         MaiDataItem(
-            type = MaiDataItemType.Markup,
+            type = MaiDataItemType.Web,
             name = "Студенческие организации",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/user-friends.svg"),
