@@ -38,7 +38,7 @@ try {
 buildConfig {
     packageName = "ru.lavafrai.maiapp"
     buildConfigField("VERSION_NAME", version)
-    buildConfigField("API_BASE_URL", "http://10.175.8.146")//https://maiapp.lavafrai.ru/api/v1")
+    buildConfigField("API_BASE_URL", "https://maiapp.lavafrai.ru/api/v1")
     buildConfigField("APPMETRICA_APIKEY", secretProperties["appmetrica.api_key"] as String)
     buildConfigField("MAIDATA_SUPPORTED_MANIFEST_VERSION", 1)
 }
@@ -108,7 +108,6 @@ kotlin {
             implementation(libs.coil.svg)
             implementation(libs.compose.shimmer)
             implementation(libs.zoomimage.compose.coil3)
-            implementation(libs.zoomimage.compose)
             // api(libs.webview) // Does not work on WEB
             implementation(libs.sonner)
             implementation(libs.multiplatform.settings.test)
@@ -120,7 +119,9 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor3)
             implementation(libs.compose.webview)
-            implementation(libs.zoomimage.view.coil3)
+            //implementation(libs.zoomimage.view.coil3)
+            implementation(libs.zoomimage.view.core)
+            implementation(libs.zoomimage.view.res)
         }
 
         androidMain.dependencies {

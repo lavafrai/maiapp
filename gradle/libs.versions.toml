@@ -10,7 +10,7 @@ kotlin = "2.1.10"
 agp = "8.7.3"
 coilCompose = "3.0.4"
 compose = "1.7.3"
-androidx-activityCompose = "1.10.0"
+androidx-activityCompose = "1.10.1"
 kermit = "2.0.4"
 kotlinRetry = "2.0.1"
 kotlinx-coroutines = "1.10.1"
@@ -20,7 +20,6 @@ androidx-lifecycle = "2.8.4"
 androidx-navigation = "2.8.0-alpha10"
 kotlinx-serialization = "1.7.3"
 koin = "4.0.0"
-ktorUtils = "3.0.3"
 libres = "1.2.3"
 materialKolor = "2.0.0"
 multiplatformSettings = "1.2.0"
@@ -29,7 +28,6 @@ kstore = "0.9.0"
 kotlincrypto = "0.5.3"
 composeIcons = "1.1.1"
 buildconfig = "5.5.0"
-resources = "0.10.0"
 richeditorCompose = "1.0.0-rc10"
 sonner = "0.3.8"
 windowSize = "0.5.0"
@@ -37,16 +35,14 @@ material-motion = "2.0.1"
 uiAndroid = "1.7.8"
 androidx-browser = "1.8.0"
 logback-classic = "1.5.11"
-recompose = "0.4.2"
 
 android-compileSdk = "35"
 android-minSdk = "23"
 android-targetSdk = "35"
-zoomimage = "1.1.0"
+zoomimage = "1.1.2"
 runtimeSaveableAndroid = "1.7.8"
 foundationAndroid = "1.7.8"
 uiTextAndroid = "1.7.8"
-zoomimageViewCoil3 = "1.1.2"
 
 
 [libraries]
@@ -91,7 +87,6 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
-ktor-utils = { module = "io.ktor:ktor-utils", version.ref = "ktorUtils" }
 libres = { module = "io.github.skeptick.libres:libres-compose", version.ref = "libres" }
 material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatformSettings" }
@@ -112,12 +107,12 @@ ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "kto
 ktor-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic" }
 ktor-server-serialization = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-caching = { module = "io.ktor:ktor-server-caching-headers", version.ref = "ktor" }
-zoomimage-compose = { module = "io.github.panpf.zoomimage:zoomimage-compose", version.ref = "zoomimage" }
 zoomimage-compose-coil3 = { module = "io.github.panpf.zoomimage:zoomimage-compose-coil3", version.ref = "zoomimage" }
 androidx-runtime-saveable-android = { group = "androidx.compose.runtime", name = "runtime-saveable-android", version.ref = "runtimeSaveableAndroid" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
-zoomimage-view-coil3 = { module = "io.github.panpf.zoomimage:zoomimage-view-coil3", version.ref = "zoomimageViewCoil3" }
+zoomimage-view-core = { module = "io.github.panpf.zoomimage:zoomimage-compose", version.ref = "zoomimage" }
+zoomimage-view-res = { module = "io.github.panpf.zoomimage:zoomimage-compose-resources", version.ref = "zoomimage" }
 
 [plugins]
 
@@ -131,4 +126,3 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-recompose-highlighter = { id = "com.vk.recompose-highlighter", version.ref = "recompose" }

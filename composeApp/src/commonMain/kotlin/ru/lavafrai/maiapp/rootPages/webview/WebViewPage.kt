@@ -3,9 +3,7 @@ package ru.lavafrai.maiapp.rootPages.webview
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +18,6 @@ import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewStateWithHTMLData
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.ArrowLeft
-import compose.icons.feathericons.RotateCw
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.rootPages.main.MainPageTitle
 import ru.lavafrai.maiapp.utils.toHex
@@ -79,7 +76,9 @@ fun WebViewPage(
 
         WebView(
             state = webViewState,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.navigationBars),
         )
     }
 }
