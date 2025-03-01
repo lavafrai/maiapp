@@ -87,10 +87,17 @@ fun SettingsPage(
 
         // DataSettings()
 
+        OpenSourceInfo()
+
         DataCleanButton()
 
         SettingsCopyright()
     }
+}
+
+@Composable
+fun OpenSourceInfo() = SettingsSection(stringResource(Res.string.information)) {
+
 }
 
 @Composable

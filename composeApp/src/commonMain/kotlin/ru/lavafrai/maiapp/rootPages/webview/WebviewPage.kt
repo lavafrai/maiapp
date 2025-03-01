@@ -29,7 +29,7 @@ import ru.lavafrai.maiapp.viewmodels.webview.WebviewViewModel
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun WebviewPage(
+fun WebViewPage(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     onNavigateBack: () -> Unit,
@@ -47,9 +47,7 @@ fun WebviewPage(
             }
         },
         rightButton = {
-            IconButton(onClick = viewModel::refresh, enabled = viewState.page.actual) {
-                Icon(FeatherIcons.RotateCw, contentDescription = "refresh")
-            }
+
         }
     )
 
@@ -90,7 +88,7 @@ fun WebviewPage(
 fun buildCssStyles(): String {
     val theme = MaterialTheme.colorScheme
     val css = """
-        body {
+        html, body {
             background-color: ${theme.background.toHex()};
             color: ${theme.onBackground.toHex()};
             --primary: ${theme.primary.toHex()};

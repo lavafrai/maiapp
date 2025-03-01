@@ -6,8 +6,10 @@ import androidx.compose.runtime.*
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 
 
-internal val LocalApplicationTheme = compositionLocalOf<State<ApplicationTheme>> { error("No theme provided") }
-internal val LocalApplicationColorSchema = compositionLocalOf<State<ApplicationColorSchema>> { error("No color schema provided") }
+internal val LocalApplicationTheme =
+    compositionLocalOf<State<ApplicationTheme>> { error("No theme provided") }
+internal val LocalApplicationColorSchema =
+    compositionLocalOf<State<ApplicationColorSchema>> { error("No color schema provided") }
 
 @Composable
 internal fun AppTheme(
@@ -20,19 +22,22 @@ internal fun AppTheme(
     val colorSchemaId = settings.colorSchema
 
     val theme = themeProvider.findThemeById(themeId)
-    val colorSchema = themeProvider.colorSchemas.find { it.id == colorSchemaId } ?: themeProvider.defaultColorSchema
+    val colorSchema = themeProvider.colorSchemas.find { it.id == colorSchemaId }
+        ?: themeProvider.defaultColorSchema
 
-    CompositionLocalProvider(LocalApplicationTheme provides mutableStateOf(theme)) {
-        CompositionLocalProvider(LocalApplicationColorSchema provides mutableStateOf(colorSchema)) {
-            SystemAppearance(!theme.isDark())
+    CompositionLocalProvider(
+        LocalApplicationTheme provides mutableStateOf(theme),
+        LocalApplicationColorSchema provides mutableStateOf(colorSchema),
+        LocalThemeIsDark provides theme.isDark()
+    ) {
+        SystemAppearance(!theme.isDark())
 
-            val colorScheme = colorSchema.buildColorScheme(theme)
+        val colorScheme = colorSchema.buildColorScheme(theme)
 
-            MaterialTheme(
-                colorScheme = colorScheme.animated(),
-                content = { Surface(content = content) }
-            )
-        }
+        MaterialTheme(
+            colorScheme = colorScheme.animated(),
+            content = { Surface(content = content) }
+        )
     }
 }
 

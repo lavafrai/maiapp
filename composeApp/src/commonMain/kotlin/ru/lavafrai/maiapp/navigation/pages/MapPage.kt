@@ -3,7 +3,7 @@ package ru.lavafrai.maiapp.navigation.pages
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WebviewPage(
+data class MapPage(
     val url: String,
     val title: String,
 )

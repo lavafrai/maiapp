@@ -21,6 +21,7 @@ import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.fragments.data.MaiDataItemCard
 import ru.lavafrai.maiapp.models.maidata.MaiDataManifest
+import ru.lavafrai.maiapp.theme.LocalThemeIsDark
 
 @Composable
 fun MaiDataView(
@@ -48,11 +49,12 @@ fun MaiDataView(
                 style = MaterialTheme.typography.titleLarge,
             )
 
+            val themeIsDark = LocalThemeIsDark.current
             items.forEach { item ->
                 MaiDataItemCard(
                     item = item,
                     modifier = Modifier,
-                    onClick = { appContext.openMaiDataItem(item) },
+                    onClick = { appContext.openMaiDataItem(item, themeIsDark) },
                 )
             }
         }

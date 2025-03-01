@@ -7,12 +7,10 @@ fun Double.toString(numOfDec: Int): String {
     val integerPart = this.toInt()
 
     if (numOfDec > 0) {
-        val decimalPart = this - integerPart
-        val decimalAsIntValue = (decimalPart * 10f.pow(numOfDec)).roundToInt()
-        val formattedDecimalPart = decimalAsIntValue.toDouble() / 10f.pow(numOfDec)
-        val formattedValue = integerPart + formattedDecimalPart
+        val num = this.toString()
+        val res = "${num.split(".")[0]}.${num.split(".")[1].substring(0, 2)}"
 
-        return "$formattedValue"
+        return res
     } else {
         return integerPart.toString()
     }

@@ -46,6 +46,7 @@ zoomimage = "1.1.0"
 runtimeSaveableAndroid = "1.7.8"
 foundationAndroid = "1.7.8"
 uiTextAndroid = "1.7.8"
+zoomimageViewCoil3 = "1.1.2"
 
 
 [libraries]
@@ -116,6 +117,7 @@ zoomimage-compose-coil3 = { module = "io.github.panpf.zoomimage:zoomimage-compos
 androidx-runtime-saveable-android = { group = "androidx.compose.runtime", name = "runtime-saveable-android", version.ref = "runtimeSaveableAndroid" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
+zoomimage-view-coil3 = { module = "io.github.panpf.zoomimage:zoomimage-view-coil3", version.ref = "zoomimageViewCoil3" }
 
 [plugins]
 

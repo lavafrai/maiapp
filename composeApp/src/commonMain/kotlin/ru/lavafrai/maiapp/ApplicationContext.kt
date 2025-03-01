@@ -12,6 +12,7 @@ import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.utils.UrlHandler
+import ru.lavafrai.maiapp.utils.resolveAsset
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
 
@@ -73,20 +74,29 @@ class ApplicationContext(
         navController.navigate(intent)
     }
 
-    private fun openWebview(url: String, title: String) {
-        navController.navigate(WebviewPage(url = url, title = title))
+    private fun openWebView(url: String, title: String) {
+        navController.navigate(WebViewPage(url = url, title = title))
     }
 
-    fun openMaiDataItem(item: MaiDataItem) {
+    private fun openMapView(url: String, title: String) {
+        navController.navigate(MapPage(url = url, title = title))
+    }
+
+    fun openMaiDataItem(item: MaiDataItem, night: Boolean) {
         when (item.type) {
             MaiDataItemType.Builtin -> openBuiltinMaiData(item)
             MaiDataItemType.Web -> {
-                require(item.asset is WebviewAsset)
-                val asset = item.asset as WebviewAsset
+                require(item.resolveAsset(night) is WebviewAsset)
+                val asset = item.resolveAsset(night) as WebviewAsset
                 val title = item.name
-                openWebview("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
+                openWebView("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
             }
-            else -> return
+            MaiDataItemType.Map -> {
+                require(item.resolveAsset(night) is WebviewAsset)
+                val asset = item.resolveAsset(night) as WebviewAsset
+                val title = item.name
+                openMapView("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
+            }
         }
     }
 }

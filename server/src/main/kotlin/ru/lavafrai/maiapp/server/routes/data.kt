@@ -57,7 +57,8 @@ fun MutableList<MaiDataItem>.campusData() {
             name = "План студгородка",
             category = "Студгородок",
             icon = Asset.relative("/assets/icons/map.svg"),
-            asset = Asset.webview("")
+            asset = Asset.webview("images/map.png"),
+            assetNight = Asset.webview("images/map-night.png")
         )
     )
     add(
