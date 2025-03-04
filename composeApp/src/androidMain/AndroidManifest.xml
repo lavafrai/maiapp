@@ -11,7 +11,9 @@
             android:theme="@android:style/Theme.Material.NoActionBar"
             android:appCategory="productivity"
             android:enableOnBackInvokedCallback="true"
-            tools:ignore="UnusedAttribute">
+            tools:ignore="UnusedAttribute"
+            android:allowBackup="true"
+            android:resizeableActivity="true">
 
         <activity
             android:name=".AppActivity"
