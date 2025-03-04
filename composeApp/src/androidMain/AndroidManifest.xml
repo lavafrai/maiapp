@@ -16,7 +16,7 @@
             android:resizeableActivity="true">
 
         <activity
-            android:name=".AppActivity"
+            android:name=".MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustPan"

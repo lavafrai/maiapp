@@ -38,7 +38,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import ru.lavafrai.maiapp.AppActivity
+import ru.lavafrai.maiapp.MainActivity
 import ru.lavafrai.maiapp.R
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
@@ -89,7 +89,7 @@ fun ScheduleWidgetContent(
     group: BaseScheduleId?,
     schedule: Schedule?,
 ) {
-    ScheduleWidgetHeader(modifier = GlanceModifier.clickable(actionStartActivity<AppActivity>()))
+    ScheduleWidgetHeader(modifier = GlanceModifier.clickable(actionStartActivity<MainActivity>()))
     if (schedule != null) ScheduleWidgetSchedule(schedule)
     else if (group != null) ScheduleWidgetNotLoaded()
     else ScheduleWidgetNotLoggedIn()
