@@ -61,7 +61,7 @@
     <string name="confirm">Подтвердить</string>
     <string name="cancel">Отменить</string>
     <string name="data">Данные</string>
-    <string name="from_n_attempt">С %n попытки</string>
+    <string name="from_n_attempt">С %n-й попытки</string>
     <string name="widget">Виджет</string>
     <string name="widget_unsupported_on_platform">Виджет не поддерживается</string>
     <string name="add_widget">Создать</string>
