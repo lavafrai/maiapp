@@ -13,6 +13,7 @@ data class MaiDataItem(
     val category: String? = null,
     val icon: Asset? = null,
     val asset: Asset? = null,
+    val accent: Boolean = false,
     @SerialName("asset-night") val assetNight: Asset? = null,
 ) {
 

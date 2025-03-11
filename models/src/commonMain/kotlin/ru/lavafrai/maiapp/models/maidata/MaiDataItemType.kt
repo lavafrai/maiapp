@@ -9,4 +9,5 @@ enum class MaiDataItemType {
     // @SerialName("cards") Cards,
     // @SerialName("markup") Markup,
     @SerialName("web") Web,
+    @SerialName("nop") DoNothing,
 }

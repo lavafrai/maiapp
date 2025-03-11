@@ -18,6 +18,7 @@ fun Route.data() {
         val manifest = MaiDataManifest(
             version = 1,
             data = buildList {
+                testData()
                 campusData()
                 teachersData()
                 lifestyleData()
@@ -26,6 +27,16 @@ fun Route.data() {
 
         call.respond(manifest)
     }
+}
+
+fun MutableList<MaiDataItem>.testData() {
+    add(
+        MaiDataItem(
+            type = MaiDataItemType.DoNothing,
+            accent = true,
+            name = "Тестовый информационный баннер",
+        )
+    )
 }
 
 fun MutableList<MaiDataItem>.teachersData() {
