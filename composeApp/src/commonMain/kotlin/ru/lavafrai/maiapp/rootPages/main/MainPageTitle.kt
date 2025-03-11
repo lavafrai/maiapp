@@ -2,7 +2,6 @@ package ru.lavafrai.maiapp.rootPages.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,18 +9,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import compose.icons.FeatherIcons
-import compose.icons.feathericons.DownloadCloud
-import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.viewing
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.utils.asDp
 
 @Composable
 fun MainPageTitle(
     modifier: Modifier = Modifier,
     titleText: @Composable () -> Unit,
-    subtitleText: @Composable () -> Unit = { Text("") },
+    subtitleText: @Composable () -> Unit = { Text(stringResource(Res.string.viewing), modifier = Modifier.alpha(0.5f)) },
     leftButton: @Composable () -> Unit = {},
     rightButton: @Composable () -> Unit = {},
     subtitleIcon: @Composable (Dp) -> Unit = {},

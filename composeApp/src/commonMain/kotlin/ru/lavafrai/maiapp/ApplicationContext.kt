@@ -82,21 +82,22 @@ class ApplicationContext(
         navController.navigate(MapPage(url = url, title = title))
     }
 
-    fun openMaiDataItem(item: MaiDataItem, night: Boolean) {
-        when (item.type) {
-            MaiDataItemType.Builtin -> openBuiltinMaiData(item)
-            MaiDataItemType.Web -> {
-                require(item.resolveAsset(night) is WebviewAsset)
-                val asset = item.resolveAsset(night) as WebviewAsset
-                val title = item.name
-                openWebView("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
-            }
-            MaiDataItemType.Map -> {
-                require(item.resolveAsset(night) is WebviewAsset)
-                val asset = item.resolveAsset(night) as WebviewAsset
-                val title = item.name
-                openMapView("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
-            }
+    fun openMaiDataItem(item: MaiDataItem, night: Boolean) = when (item.type) {
+        MaiDataItemType.Builtin -> openBuiltinMaiData(item)
+        MaiDataItemType.Web -> {
+            require(item.resolveAsset(night) is WebviewAsset)
+            val asset = item.resolveAsset(night) as WebviewAsset
+            val title = item.name
+            openWebView("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
+        }
+        MaiDataItemType.Map -> {
+            require(item.resolveAsset(night) is WebviewAsset)
+            val asset = item.resolveAsset(night) as WebviewAsset
+            val title = item.name
+            openMapView("${BuildConfig.API_BASE_URL}/assets/${asset.text}", title)
+        }
+        MaiDataItemType.DoNothing -> {
+
         }
     }
 }
