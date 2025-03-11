@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,13 +23,16 @@ fun MaiDataItemCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) = AppCard(modifier = modifier, onClick = onClick) {
+    var loadingHash by remember { mutableStateOf(0) }
     var svgIcon by remember { mutableStateOf(Loadable.loading<String>() as Loadable<String>) }
     val assetLoader = remember { AssetLoader.forApi(BuildConfig.API_BASE_URL) }
 
-    LaunchedEffect(item.icon) {
+    LaunchedEffect(item.icon, loadingHash) {
         item.icon ?: return@LaunchedEffect
 
         launchCatching(onError = { svgIcon = Loadable.error(it as Exception) }) {
+            if (svgIcon.data != null) return@launchCatching
+
             val svgData = item.icon!!.load(assetLoader)
             svgIcon = Loadable.actual(svgData.decodeToString())
         }
@@ -39,6 +43,7 @@ fun MaiDataItemCard(
             LoadableSvgIcon(
                 svg = svgIcon,
                 modifier = Modifier.size(24.dp),
+                reload = { loadingHash++ }
             )
             Spacer(modifier = Modifier.width(12.dp))
         }
