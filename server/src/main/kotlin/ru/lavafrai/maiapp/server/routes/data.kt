@@ -34,7 +34,10 @@ fun MutableList<MaiDataItem>.testData() {
         MaiDataItem(
             type = MaiDataItemType.DoNothing,
             accent = true,
-            name = "Тестовый информационный баннер",
+            name = "Тестовый баннер",
+            subtitle = "Этот информационный баннер просто <b>тестовый</b>, в будущем этот тип может использоваться для обьявлений?",
+            category = "Тесты",
+            icon = Asset.relative("/assets/icons/message-square.svg")
         )
     )
 }

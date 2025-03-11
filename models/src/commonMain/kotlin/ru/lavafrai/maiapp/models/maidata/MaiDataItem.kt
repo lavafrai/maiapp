@@ -8,6 +8,7 @@ import ru.lavafrai.maiapp.models.maidata.asset.Asset
 data class MaiDataItem(
     val type: MaiDataItemType,
     val name: String,
+    val subtitle: String? = null,
     val forTeachers: Boolean = true,
     val leadingIcon: Asset? = null,
     val category: String? = null,
