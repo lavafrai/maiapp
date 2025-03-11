@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.fragments.hypertext
 
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -16,7 +17,7 @@ import ru.lavafrai.maiapp.utils.UrlHandler
 fun Hypertext(
     hypertext: String,
     baseLinkPath: String = "https://mai-exler.ru",
-    color: Color = MaterialTheme.colorScheme.onBackground,
+    color: Color = LocalContentColor.current,
 ) {
     val state = rememberRichTextState()
     val appUrlHandler = UrlHandler.create()

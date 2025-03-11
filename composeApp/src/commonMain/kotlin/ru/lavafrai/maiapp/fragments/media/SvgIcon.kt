@@ -69,16 +69,16 @@ fun LoadableSvgIcon(
     LoadableView(
         svg,
         retry = {},
-        loading = { CircularProgressIndicator(modifier = Modifier.size(24.dp)) },
+        loading = { CircularProgressIndicator(modifier = Modifier.size(24.dp), color = tint ?: MaterialTheme.colorScheme.primary) },
         error = { e, r -> LoadableSvgIconReload(reload, e) },
         alignment = Alignment.TopStart,
-        modifier = Modifier.size(24.dp),
+        modifier = modifier,
         animated = false,
     ) { icon ->
         SvgIcon(
             icon,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = tint,
             modifier = Modifier.size(24.dp)
         )
     }

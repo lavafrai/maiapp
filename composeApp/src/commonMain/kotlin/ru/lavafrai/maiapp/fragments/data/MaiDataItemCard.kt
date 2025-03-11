@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.sp
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.fragments.AppCard
+import ru.lavafrai.maiapp.fragments.hypertext.Hypertext
 import ru.lavafrai.maiapp.fragments.media.LoadableSvgIcon
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.asset.AssetLoader
@@ -22,7 +23,12 @@ fun MaiDataItemCard(
     item: MaiDataItem,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-) = AppCard(modifier = modifier, onClick = onClick) {
+) = AppCard(
+    modifier = modifier,
+    onClick = onClick,
+    cardBackground = if (item.accent) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant,
+    cardContent = if (item.accent) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant,
+) {
     var loadingHash by remember { mutableStateOf(0) }
     var svgIcon by remember { mutableStateOf(Loadable.loading<String>() as Loadable<String>) }
     val assetLoader = remember { AssetLoader.forApi(BuildConfig.API_BASE_URL) }
@@ -38,15 +44,29 @@ fun MaiDataItemCard(
         }
     }
 
-    Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         if (item.icon != null) {
             LoadableSvgIcon(
                 svg = svgIcon,
                 modifier = Modifier.size(24.dp),
-                reload = { loadingHash++ }
+                reload = { loadingHash++ },
+                tint = if (item.accent) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.width(12.dp))
         }
-        Text(text = item.name, style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp))
+        Column {
+            Text(
+                text = item.name,
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp)
+            )
+            if (item.subtitle != null) {
+                Spacer(Modifier.height(4.dp))
+                Hypertext(item.subtitle!!)
+            }
+        }
     }
+
 }
