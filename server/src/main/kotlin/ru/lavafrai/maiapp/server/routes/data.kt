@@ -122,7 +122,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             name = "Творческие коллективы",
             category = "Жизнь",
             icon = Asset.relative("/assets/icons/palette.svg"),
-            asset = Asset.webview("")
+            asset = Asset.webview("markup/creative-teams.html")
         )
     )
 

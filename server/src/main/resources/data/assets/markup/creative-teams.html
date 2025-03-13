@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Творческие студии</title>
+    <style>
+        html, body {
+            background-color: #F0F0F0; /* Example background, will be replaced based on theme */
+            color: #333; /* Example text color, will be replaced based on theme */
+            --primary: #6200EE; /* Example primary color, will be replaced based on theme */
+            --on-primary: #FFFFFF;
+            --secondary: #03DAC5;
+            --on-secondary: #000000;
+            --surface: #FFFFFF;
+            --on-surface: #333;
+            --error: #B00020;
+            --on-error: #FFFFFF;
+            --surface-variant: #E0E0E0;
+            --on-surface-variant: #000;
+
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            user-select: none;
+            margin: 0; /* Reset default body margin */
+        }
+
+        body {
+            padding: 0; /* Reset default body padding */
+        }
+
+        row {
+            display: flex;
+            flex-direction: row;
+            align-items: center; /* Vertically align items in row */
+        }
+
+        column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* Default gap for columns */
+            padding: 8px; /* Example padding for column, can be adjusted */
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface-variant);
+            color: var(--on-surface-variant);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            gap: 8px;
+            margin-bottom: 8px; /* Add margin between cards */
+        }
+
+        .primary-color {
+            color: var(--primary);
+        }
+
+        .subtitle {
+            font-size: 20px;
+        }
+
+        .secondary70-color { /* Example style for secondary70, can be adjusted */
+            color: #778899; /* Example muted secondary color, adjust as needed */
+        }
+
+        header {
+            font-size: 24px; /* Example header size, adjust as needed */
+            font-weight: bold;
+            margin: 0; /* Reset default header margin */
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc; /* Example hr style */
+            margin: 16px 0;
+        }
+
+        button {
+            background-color: transparent;
+            border: 1px solid var(--primary); /* Example button style */
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex; /* For icon and text alignment */
+            align-items: center;
+            gap: 8px;
+            text-decoration: none; /* Remove underline from link-buttons */
+        }
+
+        button:hover {
+            background-color: rgba(98, 0, 238, 0.1); /* Example hover effect */
+        }
+
+        a {
+            text-decoration: none; /* Remove underline from links */
+            color: inherit; /* Inherit color from parent */
+        }
+    </style>
+</head>
+<body>
+<div style="height: 56px;"></div>
+<div style="display: flex; flex-direction: row;">
+    <div style="height: 16px;"></div>
+    <button type="button"> <!-- icon type="arrowback" --> Back </button>
+    <div style="flex-grow: 1;"></div>
+    <header>Творческие студии</header>
+</div>
+<div style="height: 16px;"></div>
+<hr>
+
+<div style="display: flex; flex-direction: column; overflow-y: auto; padding: 8px;">
+    <div style="height: 8px;"></div>
+
+    <div class="card">
+        <div>
+            <span style="font-size: 18px;">Студия эстрадного танца Sensuel</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <div>
+                <span class="secondary70-color">
+                    <span style="font-size: 16px;">Студия эстрадного танца Sensuel основана в 2007 году. В репертуаре коллектива — номера на основе как классической хореографии, так и современных танцевальных стилей. Коллектив постоянно участвует в концертных программах ДКиТ МАИ, а также в творческих проектах на других площадках Москвы. Студия хореографии Sensuel всегда рада видеть в своём коллективе новых участников. Благодаря разнообразию репертуара, в коллективе Sensuel каждый найдёт то, что нужно именно ему!
+                    </span>
+                </span>
+        </div>
+        <div style="height: 8px;"></div>
+        <div>
+            <span class="primary-color">Наталья Квасильчук</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <a href="tel: +7 926 677-96-51" class="button">
+            <!-- icon type="phone" -->
+            +7 926 677-96-51
+        </a>
+    </div>
+
+    <div class="card">
+        <div>
+            <span style="font-size: 18px;">Танцевальный коллектив DS TESTA</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <div>
+                <span class="secondary70-color">
+                    <span style="font-size: 16px;">Dance School TESТА обучает современным танцам вот уже 11 лет. Лучшие ученики попадают в профессиональную группу Студийцы ТЕSТА выступали на открытии олимпиады в Ванкувере и Сочи, танцевали Мирей Матьё на Международном военно-музыкальном фестивале «Спасская башня», на церемонии вручения музыкальных наград «Золотой граммофон» и на ежегодном международном конкурсе молодых исполнителей популярной музыки «Новая волна». Ребята с огромным количеством российских и мировых звезд. Специально для студентов МАИ открылось направление Breakdance, которое с 2017 года является олимпийской дисциплиной.
+                    </span>
+                </span>
+        </div>
+        <div style="height: 8px;"></div>
+        <div>
+            <span class="primary-color">Ирина Беда</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <a href="tel: +7 985 275-88-11" class="button">
+            <!-- icon type="phone" -->
+            +7 985 275-88-11
+        </a>
+    </div>
+
+    <div class="card">
+        <div>
+            <span style="font-size: 18px;">Студия эстрадного танца "Сокол"</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <div>
+                <span class="secondary70-color">
+                    <span style="font-size: 16px;">Студия эстрадного танца «Сокол» основана в 1985 году. Сегодня студия эстрадного танца — это большой дружный коллектив единомышленников: педагогов, студентов, выпускников, охваченных эдной большой любовью к танцу Репертуар коллектива очень разнообразен, интересен и с каждым выступлением удивляет новыми трюками, мизансценами и костюмами. Коллектив с радостью принимает в свои стройные ряды первокурсников и выпускает из МАИ танцующими, лёгкими и образованными.
+                    </span>
+                </span>
+        </div>
+        <div style="height: 8px;"></div>
+        <div>
+            <span class="primary-color">Оксана Владимировна Тихомирова</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <a href="tel: +7 903 144-53-39" class="button">
+            <!-- icon type="phone" -->
+            +7 903 144-53-39
+        </a>
+    </div>
+
+    <div class="card">
+        <div>
+            <span style="font-size: 18px;">Клуб веселых и находчивых</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <div>
+                <span class="secondary70-color">
+                    <span style="font-size: 16px;">КВН в МАИ имеет многолетние традиции и стал успешной стартовой площадкой для многих маёвцев. Сейчас у вас есть уникальная возможность попасть в студенческую лигу КВНв МАИ, из которой формируется сборная команда университета, которая в дальнейшем представляет МАИ на различных мероприятиях.
+                    </span>
+                </span>
+        </div>
+        <div style="height: 8px;"></div>
+        <div>
+            <span class="primary-color">Кравцов Александр</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <a href="tel: +7 965 292-25-82" class="button">
+            <!-- icon type="phone" -->
+            +7 965 292-25-82
+        </a>
+    </div>
+
+    <div class="card">
+        <div>
+            <span style="font-size: 18px;">Студенческий театр "СТАФ"</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <div>
+                <span class="secondary70-color">
+                    <span style="font-size: 16px;">Студенческий театр «СТАФ» основан в 1975 году. Лауреат и дипломант фестивалей студенческого гворчества «Фестос», «Паруса надежды», всероссийских фестивалей студенческих и любительских театров. Театр СТАФ приглашает студентов принять участие в работе над спектаклями, миниатюрами, вокально-хореографическими номерами.
+                    </span>
+                </span>
+        </div>
+        <div style="height: 8px;"></div>
+        <div>
+            <span class="primary-color">Татьяна Анатольевна Каковкина</span>
+        </div>
+        <div style="height: 8px;"></div>
+
+        <a href="tel: +7 926 119-84-91" class="button">
+            <!-- icon type="phone" -->
+            +7 926 119-84-91
+        </a>
+    </div>
+
+
+    <div style="height: 42px;"></div>
+
+</div>
+</body>
+</html>

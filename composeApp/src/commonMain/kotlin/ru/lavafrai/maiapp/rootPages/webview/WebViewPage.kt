@@ -103,6 +103,7 @@ fun buildCssStyles(): String {
             
             font-family: 'Roboto', sans-serif;
             font-size: 16px;
+            user-select: none;
         }
         
         row {
