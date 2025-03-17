@@ -4,7 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.util.Properties
+import java.util.*
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -196,6 +196,8 @@ android {
             storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
         }
     }
+
+    println(signingConfigs)
 
     buildTypes {
         release {

@@ -6,10 +6,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.GlanceId
-import androidx.glance.GlanceModifier
-import androidx.glance.Image
-import androidx.glance.ImageProvider
+import androidx.glance.*
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -18,19 +15,7 @@ import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
-import androidx.glance.background
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
-import androidx.glance.layout.Column
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
-import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
-import androidx.glance.layout.padding
-import androidx.glance.layout.size
-import androidx.glance.layout.width
+import androidx.glance.layout.*
 import androidx.glance.text.FontFamily
 import androidx.glance.text.TextDefaults
 import androidx.glance.unit.ColorProvider
@@ -146,9 +131,9 @@ fun ScheduleWidgetLesson(
     lesson: Lesson,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Column {
-            GlanceText(lesson.timeRange.split(" – ")[0], fontFamily = FontFamily.Monospace)
-            GlanceText(lesson.timeRange.split(" – ")[1], fontFamily = FontFamily.Monospace)
+        Column(horizontalAlignment = Alignment.End) {
+            GlanceText(lesson.timeRange.split(" – ")[0].padStart(5, '0'), fontFamily = FontFamily.Monospace)
+            GlanceText(lesson.timeRange.split(" – ")[1].padStart(5, '0'), fontFamily = FontFamily.Monospace)
         }
 
         Spacer(GlanceModifier.width(4.dp))
