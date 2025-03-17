@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -88,7 +87,7 @@ fun ScheduleView(
                     modifier = modifier,
                     state = state.lazyScrollState,
                 ) {
-                    for (day in filteredLessons) {
+                    for (day in filteredLessons.sortedBy { it.date }) {
                         stickyHeader {
                             DayHeader(
                                 day = day,

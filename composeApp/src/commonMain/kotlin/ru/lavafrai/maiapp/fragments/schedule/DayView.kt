@@ -3,6 +3,7 @@ package ru.lavafrai.maiapp.fragments.schedule
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
@@ -22,7 +23,7 @@ fun DayView(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
     ) {
-        for (lesson in day.lessons) {
+        for (lesson in remember(day.lessons) { day.lessons.sortedBy { it.getPairNumber() }}) {
             LessonView(
                 lesson = lesson,
                 exlerTeachers = exlerTeachers,
