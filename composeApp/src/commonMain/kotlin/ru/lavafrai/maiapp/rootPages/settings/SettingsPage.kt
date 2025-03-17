@@ -4,25 +4,10 @@ package ru.lavafrai.maiapp.rootPages.settings
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,22 +24,7 @@ import compose.icons.feathericons.DollarSign
 import compose.icons.feathericons.Edit3
 import compose.icons.feathericons.Github
 import compose.icons.lineawesomeicons.Telegram
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.add_widget
-import maiapp.composeapp.generated.resources.appearance
-import maiapp.composeapp.generated.resources.clear_application_data
-import maiapp.composeapp.generated.resources.color_scheme
-import maiapp.composeapp.generated.resources.data
-import maiapp.composeapp.generated.resources.information
-import maiapp.composeapp.generated.resources.open_github
-import maiapp.composeapp.generated.resources.open_telegram
-import maiapp.composeapp.generated.resources.open_thanks
-import maiapp.composeapp.generated.resources.settings_info
-import maiapp.composeapp.generated.resources.storage_usage
-import maiapp.composeapp.generated.resources.support_project
-import maiapp.composeapp.generated.resources.widget
-import maiapp.composeapp.generated.resources.widget_description
-import maiapp.composeapp.generated.resources.widget_unsupported_on_platform
+import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.LocalApplicationContext
@@ -143,28 +113,44 @@ fun OpenSourceInfo() = SettingsSection(stringResource(Res.string.information)) {
         )
     )
     Spacer(Modifier.height(8.dp))
-    TextButton(onClick = { platform.openThanks() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { platform.openThanks() }, Modifier.fillMaxWidth()) {
         Icon(FeatherIcons.Edit3, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.open_thanks))
     }
 
-    TextButton(onClick = { platform.openGitHub() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { platform.openGitHub() }, Modifier.fillMaxWidth()) {
         Icon(FeatherIcons.Github, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.open_github))
     }
 
-    TextButton(onClick = { appContext.openDonations() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { appContext.openDonations() }, Modifier.fillMaxWidth()) {
         Icon(FeatherIcons.DollarSign, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.support_project))
     }
 
-    TextButton(onClick = { appContext.openTelegram() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { appContext.openTelegram() }, Modifier.fillMaxWidth()) {
         Icon(LineAwesomeIcons.Telegram, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.open_telegram))
+    }
+
+    Spacer(Modifier.height(8.dp))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            "With ♥\uFE0E by. lava_frai",
+            modifier = Modifier
+                .padding(horizontal = 2.dp)
+                .clip(MaterialTheme.shapes.small)
+                .clickable { appContext.openUrl("https://lavafrai.ru/") }
+        )
     }
 }
 
