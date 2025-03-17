@@ -4,22 +4,57 @@ package ru.lavafrai.maiapp.rootPages.settings
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import compose.icons.FeatherIcons
+import compose.icons.LineAwesomeIcons
+import compose.icons.feathericons.DollarSign
+import compose.icons.feathericons.Edit3
+import compose.icons.feathericons.Github
+import compose.icons.lineawesomeicons.Telegram
 import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.*
+import maiapp.composeapp.generated.resources.add_widget
+import maiapp.composeapp.generated.resources.appearance
+import maiapp.composeapp.generated.resources.clear_application_data
+import maiapp.composeapp.generated.resources.color_scheme
+import maiapp.composeapp.generated.resources.data
+import maiapp.composeapp.generated.resources.information
+import maiapp.composeapp.generated.resources.open_github
+import maiapp.composeapp.generated.resources.open_telegram
+import maiapp.composeapp.generated.resources.open_thanks
+import maiapp.composeapp.generated.resources.settings_info
+import maiapp.composeapp.generated.resources.storage_usage
+import maiapp.composeapp.generated.resources.support_project
+import maiapp.composeapp.generated.resources.widget
+import maiapp.composeapp.generated.resources.widget_description
+import maiapp.composeapp.generated.resources.widget_unsupported_on_platform
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.LocalApplicationContext
@@ -97,7 +132,40 @@ fun SettingsPage(
 
 @Composable
 fun OpenSourceInfo() = SettingsSection(stringResource(Res.string.information)) {
+    val platform = getPlatform()
+    val appContext = LocalApplicationContext.current
 
+    Text(
+        stringResource(Res.string.settings_info),
+        style = LocalTextStyle.current.copy(
+            lineBreak = LineBreak.Paragraph,
+            hyphens = Hyphens.Auto
+        )
+    )
+    Spacer(Modifier.height(8.dp))
+    TextButton(onClick = { platform.openThanks() }, Modifier.fillMaxWidth()) {
+        Icon(FeatherIcons.Edit3, contentDescription = null)
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(Res.string.open_thanks))
+    }
+
+    TextButton(onClick = { platform.openGitHub() }, Modifier.fillMaxWidth()) {
+        Icon(FeatherIcons.Github, contentDescription = null)
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(Res.string.open_github))
+    }
+
+    TextButton(onClick = { appContext.openDonations() }, Modifier.fillMaxWidth()) {
+        Icon(FeatherIcons.DollarSign, contentDescription = null)
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(Res.string.support_project))
+    }
+
+    TextButton(onClick = { appContext.openTelegram() }, Modifier.fillMaxWidth()) {
+        Icon(LineAwesomeIcons.Telegram, contentDescription = null)
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(Res.string.open_telegram))
+    }
 }
 
 @Composable

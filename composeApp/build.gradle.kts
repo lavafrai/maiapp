@@ -4,7 +4,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import java.io.FileInputStream
 import java.io.FileNotFoundException
-import java.util.*
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -39,6 +39,8 @@ buildConfig {
     packageName = "ru.lavafrai.maiapp"
     buildConfigField("VERSION_NAME", version)
     buildConfigField("API_BASE_URL", "https://maiapp.lavafrai.ru/api/v1")
+    buildConfigField("THANKS_URL", "https://maiapp.lavafrai.ru/thanks")
+    buildConfigField("GITHUB_URL", "https://github.com/lavafrai/maiapp")
     buildConfigField("APPMETRICA_APIKEY", secretProperties["appmetrica.api_key"] as String)
     buildConfigField("MAIDATA_SUPPORTED_MANIFEST_VERSION", 1)
 }

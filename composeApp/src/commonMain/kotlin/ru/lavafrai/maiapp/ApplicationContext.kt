@@ -10,7 +10,14 @@ import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
-import ru.lavafrai.maiapp.navigation.pages.*
+import ru.lavafrai.maiapp.navigation.pages.DedicatedSchedulePage
+import ru.lavafrai.maiapp.navigation.pages.ImageViewPage
+import ru.lavafrai.maiapp.navigation.pages.LessonDetailsPage
+import ru.lavafrai.maiapp.navigation.pages.LoginPage
+import ru.lavafrai.maiapp.navigation.pages.MapPage
+import ru.lavafrai.maiapp.navigation.pages.SafeDataCleanup
+import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
+import ru.lavafrai.maiapp.navigation.pages.WebViewPage
 import ru.lavafrai.maiapp.utils.UrlHandler
 import ru.lavafrai.maiapp.utils.resolveAsset
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
@@ -29,6 +36,10 @@ class ApplicationContext(
 
     fun openDonations() {
         UrlHandler(this).openUrl("https://maiapp.lavafrai.ru/donate")
+    }
+
+    fun openTelegram() {
+        UrlHandler(this).openUrl("https://t.me/maiapp3")
     }
 
     fun openSchedule(scheduleId: ScheduleId, title: String? = null) {

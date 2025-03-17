@@ -1,8 +1,8 @@
 package ru.lavafrai.maiapp.platform
 
-import androidx.compose.runtime.Composable
-import io.ktor.client.engine.*
 import com.russhwolf.settings.Settings
+import io.ktor.client.engine.HttpClientEngineFactory
+import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.theme.ApplicationColorSchema
 
 interface Platform {
@@ -20,4 +20,7 @@ interface Platform {
 
     fun doesPlatformSupportsMonet(): Boolean = false
     fun getMonet(): ApplicationColorSchema = error("Monet theme isn't supported on this platform")
+
+    fun openGitHub() = openUrl(BuildConfig.GITHUB_URL)
+    fun openThanks() = openUrl(BuildConfig.THANKS_URL)
 }

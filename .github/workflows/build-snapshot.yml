@@ -29,7 +29,7 @@ jobs:
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Decode keystore
-              uses: akiojin/decode-base64-github-action@v0.1.0
+              uses: akiojin/decode-base64-github-action@v1
               with:
                   base64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
                   output-path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/android.keystore'
@@ -46,24 +46,24 @@ jobs:
                   name: android-artifact
                   path: composeApp/build/outputs/apk/release/*.apk
 
-    build_web:
-        name: Build WEB
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: ./.github/actions/common-build-setup
-              with:
-                  java-version: '21'
-                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
-
-            - name: Build with Gradle
-              run: ./gradlew :composeApp:wasmJsBrowserDistribution
-
-            - name: Upload WEB artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: web-artifact
-                  path: composeApp/build/dist/wasmJs/productionExecutable
+#    build_web:
+#        name: Build WEB
+#        runs-on: ubuntu-latest
+#        steps:
+#            - uses: actions/checkout@v4
+#            - uses: ./.github/actions/common-build-setup
+#              with:
+#                  java-version: '21'
+#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+#
+#            - name: Build with Gradle
+#              run: ./gradlew :composeApp:wasmJsBrowserDistribution
+#
+#            - name: Upload WEB artifact
+#              uses: actions/upload-artifact@v4
+#              with:
+#                  name: web-artifact
+#                  path: composeApp/build/dist/wasmJs/productionExecutable
 
             - name: Upload pages artifact
               uses: actions/upload-pages-artifact@v3
@@ -110,19 +110,19 @@ jobs:
                   path: composeApp/build/compose/binaries/main/deb/*
 
 
-    publish_pages:
-      needs:
-          - build_web
-      runs-on: ubuntu-latest
-      permissions:
-          contents: read
-          pages: write
-          id-token: write
-      steps:
-          -   uses: actions/checkout@v4
-
-          -   name: Publish WEB artifact
-              uses: actions/deploy-pages@v4
-              with:
-                  artifact_name: pages-artifact
-                  preview: 'true'
+#    publish_pages:
+#      needs:
+#          - build_web
+#      runs-on: ubuntu-latest
+#      permissions:
+#          contents: read
+#          pages: write
+#          id-token: write
+#      steps:
+#          -   uses: actions/checkout@v4
+#
+#          -   name: Publish WEB artifact
+#              uses: actions/deploy-pages@v4
+#              with:
+#                  artifact_name: pages-artifact
+#                  preview: 'true'
