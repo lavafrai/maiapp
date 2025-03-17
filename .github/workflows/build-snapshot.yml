@@ -64,12 +64,12 @@ jobs:
 #              with:
 #                  name: web-artifact
 #                  path: composeApp/build/dist/wasmJs/productionExecutable
-
-            - name: Upload pages artifact
-              uses: actions/upload-pages-artifact@v3
-              with:
-                  name: pages-artifact
-                  path: composeApp/build/dist/wasmJs/productionExecutable
+#
+#            - name: Upload pages artifact
+#              uses: actions/upload-pages-artifact@v3
+#              with:
+#                  name: pages-artifact
+#                  path: composeApp/build/dist/wasmJs/productionExecutable
 
     build_msi:
         name: Build MSI
