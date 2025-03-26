@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Творческие студии</title>
+    <!-- Styles will be added below -->
+</head>
+<body>
+
+<div style="display: flex; flex-direction: column; overflow-y: auto; padding: 8px; gap: 8px;"> <!-- Added gap for spacing between cards -->
+    <!-- Removed fixed height divs, relying on gap -->
+
+    <card>
+        <div>
+            <span style="font-size: 18px;">Студия эстрадного танца Sensuel</span>
+        </div>
+        <!-- Removed fixed height div -->
+        <div>
+            <span class="secondary70-color"> <!-- Assuming this class exists in your environment -->
+                <span style="font-size: 16px;">Студия эстрадного танца Sensuel основана в 2007 году. В репертуаре коллектива — номера на основе как классической хореографии, так и современных танцевальных стилей. Коллектив постоянно участвует в концертных программах ДКиТ МАИ, а также в творческих проектах на других площадках Москвы. Студия хореографии Sensuel всегда рада видеть в своём коллективе новых участников. Благодаря разнообразию репертуара, в коллективе Sensuel каждый найдёт то, что нужно именно ему!
+                </span>
+            </span>
+        </div>
+        <!-- Removed fixed height div -->
+        <div>
+            <span class="primary-color">Наталья Квасильчук</span>
+        </div>
+        <!-- Removed fixed height div -->
+
+        <!-- Modified Button -->
+        <button class="copy-button" data-phone="+79266779651" onclick="handleCopyClick(this)">
+            +7 926 677-96-51
+        </button>
+    </card>
+
+    <card>
+        <div>
+            <span style="font-size: 18px;">Танцевальный коллектив DS TESTA</span>
+        </div>
+        <div>
+            <span class="secondary70-color">
+                <span style="font-size: 16px;">Dance School TESТА обучает современным танцам вот уже 11 лет. Лучшие ученики попадают в профессиональную группу Студийцы ТЕSТА выступали на открытии олимпиады в Ванкувере и Сочи, танцевали Мирей Матьё на Международном военно-музыкальном фестивале «Спасская башня», на церемонии вручения музыкальных наград «Золотой граммофон» и на ежегодном международном конкурсе молодых исполнителей популярной музыки «Новая волна». Ребята с огромным количеством российских и мировых звезд. Специально для студентов МАИ открылось направление Breakdance, которое с 2017 года является олимпийской дисциплиной.
+                </span>
+            </span>
+        </div>
+        <div>
+            <span class="primary-color">Ирина Беда</span>
+        </div>
+        <!-- Modified Button -->
+        <button class="copy-button" data-phone="+7 985 275-88-11" onclick="handleCopyClick(this)">
+            +7 985 275-88-11
+        </button>
+    </card>
+
+    <card>
+        <div>
+            <span style="font-size: 18px;">Студия эстрадного танца "Сокол"</span>
+        </div>
+        <div>
+            <span class="secondary70-color">
+                <span style="font-size: 16px;">Студия эстрадного танца «Сокол» основана в 1985 году. Сегодня студия эстрадного танца — это большой дружный коллектив единомышленников: педагогов, студентов, выпускников, охваченных эдной большой любовью к танцу Репертуар коллектива очень разнообразен, интересен и с каждым выступлением удивляет новыми трюками, мизансценами и костюмами. Коллектив с радостью принимает в свои стройные ряды первокурсников и выпускает из МАИ танцующими, лёгкими и образованными.
+                </span>
+            </span>
+        </div>
+        <div>
+            <span class="primary-color">Оксана Владимировна Тихомирова</span>
+        </div>
+        <!-- Modified Button -->
+        <button class="copy-button" data-phone="+7 903 144-53-39" onclick="handleCopyClick(this)">
+            +7 903 144-53-39
+        </button>
+    </card>
+
+    <card>
+        <div>
+            <span style="font-size: 18px;">Клуб веселых и находчивых</span>
+        </div>
+        <div>
+            <span class="secondary70-color">
+                <span style="font-size: 16px;">КВН в МАИ имеет многолетние традиции и стал успешной стартовой площадкой для многих маёвцев. Сейчас у вас есть уникальная возможность попасть в студенческую лигу КВНв МАИ, из которой формируется сборная команда университета, которая в дальнейшем представляет МАИ на различных мероприятиях.
+                </span>
+            </span>
+        </div>
+        <div>
+            <span class="primary-color">Кравцов Александр</span>
+        </div>
+        <!-- Modified Button -->
+        <button class="copy-button" data-phone="+7 965 292-25-82" onclick="handleCopyClick(this)">
+            +7 965 292-25-82
+        </button>
+    </card>
+
+    <card>
+        <div>
+            <span style="font-size: 18px;">Студенческий театр "СТАФ"</span>
+        </div>
+        <div>
+            <span class="secondary70-color">
+                <span style="font-size: 16px;">Студенческий театр «СТАФ» основан в 1975 году. Лауреат и дипломант фестивалей студенческого гворчества «Фестос», «Паруса надежды», всероссийских фестивалей студенческих и любительских театров. Театр СТАФ приглашает студентов принять участие в работе над спектаклями, миниатюрами, вокально-хореографическими номерами.
+                </span>
+            </span>
+        </div>
+        <div>
+            <span class="primary-color">Татьяна Анатольевна Каковкина</span>
+        </div>
+        <!-- Modified Button -->
+        <button class="copy-button" data-phone="+7 926 119-84-91" onclick="handleCopyClick(this)">
+            +7 926 119-84-91
+        </button>
+    </card>
+
+</div>
+
+<!-- JavaScript for Copy Functionality -->
+<script>
+    function handleCopyClick(buttonElement) {
+        const phoneRaw = buttonElement.getAttribute('data-phone');
+        if (!phoneRaw || typeof copy !== 'function') {
+            console.error('Copy function not available or no phone number found.');
+            return;
+        }
+
+        // Remove spaces, hyphens, and potentially parentheses before copying
+        const phoneFormatted = phoneRaw.replace(/[\s-()]/g, ''); // Added parentheses removal
+
+        const originalText = buttonElement.innerHTML;
+        buttonElement.disabled = true;
+
+        try {
+            // Call the injected copy function with the *formatted* number
+            copy(phoneFormatted);
+
+            // Show feedback
+            buttonElement.innerHTML = "Скопировано!";
+            buttonElement.classList.add('copied');
+
+            // Revert back after a delay
+            setTimeout(() => {
+                buttonElement.innerHTML = originalText;
+                buttonElement.classList.remove('copied');
+                buttonElement.disabled = false;
+            }, 1500);
+
+        } catch (err) {
+            console.error('Error calling injected copy function: ', err);
+            buttonElement.innerHTML = originalText;
+            buttonElement.disabled = false;
+        }
+    }
+</script>
+
+<!-- CSS Styles for Buttons and Layout -->
+<style>
+    /* Ensure body and html take full height if needed, and remove default margin */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        /* Font styles and colors should ideally come from the injected CSS */
+        font-family: 'Roboto', sans-serif; /* Example fallback */
+    }
+
+    /* Styles from your WebViewPage example */
+    html, body {
+        /* background-color: ${theme.background.toHex()}; */ /* Provided by injected CSS */
+        /* color: ${theme.onBackground.toHex()}; */ /* Provided by injected CSS */
+        --primary: #0066CC; /* Example fallback */
+        --on-primary: #FFFFFF; /* Example fallback */
+        --secondary: #6c757d; /* Example fallback */
+        --on-secondary: #FFFFFF; /* Example fallback */
+        --surface: #FFFFFF; /* Example fallback */
+        --on-surface: #000000; /* Example fallback */
+        --error: #B00020; /* Example fallback */
+        --on-error: #FFFFFF; /* Example fallback */
+        --surface-variant: #EEEEEE; /* Example fallback */
+        --on-surface-variant: #000000; /* Example fallback */
+        /* Assuming secondary70-color is defined elsewhere or means 70% opacity */
+        --secondary70: rgba(108, 117, 125, 0.7); /* Example fallback */
+
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        user-select: none;
+    }
+
+    card {
+        display: flex;
+        flex-direction: column;
+        background-color: var(--surface-variant);
+        color: var(--on-surface-variant);
+        border-radius: 12px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+        padding: 12px; /* Slightly more padding */
+        gap: 8px; /* Consistent gap within card */
+    }
+
+    .primary-color {
+        color: var(--primary);
+    }
+
+    .secondary70-color {
+        color: var(--secondary70, rgba(0,0,0,0.7)); /* Use variable or fallback */
+    }
+
+    .subtitle { /* Assuming this class might be used */
+        font-size: 20px;
+        font-weight: 500;
+    }
+
+    /* Base Button Style */
+    .copy-button {
+        background-color: var(--primary, #0066CC);
+        color: var(--on-primary, #FFFFFF);
+        border: none;
+        border-radius: 20px; /* Fully rounded */
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        align-self: flex-start; /* Align button left */
+        margin-top: 4px; /* Space above button */
+        /* Smooth Transitions */
+        transition: background-color 0.25s ease-out, transform 0.15s ease-out, filter 0.25s ease-out, opacity 0.2s linear;
+        /* Prevent text selection */
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+
+    /* Hover State */
+    .copy-button:hover:not(:disabled) {
+        filter: brightness(1.1);
+    }
+
+    /* Active/Press State */
+    .copy-button:active:not(:disabled) {
+        transform: scale(0.97);
+        filter: brightness(0.9);
+        transition-duration: 0.1s;
+    }
+
+    /* "Copied!" State */
+    .copy-button.copied {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+
+    /* Disabled State */
+    .copy-button:disabled {
+        cursor: default;
+        opacity: 0.7;
+    }
+</style>
+
+</body>
+</html>
