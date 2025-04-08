@@ -18,7 +18,7 @@ plugins {
 
 val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.0"
 val versionPlain = System.getenv("MAIAPP_BUILD_VERSION") ?: version
-val versionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
+val calculatedVersionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
 
 
 
@@ -183,7 +183,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
 
         applicationId = "ru.lavafrai.maiapp"
-        versionCode = versionCode
+        versionCode = calculatedVersionCode
         versionName = version
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -213,7 +213,14 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
+
 dependencies {
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.runtime.saveable.android)
