@@ -37,7 +37,7 @@ fun MutableList<MaiDataItem>.testData() {
             name = "Релиз!",
             subtitle = "Наконец-то приложение выходит в релиз!",
             category = "Тесты",
-            icon = Asset.relative("/assets/icons/message-square.svg")
+            icon = Asset.relative("assets/icons/message-square.svg")
         )
     )
 }
@@ -48,7 +48,7 @@ fun MutableList<MaiDataItem>.teachersData() {
             type = MaiDataItemType.Builtin,
             name = "Расписания преподавателей",
             category = "Преподаватели",
-            icon = Asset.relative("/assets/icons/users.svg"),
+            icon = Asset.relative("assets/icons/users.svg"),
             asset = Asset.text("teacher-schedule")
         )
     )
@@ -58,7 +58,7 @@ fun MutableList<MaiDataItem>.teachersData() {
             type = MaiDataItemType.Builtin,
             name = "О преподавателях",
             category = "Преподаватели",
-            icon = Asset.relative("/assets/icons/message-square.svg"),
+            icon = Asset.relative("assets/icons/message-square.svg"),
             asset = Asset.text("teacher-review")
         )
     )
@@ -70,7 +70,7 @@ fun MutableList<MaiDataItem>.campusData() {
             type = MaiDataItemType.Map,
             name = "План студгородка",
             category = "Студгородок",
-            icon = Asset.relative("/assets/icons/map.svg"),
+            icon = Asset.relative("assets/icons/map.svg"),
             asset = Asset.webview("images/map.png"),
             assetNight = Asset.webview("images/map-night.png")
         )
@@ -80,7 +80,7 @@ fun MutableList<MaiDataItem>.campusData() {
             type = MaiDataItemType.Web,
             name = "Столовые и буфеты",
             category = "Студгородок",
-            icon = Asset.relative("/assets/icons/coffee.svg"),
+            icon = Asset.relative("assets/icons/coffee.svg"),
             asset = Asset.webview("markup/cafeterias.html")
         )
     )
@@ -89,7 +89,7 @@ fun MutableList<MaiDataItem>.campusData() {
             type = MaiDataItemType.Web,
             name = "Библиотеки",
             category = "Студгородок",
-            icon = Asset.relative("/assets/icons/book-open.svg"),
+            icon = Asset.relative("assets/icons/book-open.svg"),
             asset = Asset.webview("markup/libraries.html")
         )
     )
@@ -101,7 +101,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             type = MaiDataItemType.Web,
             name = "Спортивные секции",
             category = "Жизнь",
-            icon = Asset.relative("/assets/icons/biking-solid.svg"),
+            icon = Asset.relative("assets/icons/biking-solid.svg"),
             asset = Asset.webview("markup/sport_sections.html")
         )
     )
@@ -111,7 +111,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             type = MaiDataItemType.Web,
             name = "Маёвский словарик",
             category = "Жизнь",
-            icon = Asset.relative("/assets/icons/book-solid.svg"),
+            icon = Asset.relative("assets/icons/book-solid.svg"),
             asset = Asset.webview("markup/exlers_dictionary.html")
         )
     )
@@ -121,7 +121,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             type = MaiDataItemType.Web,
             name = "Творческие коллективы",
             category = "Жизнь",
-            icon = Asset.relative("/assets/icons/palette.svg"),
+            icon = Asset.relative("assets/icons/palette.svg"),
             asset = Asset.webview("markup/creative_teams.html")
         )
     )
@@ -131,7 +131,7 @@ fun MutableList<MaiDataItem>.lifestyleData() {
             type = MaiDataItemType.Web,
             name = "Студенческие организации",
             category = "Жизнь",
-            icon = Asset.relative("/assets/icons/user-friends.svg"),
+            icon = Asset.relative("assets/icons/user-friends.svg"),
             asset = Asset.webview("markup/students_organizations.html")
         )
     )
