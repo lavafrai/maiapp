@@ -34,6 +34,10 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://jitpack.io")
         maven("https://jogamp.org/deployment/maven")
+        maven("https://oss.sonatype.org/content/repositories/snapshots") {
+            name = "SonatypeSnapshots"
+            mavenContent { snapshotsOnly() }
+        }
     }
 }
 include(":models")

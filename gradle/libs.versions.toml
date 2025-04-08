@@ -30,6 +30,7 @@ composeIcons = "1.1.1"
 buildconfig = "5.5.0"
 richeditorCompose = "1.0.0-rc10"
 sonner = "0.3.8"
+urlencoderLib = "1.6.0"
 windowSize = "0.5.0"
 material-motion = "2.0.1"
 uiAndroid = "1.7.8"
@@ -99,6 +100,7 @@ composeIcons-featherIcons = { module = "br.com.devsrsouza.compose.icons:feather"
 composeIcons-lineAwesomeIcons = { module = "br.com.devsrsouza.compose.icons:line-awesome", version.ref = "composeIcons" }
 richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditorCompose" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
+urlencoder-lib = { module = "net.thauvin.erik.urlencoder:urlencoder-lib", version.ref = "urlencoderLib" }
 windowSize = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "windowSize" }
 material-motion = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "material-motion" }
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }

@@ -124,6 +124,7 @@ kotlin {
             //implementation(libs.zoomimage.view.coil3)
             implementation(libs.zoomimage.view.core)
             implementation(libs.zoomimage.view.res)
+            implementation(libs.urlencoder.lib)
         }
 
         androidMain.dependencies {
