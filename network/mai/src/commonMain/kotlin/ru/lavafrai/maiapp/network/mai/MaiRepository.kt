@@ -31,7 +31,7 @@ class MaiRepository(
         .filter { it.name != "Для внеучебных мероприятий (служебная)" }
 
     suspend fun getGroupSchedule(group: GroupName) = httpClient
-        .get("https://public.mai.ru/schedule/data/${md5(group.name.uppercase())}.json")
+        .get("https://public.mai.ru/schedule/data/${md5(group.name)}.json")
         .apply { if (this.status == HttpStatusCode.NotFound) throw NotFoundException("Failed to get schedule($group): Not found") }
         .bodyAsText()
         .parseRawSchedule()
