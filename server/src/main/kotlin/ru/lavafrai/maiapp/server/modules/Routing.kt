@@ -17,5 +17,6 @@ fun Application.configureRouting(
         schedule(maiRepository)
         teachers(maiRepository)
         exler(exlerRepository)
+        privacy()
     }
 }
