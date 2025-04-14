@@ -15,13 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import maiapp.composeapp.generated.resources.*
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.ic_award
-import maiapp.composeapp.generated.resources.ic_info
-import maiapp.composeapp.generated.resources.ic_info_filled
-import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
-import ru.lavafrai.maiapp.LibRes
 import ru.lavafrai.maiapp.fragments.AnimatedIcon
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.materialSharedAxisX
@@ -99,7 +93,7 @@ fun MainPageNavigation(
                 mainNavigationItems.forEachIndexed { index, item ->
                     NavigationRailItem(
                         icon = { item.icon(selectedItem.id == item.id) },
-                        label = item.title,
+                        // label = item.title,
                         onClick = { setPage(mainNavigationItems[index].id) },
                         selected = selectedItem.id == item.id,
                     )
