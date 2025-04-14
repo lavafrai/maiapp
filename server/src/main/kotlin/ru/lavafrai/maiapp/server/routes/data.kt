@@ -18,7 +18,7 @@ fun Route.data() {
         val manifest = MaiDataManifest(
             version = 1,
             data = buildList {
-                testData()
+                // testData()
                 campusData()
                 teachersData()
                 lifestyleData()
