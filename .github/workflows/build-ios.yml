@@ -50,22 +50,26 @@ jobs:
           pod install --repo-update
 
       # --- Сборка Kotlin Multiplatform Framework (УДАЛЕНО) ---
-      # Шаги chmod +x gradlew и Build KMP Shared Framework for Xcode УДАЛЕНЫ
       # Xcode сам вызовет Gradle через Build Phases во время архивации
 
       # --- Настройка подписи кода ---
       - name: Import Apple Certificate
         uses: apple-actions/import-codesign-certs@v2
         with:
+          # Имя секрета для Base64 P12 файла (убедитесь, что оно правильное)
           p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
+          # Имя секрета для пароля от P12 файла
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          keychain-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # Имя секрета для пароля временной связки ключей (ОТДЕЛЬНЫЙ СЕКРЕТ!)
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
       - name: Import Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.APPLE_P12_KEYSTORE_B64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
+          # Декодируем профиль из переменной окружения, заданной ниже
+          echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
         env:
+          # Имя секрета для Base64 mobileprovision файла (убедитесь, что оно правильное)
           APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
 
       # --- Создание ExportOptions.plist ---
@@ -87,21 +91,22 @@ jobs:
               <key>uploadSymbols</key>
               <true/>
               <!-- При manual signing добавьте provisioningProfiles -->
+              <!-- Закомментировано, т.к. используется automatic signing -->
               <!--
               <key>provisioningProfiles</key>
               <dict>
-                  <key>ru.lavafrai.maiapp</key> <!-- Замените на ваш Bundle ID -->
-                  <string>Имя вашего Provisioning Profile</string>
+                  <key>ru.lavafrai.maiapp</key> <!-- Ваш Bundle ID -->
+                  <!-- <string>Имя вашего Provisioning Profile</string> --> <!-- Не нужно при automatic -->
               </dict>
               -->
           </dict>
           </plist>
           EOF
         env:
+          # Имя секрета для Team ID (убедитесь, что оно правильное)
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # --- Сборка Архива (.xcarchive) ---
-      # Теперь этот шаг также отвечает за запуск Gradle через Xcode Build Phases
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
