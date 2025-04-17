@@ -26,6 +26,7 @@ import com.multiplatform.webview.web.WebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewStateWithHTMLData
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.ArrowLeft
+import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.rootPages.main.MainPageTitle
@@ -85,14 +86,16 @@ fun WebViewPage(
             }
         }
 
+        val appContext = LocalApplicationContext.current
         val clipboard = LocalClipboardManager.current
         LaunchedEffect(jsBridge) {
+            jsBridge.register(MapJsMessageHandler())
             jsBridge.register(ClipboardJsMessageHandler {
                 clipboard.setText(buildAnnotatedString { append(it) })
             })
-        }
-        LaunchedEffect(jsBridge) {
-            jsBridge.register(MapJsMessageHandler())
+            jsBridge.register(UrlJsMessageHandler {
+                appContext.openUrl(it)
+            })
         }
 
         WebView(
@@ -132,6 +135,18 @@ class MapJsMessageHandler(): IJsMessageHandler {
     }
 
     override fun methodName() = "openMap"
+}
+
+class UrlJsMessageHandler(
+    private val open: (String) -> Unit,
+): IJsMessageHandler {
+    override fun handle(message: JsMessage, navigator: WebViewNavigator?, callback: (String) -> Unit) {
+        Logger.i("Url handler message: $message")
+        val param = message.params
+        open(param)
+    }
+
+    override fun methodName() = "openUrl"
 }
 
 @Composable
@@ -198,6 +213,9 @@ fun buildJsScripts(): String {
         }
         function openMap(text) {
             window.kmpJsBridge.callNative("openMap", text, function(data) {})
+        }
+        function openUrl(text) {
+            window.kmpJsBridge.callNative("openUrl", text, function(data) {})
         }
     """.trimIndent()
 

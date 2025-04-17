@@ -44,7 +44,7 @@ fun GreetingPage(
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Image(
-                    painter = painterResource(Res.drawable.mai_logo),
+                    painter = painterResource(Res.drawable.mai_logo_exler),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .fillMaxWidth(0.5f),
