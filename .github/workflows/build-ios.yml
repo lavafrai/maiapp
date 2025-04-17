@@ -1,40 +1,35 @@
 name: Build KMP iOS App (maiapp)
 
 on:
-  # Запускать при пуше в ветку master (или другую)
   push:
     branches: [ master ]
-  # Позволяет запускать вручную со страницы Actions в GitHub
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: macos-latest # Использовать последнюю доступную macOS
+    runs-on: macos-latest
 
     env:
-      # Переменные для удобства
       SCHEME_NAME: iosApp
       WORKSPACE_PATH: iosApp/iosApp.xcodeproj/project.xcworkspace
-      EXPORT_METHOD: app-store # Метод экспорта (app-store, ad-hoc, etc.)
-      OUTPUT_DIR_IOS: iosApp/actions # Директория для архива и IPA
+      EXPORT_METHOD: app-store
+      OUTPUT_DIR_IOS: iosApp/actions
       ARCHIVE_NAME: maiapp.xcarchive
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Общий шаг настройки сборки (Java, secrets.properties)
       - name: Setup common build environment
-        uses: ./.github/actions/common-build-setup # Путь к вашему composite action
+        uses: ./.github/actions/common-build-setup
         with:
           java-version: '17'
           secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
-      # --- Установка зависимостей iOS (CocoaPods) ---
       - name: Set up Ruby for CocoaPods
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0' # Укажите нужную версию Ruby
+          ruby-version: '3.0'
 
       - name: Cache CocoaPods dependencies
         uses: actions/cache@v4
@@ -49,67 +44,53 @@ jobs:
           cd iosApp
           pod install --repo-update
 
-      # --- Сборка Kotlin Multiplatform Framework (УДАЛЕНО) ---
-      # Xcode сам вызовет Gradle через Build Phases во время архивации
+      # --- НОВЫЙ ШАГ: Диагностика настроек сборки ---
+      - name: Show Resolved Build Settings for Release
+        run: |
+          echo "--- Dumping Resolved Build Settings for Release ---"
+          cd iosApp # Переходим в iosApp, чтобы пути к workspace/project были правильными
+          xcodebuild -workspace iosApp.xcodeproj/project.xcworkspace \
+                     -scheme iosApp \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -showBuildSettings \
+                     | grep "CODE_SIGN\|PROVISIONING_PROFILE"
+          echo "--- End of Build Settings Dump ---"
+        # Мы ищем строки, содержащие CODE_SIGN или PROVISIONING_PROFILE
 
       # --- Настройка подписи кода ---
       - name: Import Apple Certificate
         uses: apple-actions/import-codesign-certs@v2
         with:
-          # Имя секрета для Base64 P12 файла (убедитесь, что оно правильное)
           p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
-          # Имя секрета для пароля от P12 файла
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          # Имя секрета для пароля временной связки ключей (ОТДЕЛЬНЫЙ СЕКРЕТ!)
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
       - name: Import Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          # Декодируем профиль из переменной окружения, заданной ниже
           echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
         env:
-          # Имя секрета для Base64 mobileprovision файла (убедитесь, что оно правильное)
           APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
+
+      # --- НОВЫЙ ШАГ: Проверка установленных профилей ---
+      - name: List Installed Provisioning Profiles
+        run: |
+          echo "--- Listing Installed Provisioning Profiles ---"
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "--- End of Profile Listing ---"
 
       # --- Создание ExportOptions.plist ---
       - name: Create ExportOptions.plist
-        run: |
-          cat << EOF > ExportOptions.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>${{ env.EXPORT_METHOD }}</string>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>uploadBitcode</key>
-              <true/>
-              <key>uploadSymbols</key>
-              <true/>
-              <!-- При manual signing добавьте provisioningProfiles -->
-              <!-- Закомментировано, т.к. используется automatic signing -->
-              <!--
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>maiapp</key> <!-- Ваш Bundle ID -->
-                  <!-- <string>Имя вашего Provisioning Profile</string> --> <!-- Не нужно при automatic -->
-              </dict>
-              -->
-          </dict>
-          </plist>
-          EOF
+        # ... (код без изменений) ...
         env:
-          # Имя секрета для Team ID (убедитесь, что оно правильное)
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # --- Сборка Архива (.xcarchive) ---
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
+          # Запускаем из корня, как и раньше
           xcodebuild archive \
             -workspace "${{ env.WORKSPACE_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
