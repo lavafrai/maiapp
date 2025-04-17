@@ -48,7 +48,8 @@ jobs:
       - name: Show Resolved Build Settings for Release
         run: |
           echo "--- Dumping Resolved Build Settings for Release ---"
-          cd iosApp # Переходим в iosApp, чтобы пути к workspace/project были правильными
+          # Переходим в iosApp, чтобы пути к workspace/project были правильными
+          cd iosApp
           xcodebuild -workspace iosApp.xcodeproj/project.xcworkspace \
                      -scheme iosApp \
                      -sdk iphoneos \
@@ -56,7 +57,6 @@ jobs:
                      -showBuildSettings \
                      | grep "CODE_SIGN\|PROVISIONING_PROFILE"
           echo "--- End of Build Settings Dump ---"
-        # Мы ищем строки, содержащие CODE_SIGN или PROVISIONING_PROFILE
 
       # --- Настройка подписи кода ---
       - name: Import Apple Certificate
@@ -82,7 +82,25 @@ jobs:
 
       # --- Создание ExportOptions.plist ---
       - name: Create ExportOptions.plist
-        # ... (код без изменений) ...
+        run: |
+          cat << EOF > ExportOptions.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>${{ env.EXPORT_METHOD }}</string>
+              <key>teamID</key>
+              <string>${{ secrets.APPLE_TEAM_ID }}</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>uploadBitcode</key>
+              <true/>
+              <key>uploadSymbols</key>
+              <true/>
+          </dict>
+          </plist>
+          EOF
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
@@ -90,7 +108,6 @@ jobs:
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
-          # Запускаем из корня, как и раньше
           xcodebuild archive \
             -workspace "${{ env.WORKSPACE_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
@@ -110,6 +127,6 @@ jobs:
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-app-${{ github.run_number }} # Название артефакта
+          name: ios-app-${{ github.run_number }}
           path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.SCHEME_NAME }}.ipa
-          retention-days: 7 # Хранить артефакт 7 дней
+          retention-days: 7
