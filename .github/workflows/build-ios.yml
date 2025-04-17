@@ -108,12 +108,16 @@ jobs:
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
+          # !! ЯВНО УКАЗЫВАЕМ ПРАВИЛЬНУЮ ИДЕНТИЧНОСТЬ ПОДПИСИ ДЛЯ RELEASE !!
+          # И сбрасываем specifier профиля, чтобы Xcode искал автоматически
           xcodebuild archive \
             -workspace "${{ env.WORKSPACE_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}"
+            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="" # Указываем пустое значение для поиска профиля по ID/типу
 
       # --- Экспорт IPA (.ipa) ---
       - name: Export IPA
