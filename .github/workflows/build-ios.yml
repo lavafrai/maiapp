@@ -44,18 +44,19 @@ jobs:
           cd iosApp
           pod install --repo-update
 
-      # --- НОВЫЙ ШАГ: Диагностика настроек сборки ---
+      # --- Диагностика настроек сборки (расширено) ---
       - name: Show Resolved Build Settings for Release
         run: |
           echo "--- Dumping Resolved Build Settings for Release ---"
           # Переходим в iosApp, чтобы пути к workspace/project были правильными
           cd iosApp
+          # Добавлено FRAMEWORK_SEARCH_PATHS в grep
           xcodebuild -workspace iosApp.xcodeproj/project.xcworkspace \
                      -scheme iosApp \
                      -sdk iphoneos \
                      -configuration Release \
                      -showBuildSettings \
-                     | grep "CODE_SIGN\|PROVISIONING_PROFILE"
+                     | grep -E "CODE_SIGN\|PROVISIONING_PROFILE\|FRAMEWORK_SEARCH_PATHS"
           echo "--- End of Build Settings Dump ---"
 
       # --- Настройка подписи кода ---
@@ -73,7 +74,7 @@ jobs:
         env:
           APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
 
-      # --- НОВЫЙ ШАГ: Проверка установленных профилей ---
+      # --- Проверка установленных профилей ---
       - name: List Installed Provisioning Profiles
         run: |
           echo "--- Listing Installed Provisioning Profiles ---"
@@ -93,7 +94,15 @@ jobs:
               <key>teamID</key>
               <string>${{ secrets.APPLE_TEAM_ID }}</string>
               <key>signingStyle</key>
-              <string>automatic</string>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>ru.lavafrai.maiapp</key> <!-- Ваш Bundle ID -->
+                  # ↓↓↓ ВОТ ЗДЕСЬ ↓↓↓
+                  <string>maiapp-dist</string> <!-- Заменено на имя из Xcode -->
+              </dict>
+              <key>signingCertificate</key>
+              <string>Apple Distribution</string>
               <key>uploadBitcode</key>
               <true/>
               <key>uploadSymbols</key>
@@ -103,11 +112,20 @@ jobs:
           EOF
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # !! ВАЖНО: Замените "ВАШЕ_ТОЧНОЕ_ИМЯ_PROVISIONING_PROFILE" в скрипте выше
+          # на точное имя вашего Distribution профиля, которое вы указали в настройках Xcode
 
       # --- Сборка Архива (.xcarchive) ---
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
+          # !! ДОБАВЛЕН ШАГ ОЧИСТКИ ПЕРЕД АРХИВАЦИЕЙ !!
+          echo "--- Cleaning Xcode Build Folder ---"
+          xcodebuild clean \
+            -workspace "${{ env.WORKSPACE_PATH }}" \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -configuration Release
+          echo "--- Starting Archive ---"
           # Используем ручную подпись, настроенную в проекте Xcode
           # Явно указываем Team ID
           xcodebuild archive \
@@ -121,6 +139,12 @@ jobs:
       # --- Экспорт IPA (.ipa) ---
       - name: Export IPA
         run: |
+          # Проверяем существование ExportOptions.plist перед экспортом
+          if [ ! -f ExportOptions.plist ]; then
+            echo "ExportOptions.plist not found!"
+            exit 1
+          fi
+          echo "--- Starting IPA Export ---"
           xcodebuild -exportArchive \
             -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
             -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
