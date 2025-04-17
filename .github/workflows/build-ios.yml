@@ -57,9 +57,9 @@ jobs:
       - name: Import Apple Certificate
         uses: apple-actions/import-codesign-certs@v2
         with:
-          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+          keychain-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Import Provisioning Profile
         run: |
