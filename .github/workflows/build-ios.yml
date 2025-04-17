@@ -95,7 +95,7 @@ jobs:
               <!--
               <key>provisioningProfiles</key>
               <dict>
-                  <key>ru.lavafrai.maiapp</key> <!-- Ваш Bundle ID -->
+                  <key>maiapp</key> <!-- Ваш Bundle ID -->
                   <!-- <string>Имя вашего Provisioning Profile</string> --> <!-- Не нужно при automatic -->
               </dict>
               -->
