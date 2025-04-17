@@ -1,7 +1,7 @@
 name: Build KMP iOS App (maiapp)
 
 on:
-  # Запускать при пуше в ветку main (или другую)
+  # Запускать при пуше в ветку master (или другую)
   push:
     branches: [ master ]
   # Позволяет запускать вручную со страницы Actions в GitHub
@@ -9,24 +9,23 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest # Или macos-latest
+    runs-on: macos-latest # Использовать последнюю доступную macOS
 
     env:
-      # Переменные для удобства (проверьте и замените, если нужно)
+      # Переменные для удобства
       SCHEME_NAME: iosApp
-      # !! ВАЖНО: Путь к workspace согласно вашему tree.txt
       WORKSPACE_PATH: iosApp/iosApp.xcodeproj/project.xcworkspace
-      EXPORT_METHOD: app-store # Или ad-hoc, development, enterprise
-      # !! ВАЖНО: Проверьте точное имя Gradle задачи для сборки iOS Framework!
-      # Часто это :composeApp:embedAndSignAppleFrameworkForXcode или :shared:packForXcode
-      KMP_FRAMEWORK_BUILD_TASK: ':composeApp:embedAndSignAppleFrameworkForXcode'
-      # Директория для вывода архива и IPA внутри iosApp
-      OUTPUT_DIR_IOS: iosApp/actions
+      EXPORT_METHOD: app-store # Метод экспорта (app-store, ad-hoc, etc.)
+      OUTPUT_DIR_IOS: iosApp/actions # Директория для архива и IPA
       ARCHIVE_NAME: maiapp.xcarchive
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/common-build-setup
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Общий шаг настройки сборки (Java, secrets.properties)
+      - name: Setup common build environment
+        uses: ./.github/actions/common-build-setup # Путь к вашему composite action
         with:
           java-version: '17'
           secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
@@ -35,38 +34,24 @@ jobs:
       - name: Set up Ruby for CocoaPods
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0' # Или версия, совместимая с вашими инструментами/Gemfile
-          # bundler-cache: true # Раскомментируйте, если используете Gemfile/Bundler для управления версией CocoaPods
+          ruby-version: '3.0' # Укажите нужную версию Ruby
 
       - name: Cache CocoaPods dependencies
         uses: actions/cache@v4
         with:
-          # Путь к директории Pods внутри iosApp
           path: iosApp/Pods
-          # Ключ кеша на основе lock-файла Podfile
           key: ${{ runner.os }}-pods-${{ hashFiles('iosApp/Podfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pods-
 
       - name: Install CocoaPods dependencies
         run: |
-          cd iosApp # Переходим в директорию iOS приложения
-          # Установите bundler, если используете его (раскомментируйте bundler-cache выше)
-          # bundle install
-          # Запуск pod install (можно через bundle exec если используете Bundler)
-          pod install --repo-update # Или просто pod install, если repo-update не нужен или кешируете репозиторий подов отдельно
+          cd iosApp
+          pod install --repo-update
 
-      # --- Сборка Kotlin Multiplatform Framework ---
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build KMP Shared Framework for Xcode
-        uses: gradle/actions/setup-gradle@v3 # Использует Gradle Tooling API, кеширование встроено
-        with:
-          # Передаем имя задачи как аргумент
-          arguments: ${{ env.KMP_FRAMEWORK_BUILD_TASK }}
-        # Если setup-gradle не сработает, можно вернуться к ручному запуску:
-        # run: ./gradlew $KMP_FRAMEWORK_BUILD_TASK
+      # --- Сборка Kotlin Multiplatform Framework (УДАЛЕНО) ---
+      # Шаги chmod +x gradlew и Build KMP Shared Framework for Xcode УДАЛЕНЫ
+      # Xcode сам вызовет Gradle через Build Phases во время архивации
 
       # --- Настройка подписи кода ---
       - name: Import Apple Certificate
@@ -74,19 +59,18 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }} # Используется для временной связки
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
       - name: Import Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision" # Имя файла не критично, но можно сделать его уникальным
+          echo "${{ secrets.APPLE_P12_KEYSTORE_B64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
         env:
-          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
 
       # --- Создание ExportOptions.plist ---
       - name: Create ExportOptions.plist
         run: |
-          # Создаем файл в корне репозитория
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -106,7 +90,7 @@ jobs:
               <!--
               <key>provisioningProfiles</key>
               <dict>
-                  <key>ВАШ_BUNDLE_ID</key> <!-- Замените на ваш Bundle ID -->
+                  <key>ru.lavafrai.maiapp</key> <!-- Замените на ваш Bundle ID -->
                   <string>Имя вашего Provisioning Profile</string>
               </dict>
               -->
@@ -117,34 +101,29 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # --- Сборка Архива (.xcarchive) ---
+      # Теперь этот шаг также отвечает за запуск Gradle через Xcode Build Phases
       - name: Build Xcode Archive
         run: |
-          # Создаем директорию для вывода, если ее нет
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
-          # Запускаем xcodebuild из корня проекта
           xcodebuild archive \
             -workspace "${{ env.WORKSPACE_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            # Можно добавить CODE_SIGNING_ALLOWED=YES, если возникают проблемы с автоподписью
-            # DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" # Обычно не нужно при automatic signingStyle в ExportOptions
+            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}"
 
       # --- Экспорт IPA (.ipa) ---
       - name: Export IPA
         run: |
-          # Запускаем экспорт из корня проекта
           xcodebuild -exportArchive \
             -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
             -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
-            -exportOptionsPlist ExportOptions.plist # Файл лежит в корне
+            -exportOptionsPlist ExportOptions.plist
 
       # --- Загрузка артефакта ---
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-app-${{ github.run_number }} # Название артефакта
-          # Путь к файлу IPA (xcodebuild создает его в exportPath с именем схемы)
           path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.SCHEME_NAME }}.ipa
-          retention-days: 7 # Сколько дней хранить артефакт
+          retention-days: 7 # Хранить артефакт 7 дней
