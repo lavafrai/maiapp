@@ -3,7 +3,7 @@ name: Build KMP iOS App (maiapp)
 on:
   # Запускать при пуше в ветку main (или другую)
   push:
-    branches: [ main ]
+    branches: [ master ]
   # Позволяет запускать вручную со страницы Actions в GitHub
   workflow_dispatch:
 
