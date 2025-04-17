@@ -25,14 +25,11 @@ jobs:
       ARCHIVE_NAME: maiapp.xcarchive
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17 # Укажите нужную вам версию JDK
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/common-build-setup
         with:
-          distribution: 'temurin'
           java-version: '17'
+          secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
       # --- Установка зависимостей iOS (CocoaPods) ---
       - name: Set up Ruby for CocoaPods
