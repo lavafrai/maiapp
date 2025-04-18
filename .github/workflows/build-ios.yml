@@ -44,20 +44,17 @@ jobs:
           cd iosApp
           pod install --repo-update
 
-      # --- Диагностика настроек сборки (расширено) ---
+      # --- Диагностика настроек сборки (Показываем ВСЕ настройки) ---
       - name: Show Resolved Build Settings for Release
         run: |
-          echo "--- Dumping Resolved Build Settings for Release ---"
-          # Переходим в iosApp, чтобы пути к workspace/project были правильными
+          echo "--- Dumping ALL Resolved Build Settings for Release ---"
           cd iosApp
-          # Добавлено FRAMEWORK_SEARCH_PATHS в grep
           xcodebuild -workspace iosApp.xcodeproj/project.xcworkspace \
                      -scheme iosApp \
                      -sdk iphoneos \
                      -configuration Release \
-                     -showBuildSettings \
-                     | grep -E "CODE_SIGN\|PROVISIONING_PROFILE\|FRAMEWORK_SEARCH_PATHS"
-          echo "--- End of Build Settings Dump ---"
+                     -showBuildSettings
+          echo "--- End of ALL Build Settings Dump ---"
 
       # --- Настройка подписи кода ---
       - name: Import Apple Certificate
