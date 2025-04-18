@@ -1,70 +1,57 @@
 name: Build KMP iOS App (maiapp)
 
 on:
-  # Запускать при пуше в ветку master (или другую)
   push:
-    branches: [ master ]
-  # Позволяет запускать вручную со страницы Actions в GitHub
+    branches: [ "master" ]
+    paths:
+      - '.github/workflows/build-ios.yml'
   workflow_dispatch:
 
 jobs:
   build:
-    # Используем последнюю доступную macOS
     runs-on: macos-latest
 
     env:
-      # Переменные для удобства
       SCHEME_NAME: iosApp
-      PROJECT_PATH: iosApp/iosApp.xcodeproj # Используем .xcodeproj
-      EXPORT_METHOD: app-store # Метод экспорта (app-store, ad-hoc, etc.)
-      OUTPUT_DIR_IOS: iosApp/actions # Директория для архива и IPA
+      PROJECT_PATH: iosApp/iosApp.xcodeproj
+      EXPORT_METHOD: app-store-connect
+      OUTPUT_DIR_IOS: iosApp/actions
       ARCHIVE_NAME: maiapp.xcarchive
+      PRODUCT_NAME: maiapp
 
     steps:
-      # 1. Получение кода из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Общий шаг настройки сборки (Java, secrets.properties)
-      #    (Предполагается, что этот Action настраивает JDK и Gradle)
       - name: Setup common build environment
         uses: ./.github/actions/common-build-setup
         with:
           java-version: '17'
           secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
-      # 3. Настройка подписи кода (Сертификат)
       - name: Import Apple Certificate
         uses: apple-actions/import-codesign-certs@v2
         with:
-          # Имя секрета для Base64 P12 файла
           p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
-          # Имя секрета для пароля от P12 файла
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          # Имя секрета для пароля временной связки ключей
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
-      # 4. Настройка подписи кода (Профиль подписи)
       - name: Import Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
         env:
-          # Имя секрета для Base64 mobileprovision файла
           APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
 
-      # --- Создание ExportOptions.plist ---
       - name: Create ExportOptions.plist
         run: |
-          # Используем РУЧНУЮ подпись при экспорте, как и в проекте
-          # Убедитесь, что имя профиля ниже ТОЧНОЕ
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
               <key>method</key>
-              <string>app-store-connect</string>
+              <string>${{ env.EXPORT_METHOD }}</string>
               <key>teamID</key>
               <string>${{ secrets.APPLE_TEAM_ID }}</string>
               <key>signingStyle</key>
@@ -72,7 +59,7 @@ jobs:
               <key>provisioningProfiles</key>
               <dict>
                   <key>ru.lavafrai.maiapp</key>
-                  <string>maiapp-dist</string>
+                  <string>maiapp-dist</string> <!-- Убедитесь, что это точное имя вашего App Store профиля -->
               </dict>
               <key>signingCertificate</key>
               <string>Apple Distribution</string>
@@ -86,48 +73,31 @@ jobs:
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
-      # 6. Сборка Архива Xcode (.xcarchive)
-      #    Xcode сам вызовет Gradle через Build Phases
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
-          # Очистка перед сборкой
-          echo "--- Cleaning Xcode Build Folder ---"
           xcodebuild clean \
             -project "${{ env.PROJECT_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -configuration Release
-          # Запуск архивации
-          echo "--- Starting Archive ---"
           xcodebuild archive \
             -project "${{ env.PROJECT_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -sdk iphoneos \
             -configuration Release \
             -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            # Можно добавить DEVELOPMENT_TEAM, если автоматическая подпись в Xcode не находит команду
-            # DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" # Важно для ручной подписи и SPM
 
-      # 7. Экспорт файла IPA (.ipa) из архива
       - name: Export IPA
         run: |
-          if [ ! -f ExportOptions.plist ]; then
-            echo "ExportOptions.plist not found!"
-            exit 1
-          fi
-          echo "--- Starting IPA Export ---"
           xcodebuild -exportArchive \
             -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
             -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
             -exportOptionsPlist ExportOptions.plist
 
-      # --- Загрузка артефакта ---
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          # Название артефакта остается прежним
-          name: ios-app-${{ github.run_number }}
-          # ↓↓↓ ИЗМЕНЕН ПУТЬ К ФАЙЛУ IPA (используем имя продукта 'maiapp') ↓↓↓
-          path: ${{ env.OUTPUT_DIR_IOS }}/maiapp.ipa
-          # Хранить артефакт 7 дней
+          name: ios-artifact
+          path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
           retention-days: 7
