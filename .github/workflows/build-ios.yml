@@ -96,7 +96,7 @@ jobs:
             -exportOptionsPlist ExportOptions.plist
 
       - name: Upload to App Store Connect (TestFlight)
-        uses: apple-actions/upload-testflight-build@v3
+        uses: Apple-Actions/upload-testflight-build@v3.0.0
         with:
           app-path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
           app-type: ${{ env.APP_TYPE }}
