@@ -121,13 +121,13 @@ jobs:
             -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
             -exportOptionsPlist ExportOptions.plist
 
-      # 8. Загрузка собранного IPA как артефакта сборки
+      # --- Загрузка артефакта ---
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          # Название артефакта в GitHub Actions
+          # Название артефакта остается прежним
           name: ios-app-${{ github.run_number }}
-          # Путь к файлу IPA (xcodebuild создает его в exportPath с именем схемы)
-          path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.SCHEME_NAME }}.ipa
-          # Сколько дней хранить артефакт
+          # ↓↓↓ ИЗМЕНЕН ПУТЬ К ФАЙЛУ IPA (используем имя продукта 'maiapp') ↓↓↓
+          path: ${{ env.OUTPUT_DIR_IOS }}/maiapp.ipa
+          # Хранить артефакт 7 дней
           retention-days: 7
