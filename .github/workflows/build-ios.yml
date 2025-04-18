@@ -101,7 +101,7 @@ jobs:
           app-path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
           app-type: ${{ env.APP_TYPE }}
           api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          api-issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
 
       - name: Upload IPA Artifact
