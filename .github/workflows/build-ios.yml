@@ -81,6 +81,7 @@ jobs:
       # --- Создание ExportOptions.plist ---
       - name: Create ExportOptions.plist
         run: |
+          # Создаем ExportOptions.plist для автоматической подписи
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -91,15 +92,7 @@ jobs:
               <key>teamID</key>
               <string>${{ secrets.APPLE_TEAM_ID }}</string>
               <key>signingStyle</key>
-              <string>manual</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>ru.lavafrai.maiapp</key> <!-- Ваш Bundle ID -->
-                  # ↓↓↓ ВОТ ЗДЕСЬ ↓↓↓
-                  <string>maiapp-dist</string> <!-- Заменено на имя из Xcode -->
-              </dict>
-              <key>signingCertificate</key>
-              <string>Apple Distribution</string>
+              <string>automatic</string>
               <key>uploadBitcode</key>
               <true/>
               <key>uploadSymbols</key>
@@ -109,8 +102,6 @@ jobs:
           EOF
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # !! ВАЖНО: Замените "ВАШЕ_ТОЧНОЕ_ИМЯ_PROVISIONING_PROFILE" в скрипте выше
-          # на точное имя вашего Distribution профиля, которое вы указали в настройках Xcode
 
       # --- Сборка Архива (.xcarchive) ---
       - name: Build Xcode Archive
