@@ -53,10 +53,9 @@ jobs:
           # Имя секрета для Base64 mobileprovision файла
           APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
 
-      # 5. Создание файла ExportOptions.plist для экспорта IPA
+      # --- Создание ExportOptions.plist ---
       - name: Create ExportOptions.plist
         run: |
-          # Используем автоматическую подпись при экспорте
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -69,14 +68,13 @@ jobs:
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
-              <true/>
+              <false/>
               <key>uploadSymbols</key>
               <true/>
           </dict>
           </plist>
           EOF
         env:
-          # Имя секрета для Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       # 6. Сборка Архива Xcode (.xcarchive)
