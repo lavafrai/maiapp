@@ -95,6 +95,15 @@ jobs:
             -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
             -exportOptionsPlist ExportOptions.plist
 
+      - name: Upload to App Store Connect (TestFlight)
+        uses: apple-actions/upload-app-to-app-store@v2
+        with:
+          app-path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
+          app-type: ${{ env.APP_TYPE }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          api-issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
