@@ -99,7 +99,6 @@ jobs:
         uses: Apple-Actions/upload-testflight-build@v3.0.0
         with:
           app-path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
-          app-type: ${{ env.APP_TYPE }}
           api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
