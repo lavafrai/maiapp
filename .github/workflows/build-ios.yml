@@ -1,72 +1,62 @@
 name: Build KMP iOS App (maiapp)
 
 on:
+  # Запускать при пуше в ветку master (или другую)
   push:
     branches: [ master ]
+  # Позволяет запускать вручную со страницы Actions в GitHub
   workflow_dispatch:
 
 jobs:
   build:
+    # Используем последнюю доступную macOS
     runs-on: macos-latest
 
     env:
+      # Переменные для удобства
       SCHEME_NAME: iosApp
-      # !! Используем PROJECT_PATH вместо WORKSPACE_PATH !!
-      PROJECT_PATH: iosApp/iosApp.xcodeproj
-      EXPORT_METHOD: app-store
-      OUTPUT_DIR_IOS: iosApp/actions
+      PROJECT_PATH: iosApp/iosApp.xcodeproj # Используем .xcodeproj
+      EXPORT_METHOD: app-store # Метод экспорта (app-store, ad-hoc, etc.)
+      OUTPUT_DIR_IOS: iosApp/actions # Директория для архива и IPA
       ARCHIVE_NAME: maiapp.xcarchive
 
     steps:
+      # 1. Получение кода из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. Общий шаг настройки сборки (Java, secrets.properties)
+      #    (Предполагается, что этот Action настраивает JDK и Gradle)
       - name: Setup common build environment
         uses: ./.github/actions/common-build-setup
         with:
           java-version: '17'
           secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
-      # !!! ШАГИ ДЛЯ COCOAPODS УДАЛЕНЫ !!!
-
-      # --- Диагностика (опционально, можно пока закомментировать) ---
-      # - name: Show Resolved Build Settings for Release
-      #   run: |
-      #     echo "--- Dumping ALL Resolved Build Settings for Release ---"
-      #     # Используем -project
-      #     xcodebuild -project "${{ env.PROJECT_PATH }}" \
-      #                -scheme "${{ env.SCHEME_NAME }}" \
-      #                -sdk iphoneos \
-      #                -configuration Release \
-      #                -showBuildSettings
-      #     echo "--- End of ALL Build Settings Dump ---"
-
-      # --- Настройка подписи кода ---
+      # 3. Настройка подписи кода (Сертификат)
       - name: Import Apple Certificate
         uses: apple-actions/import-codesign-certs@v2
         with:
+          # Имя секрета для Base64 P12 файла
           p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
+          # Имя секрета для пароля от P12 файла
           p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          # Имя секрета для пароля временной связки ключей
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
+      # 4. Настройка подписи кода (Профиль подписи)
       - name: Import Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
         env:
+          # Имя секрета для Base64 mobileprovision файла
           APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
 
-      # --- Проверка установленных профилей ---
-      - name: List Installed Provisioning Profiles
-        run: |
-          echo "--- Listing Installed Provisioning Profiles ---"
-          ls -la ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "--- End of Profile Listing ---"
-
-      # --- Создание ExportOptions.plist ---
+      # 5. Создание файла ExportOptions.plist для экспорта IPA
       - name: Create ExportOptions.plist
         run: |
-          # Создаем ExportOptions.plist для автоматической подписи
+          # Используем автоматическую подпись при экспорте
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -76,8 +66,6 @@ jobs:
               <string>${{ env.EXPORT_METHOD }}</string>
               <key>teamID</key>
               <string>${{ secrets.APPLE_TEAM_ID }}</string>
-              # !! Возвращаем automatic, т.к. нет конфликтов от Pods !!
-              # !! И убираем manual-секции !!
               <key>signingStyle</key>
               <string>automatic</string>
               <key>uploadBitcode</key>
@@ -88,29 +76,32 @@ jobs:
           </plist>
           EOF
         env:
+          # Имя секрета для Team ID
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
-      # --- Сборка Архива (.xcarchive) ---
+      # 6. Сборка Архива Xcode (.xcarchive)
+      #    Xcode сам вызовет Gradle через Build Phases
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
+          # Очистка перед сборкой
           echo "--- Cleaning Xcode Build Folder ---"
-          # Используем -project
           xcodebuild clean \
             -project "${{ env.PROJECT_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -configuration Release
+          # Запуск архивации
           echo "--- Starting Archive ---"
-          # Используем -project. Убрали DEVELOPMENT_TEAM, т.к. automatic signing
-          # Настройки подписи теперь должны браться из .xcodeproj без конфликтов
           xcodebuild archive \
             -project "${{ env.PROJECT_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}"
+            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
+            # Можно добавить DEVELOPMENT_TEAM, если автоматическая подпись в Xcode не находит команду
+            # DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
 
-      # --- Экспорт IPA (.ipa) ---
+      # 7. Экспорт файла IPA (.ipa) из архива
       - name: Export IPA
         run: |
           if [ ! -f ExportOptions.plist ]; then
@@ -123,10 +114,13 @@ jobs:
             -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
             -exportOptionsPlist ExportOptions.plist
 
-      # --- Загрузка артефакта ---
+      # 8. Загрузка собранного IPA как артефакта сборки
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
+          # Название артефакта в GitHub Actions
           name: ios-app-${{ github.run_number }}
+          # Путь к файлу IPA (xcodebuild создает его в exportPath с именем схемы)
           path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.SCHEME_NAME }}.ipa
+          # Сколько дней хранить артефакт
           retention-days: 7
