@@ -86,7 +86,7 @@ jobs:
             -sdk iphoneos \
             -configuration Release \
             -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" # Важно для ручной подписи и SPM
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
 
       - name: Export IPA
         run: |
