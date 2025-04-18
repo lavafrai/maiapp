@@ -11,7 +11,8 @@ jobs:
 
     env:
       SCHEME_NAME: iosApp
-      WORKSPACE_PATH: iosApp/iosApp.xcodeproj/project.xcworkspace
+      # !! Используем PROJECT_PATH вместо WORKSPACE_PATH !!
+      PROJECT_PATH: iosApp/iosApp.xcodeproj
       EXPORT_METHOD: app-store
       OUTPUT_DIR_IOS: iosApp/actions
       ARCHIVE_NAME: maiapp.xcarchive
@@ -26,35 +27,19 @@ jobs:
           java-version: '17'
           secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
-      - name: Set up Ruby for CocoaPods
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
+      # !!! ШАГИ ДЛЯ COCOAPODS УДАЛЕНЫ !!!
 
-      - name: Cache CocoaPods dependencies
-        uses: actions/cache@v4
-        with:
-          path: iosApp/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('iosApp/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
-
-      - name: Install CocoaPods dependencies
-        run: |
-          cd iosApp
-          pod install --repo-update
-
-      # --- Диагностика настроек сборки (Показываем ВСЕ настройки) ---
-      - name: Show Resolved Build Settings for Release
-        run: |
-          echo "--- Dumping ALL Resolved Build Settings for Release ---"
-          cd iosApp
-          xcodebuild -workspace iosApp.xcodeproj/project.xcworkspace \
-                     -scheme iosApp \
-                     -sdk iphoneos \
-                     -configuration Release \
-                     -showBuildSettings
-          echo "--- End of ALL Build Settings Dump ---"
+      # --- Диагностика (опционально, можно пока закомментировать) ---
+      # - name: Show Resolved Build Settings for Release
+      #   run: |
+      #     echo "--- Dumping ALL Resolved Build Settings for Release ---"
+      #     # Используем -project
+      #     xcodebuild -project "${{ env.PROJECT_PATH }}" \
+      #                -scheme "${{ env.SCHEME_NAME }}" \
+      #                -sdk iphoneos \
+      #                -configuration Release \
+      #                -showBuildSettings
+      #     echo "--- End of ALL Build Settings Dump ---"
 
       # --- Настройка подписи кода ---
       - name: Import Apple Certificate
@@ -90,16 +75,10 @@ jobs:
               <string>${{ env.EXPORT_METHOD }}</string>
               <key>teamID</key>
               <string>${{ secrets.APPLE_TEAM_ID }}</string>
+              # !! Возвращаем automatic, т.к. нет конфликтов от Pods !!
+              # !! И убираем manual-секции !!
               <key>signingStyle</key>
-              <string>manual</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>ru.lavafrai.maiapp</key> <!-- Ваш Bundle ID -->
-                  # ↓↓↓ ВОТ ЗДЕСЬ ↓↓↓
-                  <string>maiapp-dist</string> <!-- Заменено на имя из Xcode -->
-              </dict>
-              <key>signingCertificate</key>
-              <string>Apple Distribution</string>
+              <string>automatic</string>
               <key>uploadBitcode</key>
               <true/>
               <key>uploadSymbols</key>
@@ -109,34 +88,30 @@ jobs:
           EOF
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          # !! ВАЖНО: Замените "ВАШЕ_ТОЧНОЕ_ИМЯ_PROVISIONING_PROFILE" в скрипте выше
-          # на точное имя вашего Distribution профиля, которое вы указали в настройках Xcode
 
       # --- Сборка Архива (.xcarchive) ---
       - name: Build Xcode Archive
         run: |
           mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
-          # !! ДОБАВЛЕН ШАГ ОЧИСТКИ ПЕРЕД АРХИВАЦИЕЙ !!
           echo "--- Cleaning Xcode Build Folder ---"
+          # Используем -project
           xcodebuild clean \
-            -workspace "${{ env.WORKSPACE_PATH }}" \
+            -project "${{ env.PROJECT_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -configuration Release
           echo "--- Starting Archive ---"
-          # Используем ручную подпись, настроенную в проекте Xcode
-          # Явно указываем Team ID
+          # Используем -project. Убрали DEVELOPMENT_TEAM, т.к. automatic signing
+          # Настройки подписи теперь должны браться из .xcodeproj без конфликтов
           xcodebuild archive \
-            -workspace "${{ env.WORKSPACE_PATH }}" \
+            -project "${{ env.PROJECT_PATH }}" \
             -scheme "${{ env.SCHEME_NAME }}" \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
+            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}"
 
       # --- Экспорт IPA (.ipa) ---
       - name: Export IPA
         run: |
-          # Проверяем существование ExportOptions.plist перед экспортом
           if [ ! -f ExportOptions.plist ]; then
             echo "ExportOptions.plist not found!"
             exit 1
