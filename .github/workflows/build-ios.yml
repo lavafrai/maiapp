@@ -86,7 +86,7 @@ jobs:
             -sdk iphoneos \
             -configuration Release \
             -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" # Важно для ручной подписи и SPM
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
 
       - name: Export IPA
         run: |
@@ -99,10 +99,9 @@ jobs:
         uses: Apple-Actions/upload-testflight-build@v3.0.0
         with:
           app-path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
-          app-type: ${{ env.APP_TYPE }}
           api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          api-issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
