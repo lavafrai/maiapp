@@ -30,6 +30,12 @@ jobs:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
+            - name: Print outputs
+              shell: bash
+              run: echo "All outputs are ${{ toJson(steps.init.outputs.formattedTime) }}"
+              env:
+                  CURRENT_TIME: ${{ join(steps.run_tests.outputs.*, '\n') }}
+
             - name: Decode keystore
               uses: akiojin/decode-base64-github-action@v1
               with:
