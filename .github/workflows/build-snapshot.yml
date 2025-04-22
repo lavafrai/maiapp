@@ -24,6 +24,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
+              id: init
               with:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
@@ -38,7 +39,7 @@ jobs:
               run: ./gradlew :composeApp:assemble
 
             - name: Rename APK
-              run: mv composeApp/build/outputs/apk/release/*.apk composeApp/build/outputs/apk/release/maiapp.apk
+              run: mv composeApp/build/outputs/apk/release/*.apk composeApp/build/outputs/apk/release/maiapp-${{ steps.init.outputs.current-time }}.apk
 
             - name: Upload Android artifact
               uses: actions/upload-artifact@v4
@@ -149,6 +150,9 @@ jobs:
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageMsi
+
+            - name: Rename MSI
+              run: mv composeApp\build\compose\binaries\main\msi\*.msi composeApp\build\compose\binaries\main\msi\maiapp-${{ steps.init.outputs.current-time }}.msi
 
             - name: Upload MSI artifact
               uses: actions/upload-artifact@v4
