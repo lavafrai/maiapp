@@ -41,6 +41,7 @@ runs:
               utcOffset: '+08:00'
 
         - name: Print outputs
+          shell: bash
           run: echo "All outputs are ${{ toJson(steps.set-time.outputs.*) }}"
           env:
               CURRENT_TIME: ${{ join(steps.run_tests.outputs.*, '\n') }}
