@@ -36,5 +36,5 @@ runs:
           id: set-time
           uses: josStorer/get-current-time@v2
           with:
-              format: 'yyyy-MM-dd-HH:mm:ss'
+              format: 'yyyyMMddHHmmss'
               utcOffset: '+08:00'
