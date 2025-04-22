@@ -32,7 +32,7 @@ jobs:
 
             - name: Print outputs
               shell: bash
-              run: echo "All outputs are ${{ toJson(steps.init.outputs.formattedTime) }}"
+              run: echo "All outputs are ${{ toJson(steps.init.outputs.*) }}"
               env:
                   CURRENT_TIME: ${{ join(steps.run_tests.outputs.*, '\n') }}
 
