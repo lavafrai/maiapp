@@ -13,8 +13,6 @@ outputs:
         description: 'The current time'
         value: ${{ steps.set-time.outputs.formattedTime }}
 
-env:
-    CURRENT_TIME: ${{ steps.set-time.outputs.formattedTime }}
 
 runs:
     using: "composite"
@@ -41,3 +39,5 @@ runs:
           with:
               format: 'yyyyMMddHHmmss'
               utcOffset: '+08:00'
+          env:
+              CURRENT_TIME: ${{ steps.set-time.outputs.formattedTime }}
