@@ -1,8 +1,9 @@
 package ru.lavafrai.maiapp.server.routes
 
-import io.ktor.server.http.content.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.http.content.staticResources
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.MaiDataItemType
 import ru.lavafrai.maiapp.models.maidata.MaiDataManifest
@@ -18,7 +19,7 @@ fun Route.data() {
         val manifest = MaiDataManifest(
             version = 1,
             data = buildList {
-                // testData()
+                testData()
                 campusData()
                 teachersData()
                 lifestyleData()
@@ -34,10 +35,10 @@ fun MutableList<MaiDataItem>.testData() {
         MaiDataItem(
             type = MaiDataItemType.DoNothing,
             accent = true,
-            name = "Релиз!",
-            subtitle = "Наконец-то приложение выходит в релиз!",
-            category = "Тесты",
-            icon = Asset.relative("assets/icons/message-square.svg")
+            name = "Вечная память Мусе",
+            subtitle = "Поддержите инициативу об устаовке памятника нашей легенде - Кошке их Трешки",
+            category = "Новости",
+            icon = Asset.relative("assets/icons/mai-3.svg")
         )
     )
 }
