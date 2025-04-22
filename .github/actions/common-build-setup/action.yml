@@ -42,6 +42,6 @@ runs:
 
         - name: Print outputs
           shell: bash
-          run: echo "All outputs are ${{ toJson(steps.set-time.outputs.*) }}"
+          run: echo "All outputs are ${{ toJson(steps.set-time.outputs.formattedTime) }}"
           env:
               CURRENT_TIME: ${{ join(steps.run_tests.outputs.*, '\n') }}
