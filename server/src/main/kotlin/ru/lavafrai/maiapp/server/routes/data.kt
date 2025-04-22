@@ -39,7 +39,7 @@ fun MutableList<MaiDataItem>.testData() {
             subtitle = "Поддержите инициативу об устаовке памятника нашей легенде - Кошке их Трешки",
             category = "Новости",
             icon = Asset.relative("assets/icons/cat-3.svg"),
-            asset = Asset.webview("https://docs.google.com/forms/d/e/1FAIpQLSd8k9HkOlTR4a7-wVJOOqPCdkN9v7LAoZtR00vBhx7L4yjRuw/viewform"),
+            asset = Asset.webview("markup/cat3-memorial.html"),
         )
     )
 }
