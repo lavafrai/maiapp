@@ -109,6 +109,26 @@ jobs:
                   name: deb-artifact
                   path: composeApp/build/compose/binaries/main/deb/*
 
+    build-ios:
+        name: Build iOS
+        runs-on: macos-latest
+
+        env:
+            SCHEME_NAME: iosApp
+            PROJECT_PATH: iosApp/iosApp.xcodeproj
+            EXPORT_METHOD: app-store-connect
+            OUTPUT_DIR_IOS: iosApp/actions
+            ARCHIVE_NAME: maiapp.xcarchive
+            PRODUCT_NAME: maiapp
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/common-build-setup
+              with:
+                  java-version: '17'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+
 
 #    publish_pages:
 #      needs:

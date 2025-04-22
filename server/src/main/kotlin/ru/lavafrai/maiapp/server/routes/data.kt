@@ -33,12 +33,13 @@ fun Route.data() {
 fun MutableList<MaiDataItem>.testData() {
     add(
         MaiDataItem(
-            type = MaiDataItemType.DoNothing,
+            type = MaiDataItemType.Web,
             accent = true,
             name = "Вечная память Мусе",
             subtitle = "Поддержите инициативу об устаовке памятника нашей легенде - Кошке их Трешки",
             category = "Новости",
-            icon = Asset.relative("assets/icons/cat-3.svg")
+            icon = Asset.relative("assets/icons/cat-3.svg"),
+            asset = Asset.webview("markup/cat3-memorial.html"),
         )
     )
 }
