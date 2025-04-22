@@ -227,7 +227,12 @@ jobs:
                   merge-multiple: true
 
             - name: Publish to GitHub Releases
-              run: ls artifacts
+              uses: andelf/nightly-release@main
+              with:
+                tag_name: nightly
+                name: 'MaiApp Rolling Release $$'
+                prerelease: true
+                files: artifacts/*
 
 
 
