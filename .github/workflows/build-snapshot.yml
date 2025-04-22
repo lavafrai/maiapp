@@ -148,7 +148,7 @@ jobs:
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Build with Gradle
-              run: ./gradlew :composeApp:packageReleaseMsi
+              run: ./gradlew :composeApp:packageMsi
 
             - name: Upload MSI artifact
               uses: actions/upload-artifact@v4
@@ -167,7 +167,7 @@ jobs:
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             - name: Build with Gradle
-              run: ./gradlew :composeApp:packageReleaseDeb
+              run: ./gradlew :composeApp:packageDeb
 
             - name: Upload DEB artifact
               uses: actions/upload-artifact@v4
