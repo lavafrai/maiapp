@@ -48,7 +48,7 @@ jobs:
                   name: android-artifact
                   path: composeApp/build/outputs/apk/release/*.apk
 
-    build-ios:
+    build_ios:
         name: Build iOS
         runs-on: macos-latest
 
