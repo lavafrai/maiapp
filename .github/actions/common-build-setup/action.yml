@@ -26,3 +26,4 @@ runs:
           with:
               path: 'composeApp/secrets.properties'
               contents: ${{ inputs.secrets-properties }}
+
