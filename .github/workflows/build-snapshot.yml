@@ -174,7 +174,7 @@ jobs:
               run: ./gradlew :composeApp:packageDeb
 
             - name: Test print output
-              run: echo '${{ steps.init.outputs.current-time }}'
+              run: echo '${{ steps.init.outputs }}'
 
             - name: Rename DEB
               run: mv composeApp/build/compose/binaries/main/deb/*.deb composeApp/build/compose/binaries/main/deb\maiapp-${{ steps.init.outputs.current-time }}.msi
