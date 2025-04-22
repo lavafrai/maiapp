@@ -38,7 +38,7 @@ fun MutableList<MaiDataItem>.testData() {
             name = "Вечная память Мусе",
             subtitle = "Поддержите инициативу об устаовке памятника нашей легенде - Кошке их Трешки",
             category = "Новости",
-            icon = Asset.relative("assets/icons/mai-3.svg")
+            icon = Asset.relative("assets/icons/cat-3.svg")
         )
     )
 }
