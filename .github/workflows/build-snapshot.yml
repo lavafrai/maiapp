@@ -227,12 +227,12 @@ jobs:
                   merge-multiple: true
 
             - name: Publish to GitHub Releases
-              uses: andelf/nightly-release@main
+              uses: softprops/action-gh-release@v1
               with:
-                tag_name: nightly
-                name: 'MaiApp Rolling Release $$'
-                prerelease: true
-                files: artifacts/*
+                  tag_name: "rolling"
+                  files: artifacts/*
+                  prerelease: true
+
 
 
 
