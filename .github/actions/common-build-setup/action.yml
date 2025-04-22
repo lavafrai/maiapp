@@ -8,6 +8,11 @@ inputs:
         description: 'The secrets.properties file to decode'
         required: true
 
+outputs:
+    current-time:
+        description: 'The current time'
+        value: ${{ steps.set-time.outputs.formattedTime }}
+
 runs:
     using: "composite"
     steps:
@@ -26,3 +31,10 @@ runs:
           with:
               path: 'composeApp/secrets.properties'
               contents: ${{ inputs.secrets-properties }}
+
+        - name: Set current time
+          id: set-time
+          uses: josStorer/get-current-time@v2
+          with:
+              format: 'yyyy-MM-dd-HH:mm:ss'
+              utcOffset: '+08:00'
