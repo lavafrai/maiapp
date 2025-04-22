@@ -217,7 +217,7 @@ jobs:
     publish_rolling:
         name: Publish Rolling Release
         runs-on: ubuntu-latest
-        needs: [ build_windows, build_debian, build_android, build_ios ]
+        needs: [ build_windows, build_debian ]
         steps:
             - uses: actions/checkout@v4
             - name: Download artifacts
