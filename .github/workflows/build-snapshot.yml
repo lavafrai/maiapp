@@ -173,11 +173,8 @@ jobs:
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
 
-            - name: Test print output
-              run: echo '${{ steps.init.outputs }}'
-
             - name: Rename DEB
-              run: mv composeApp/build/compose/binaries/main/deb/*.deb composeApp/build/compose/binaries/main/deb\maiapp-${{ steps.init.outputs.current-time }}.msi
+              run: mv composeApp/build/compose/binaries/main/deb/*.deb composeApp/build/compose/binaries/main/deb/maiapp-${{ steps.init.outputs.current-time }}.deb
 
             - name: Upload DEB artifact
               uses: actions/upload-artifact@v4
