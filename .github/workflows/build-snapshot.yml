@@ -63,6 +63,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
+              id: init
               with:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
@@ -133,11 +134,14 @@ jobs:
                       -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
                       -exportOptionsPlist ExportOptions.plist
 
+            - name: Rename IPA
+              run: mv ${{ env.OUTPUT_DIR_IOS }}/*.ipa "${{ env.OUTPUT_DIR_IOS }}/maiapp-${{ steps.init.outputs.current-time }}.ipa"
+
             -   name: Upload IPA Artifact
                 uses: actions/upload-artifact@v4
                 with:
                     name: ios-artifact
-                    path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
+                    path: ${{ env.OUTPUT_DIR_IOS }}/*.ipa
 
     build_windows:
         name: Build Windows
@@ -145,6 +149,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
+              id: init
               with:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
@@ -167,13 +172,10 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/common-build-setup
+              id: init
               with:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
-
-            - name: Print outputs
-              shell: bash
-              run: echo "All outputs are ${{ steps.init.outputs.current-time }}"
 
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
