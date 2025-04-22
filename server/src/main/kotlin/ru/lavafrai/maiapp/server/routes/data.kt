@@ -36,7 +36,7 @@ fun MutableList<MaiDataItem>.testData() {
             type = MaiDataItemType.Web,
             accent = true,
             name = "Вечная память Мусе",
-            subtitle = "Поддержите инициативу об устаовке памятника нашей легенде - Кошке их Трешки",
+            subtitle = "Поддержите инициативу об устаовке памятника нашей легенде - Кошке из Трешки",
             category = "Новости",
             icon = Asset.relative("assets/icons/cat-3.svg"),
             asset = Asset.webview("markup/cat3-memorial.html"),
