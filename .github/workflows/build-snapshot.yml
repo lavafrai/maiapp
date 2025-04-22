@@ -128,6 +128,78 @@ jobs:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
+            -   name: Import Apple Certificate
+                uses: apple-actions/import-codesign-certs@v2
+                with:
+                    p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
+                    p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+                    keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+            -   name: Import Provisioning Profile
+                run: |
+                    mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+                    echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
+                env:
+                    APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
+
+            -   name: Create ExportOptions.plist
+                run: |
+                    cat << EOF > ExportOptions.plist
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                    <plist version="1.0">
+                    <dict>
+                        <key>method</key>
+                        <string>${{ env.EXPORT_METHOD }}</string>
+                        <key>teamID</key>
+                        <string>${{ secrets.APPLE_TEAM_ID }}</string>
+                        <key>signingStyle</key>
+                        <string>manual</string>
+                        <key>provisioningProfiles</key>
+                        <dict>
+                            <key>ru.lavafrai.maiapp</key>
+                            <string>maiapp-dist</string> <!-- Убедитесь, что это точное имя вашего App Store профиля -->
+                        </dict>
+                        <key>signingCertificate</key>
+                        <string>Apple Distribution</string>
+                        <key>uploadBitcode</key>
+                        <false/>
+                        <key>uploadSymbols</key>
+                        <true/>
+                    </dict>
+                    </plist>
+                    EOF
+                env:
+                    APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+            -   name: Build Xcode Archive
+                run: |
+                    mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
+                    xcodebuild clean \
+                      -project "${{ env.PROJECT_PATH }}" \
+                      -scheme "${{ env.SCHEME_NAME }}" \
+                      -configuration Release
+                    xcodebuild archive \
+                      -project "${{ env.PROJECT_PATH }}" \
+                      -scheme "${{ env.SCHEME_NAME }}" \
+                      -sdk iphoneos \
+                      -configuration Release \
+                      -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
+                      DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
+
+            -   name: Export IPA
+                run: |
+                    xcodebuild -exportArchive \
+                      -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
+                      -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
+                      -exportOptionsPlist ExportOptions.plist
+
+            -   name: Upload IPA Artifact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: ios-artifact
+                    path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
+
 
 
 #    publish_pages:
