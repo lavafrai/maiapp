@@ -171,6 +171,10 @@ jobs:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
+            - name: Print outputs
+              shell: bash
+              run: echo "All outputs are ${{ steps.init.outputs.current-time }}"
+
             - name: Build with Gradle
               run: ./gradlew :composeApp:packageDeb
 

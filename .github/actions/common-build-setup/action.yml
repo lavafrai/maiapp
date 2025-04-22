@@ -38,4 +38,4 @@ runs:
           uses: josStorer/get-current-time@v2
           with:
               format: 'yyyyMMDDHHmm'
-              utcOffset: '+00:00'
+              utcOffset: '+03:00'
