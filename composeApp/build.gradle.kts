@@ -53,13 +53,9 @@ kotlin {
         binaries.executable()
     }*/
 
-    jvm {
+    jvm { }
 
-    }
-
-    androidTarget {
-
-    }
+    androidTarget { }
 
     listOf(
         iosX64(),
@@ -77,6 +73,7 @@ kotlin {
             implementation(projects.models)
             implementation(projects.network.mymai)
             implementation(projects.shared)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -201,6 +198,13 @@ android {
     println(signingConfigs)
 
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
+
         release {
             isMinifyEnabled = true
             isShrinkResources = true
