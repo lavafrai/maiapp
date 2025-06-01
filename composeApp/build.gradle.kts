@@ -46,6 +46,10 @@ buildConfig {
 }
 
 kotlin {
+    sourceSets.all {
+        languageSettings.optIn("androidx.compose.animation.ExperimentalSharedTransitionApi")
+    }
+
     jvmToolchain(17)
 
     /*wasmJs {

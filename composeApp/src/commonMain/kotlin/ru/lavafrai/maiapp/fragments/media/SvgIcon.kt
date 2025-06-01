@@ -58,6 +58,9 @@ fun SvgIcon(
     )
 }
 
+
+val svgIconCache = mutableMapOf<String, String>()
+
 @Composable
 fun LoadableSvgIcon(
     svg: Loadable<String>,
@@ -65,6 +68,7 @@ fun LoadableSvgIcon(
     modifier: Modifier = Modifier.size(24.dp),
     tint: Color? = null,
     reload: () -> Unit = {},
+    cacheable: Boolean = false,
 ) {
     LoadableView(
         svg,

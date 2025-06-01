@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.fragments.schedule
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable

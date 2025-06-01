@@ -2,6 +2,7 @@
 
 package ru.lavafrai.maiapp.fragments.schedule
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
@@ -23,7 +23,6 @@ import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.AppCard
 import ru.lavafrai.maiapp.fragments.AppCardShape
 import ru.lavafrai.maiapp.fragments.AppCardShapes
-import ru.lavafrai.maiapp.fragments.DefaultChip
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
@@ -32,6 +31,7 @@ import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.theme.LinkColor
 import ru.lavafrai.maiapp.utils.conditional
+
 
 @Composable
 fun LessonView(
@@ -54,6 +54,7 @@ fun LessonView(
                 schedule = schedule,
             )
         },
+        modifier = Modifier
     ) {
         Row {
             Column { // Pair number and annotations
