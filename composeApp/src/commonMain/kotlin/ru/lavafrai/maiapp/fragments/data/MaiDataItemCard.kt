@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.sp
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.fragments.AppCard
+import ru.lavafrai.maiapp.fragments.AppCardShape
+import ru.lavafrai.maiapp.fragments.AppCardShapes
 import ru.lavafrai.maiapp.fragments.hypertext.Hypertext
 import ru.lavafrai.maiapp.fragments.media.LoadableSvgIcon
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
@@ -23,11 +25,13 @@ fun MaiDataItemCard(
     item: MaiDataItem,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
+    shape: AppCardShape = AppCardShapes.default(),
 ) = AppCard(
     modifier = modifier,
     onClick = onClick,
     cardBackground = if (item.accent) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.surfaceVariant,
     cardContent = if (item.accent) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurfaceVariant,
+    shape = shape,
 ) {
     var loadingHash by remember { mutableStateOf(0) }
     var svgIcon by remember { mutableStateOf(Loadable.loading<String>() as Loadable<String>) }

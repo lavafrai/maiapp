@@ -18,6 +18,7 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.fragments.AppCardShapes
 import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.fragments.data.MaiDataItemCard
 import ru.lavafrai.maiapp.models.maidata.MaiDataManifest
@@ -50,12 +51,22 @@ fun MaiDataView(
             )
 
             val themeIsDark = LocalThemeIsDark.current
-            items.forEach { item ->
-                MaiDataItemCard(
-                    item = item,
-                    modifier = Modifier,
-                    onClick = { appContext.openMaiDataItem(item, themeIsDark) },
-                )
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                items.forEachIndexed { i, item ->
+                    val shape = when {
+                        i == 0 && i == items.lastIndex -> AppCardShapes.firstLast()
+                        i == 0 -> AppCardShapes.first()
+                        i == items.lastIndex -> AppCardShapes.last()
+                        else -> AppCardShapes.middle()
+                    }
+
+                    MaiDataItemCard(
+                        item = item,
+                        modifier = Modifier,
+                        onClick = { appContext.openMaiDataItem(item, themeIsDark) },
+                        shape = shape,
+                    )
+                }
             }
         }
         Spacer(Modifier.height(0.dp))

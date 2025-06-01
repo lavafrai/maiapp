@@ -6,10 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ru.lavafrai.maiapp.fragments.AppCardShapes
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
+import kotlin.collections.indices
 
 @Composable
 fun DayView(
@@ -20,15 +22,28 @@ fun DayView(
     schedule: Schedule,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier,
     ) {
-        for (lesson in remember(day.lessons) { day.lessons.sortedBy { it.getPairNumber() }}) {
+        val sortedLessons = remember(day.lessons) { day.lessons.sortedBy { it.getPairNumber() } }
+        for (lessonId in sortedLessons.indices) {
+            val lesson = sortedLessons[lessonId]
+
+            val first = lessonId == 0
+            val last = lessonId == sortedLessons.lastIndex
+            val shape = when {
+                first && last -> AppCardShapes.firstLast()
+                first -> AppCardShapes.first()
+                last -> AppCardShapes.last()
+                else -> AppCardShapes.middle()
+            }
+
             LessonView(
                 lesson = lesson,
                 exlerTeachers = exlerTeachers,
                 annotations = annotations.filter { it.lessonUid == lesson.getUid() },
                 schedule = schedule,
+                shape = shape,
             )
         }
     }

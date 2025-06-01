@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +21,9 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.AppCard
+import ru.lavafrai.maiapp.fragments.AppCardShape
+import ru.lavafrai.maiapp.fragments.AppCardShapes
+import ru.lavafrai.maiapp.fragments.DefaultChip
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
@@ -35,11 +39,13 @@ fun LessonView(
     exlerTeachers: List<ExlerTeacher>?,
     annotations: List<LessonAnnotation>,
     schedule: Schedule,
+    shape: AppCardShape = AppCardShapes.default(),
 ) {
     val appContext = LocalApplicationContext.current
     val haptic = LocalHapticFeedback.current
 
     AppCard(
+        shape = shape,
         onLongClick = {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 
@@ -50,7 +56,7 @@ fun LessonView(
         },
     ) {
         Row {
-            Column {
+            Column { // Pair number and annotations
                 PairNumber(text = lesson.getPairNumber().toString())
 
                 val lessonAnnotations = annotations.filter { it.lessonUid == lesson.getUid() }
@@ -60,18 +66,19 @@ fun LessonView(
                     onOpenAnnotations = { appContext.openLessonDetails(lesson, schedule) },
                 )
             }
+
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp)
-            ) {
+            ) { // Lesson name, teachers and time
                 Text(
                     lesson.name,
                     style = MaterialTheme.typography.titleMedium.copy(lineHeight = 1.2.em, fontSize = 17.sp, fontWeight = FontWeight.Medium),
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-                lesson.lectors.forEach {
+                lesson.lectors.filter { it.teacherName.name.isNotBlank() }.forEach {
                     val areOnExler = remember(exlerTeachers) { exlerTeachers?.any { exler -> exler.name == it.name } ?: false }
                     val hasSchedule = remember(it) { it.uid != TeacherUid.Empty }
                     val clickable = areOnExler || hasSchedule
@@ -86,7 +93,8 @@ fun LessonView(
                         }}
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                // Spacer(modifier = Modifier.height(2.dp))
+
                 Text(
                     lesson.timeRange,
                     style = MaterialTheme.typography.bodyMedium,
@@ -94,20 +102,28 @@ fun LessonView(
                 )
             }
         }
-        Row(
+
+        Row( // Rooms and type
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
-                .height(32.dp),
+                .padding(top = 4.dp)
+                .height(28.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(lesson.rooms.joinToString(separator = "/") { it.name }, style = MaterialTheme.typography.bodySmall)
 
+            /*DefaultChip(
+                onClick = {},
+                label = { Text(lesson.type.localized().uppercase(), fontSize = 12.sp) },
+                horizontalPadding = 12.dp,
+                height = 28.dp,
+            )*/
             SuggestionChip(
                 onClick = {},
-                label = { Text(lesson.type.localized().uppercase()) },
-                //modifier = Modifier.padding(end = 8.dp)
+                label = { Text(lesson.type.localized().uppercase(), fontSize = 13.sp) },
+                modifier = Modifier
+                    .height(28.dp),
             )
         }
     }
