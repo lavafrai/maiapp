@@ -71,6 +71,7 @@
     <string name="schedule_is_empty">Здесь нет ни одного занятия, можете отдыхать!</string>
     <string name="open_on_exler">Открыть на МАИ.Экслер.ру</string>
     <string name="semester">Семестр</string>
+    <string name="semesterComplete">Завершен</string>
     <string name="widget_description">Приложение поддерживает вывод расписания в виджет. Попробуйте добавить его на главный экран и пользоваться.</string>
     <string name="safe_data_cleanup_warning">Вы уверены?</string>
     <string name="safe_data_cleanup_warning_description">Вы точно хотите удалить все данные приложения с устройства? Среди них находятся все настройки и загруженные расписания.\n\nПриложение будет перезапущено.</string>

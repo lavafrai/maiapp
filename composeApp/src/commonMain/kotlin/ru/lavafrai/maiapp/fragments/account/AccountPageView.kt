@@ -3,7 +3,6 @@
 package ru.lavafrai.maiapp.fragments.account
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.AlertOctagon
@@ -20,11 +18,7 @@ import compose.icons.feathericons.ChevronUp
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.Loadable
-import ru.lavafrai.maiapp.data.settings.rememberSettings
-import ru.lavafrai.maiapp.fragments.AnimatedIcon
-import ru.lavafrai.maiapp.fragments.AppCard
-import ru.lavafrai.maiapp.fragments.LoadableView
-import ru.lavafrai.maiapp.fragments.PageColumn
+import ru.lavafrai.maiapp.fragments.*
 import ru.lavafrai.maiapp.localizers.localizeTypeControlName
 import ru.lavafrai.maiapp.models.account.Mark
 import ru.lavafrai.maiapp.models.account.Student
@@ -33,6 +27,7 @@ import ru.lavafrai.maiapp.utils.asDp
 import ru.lavafrai.maiapp.utils.capitalizeWords
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewState
+
 
 @Composable
 fun AccountPageView(
@@ -45,7 +40,6 @@ fun AccountPageView(
     modifier = Modifier.fillMaxSize(),
 ) {
     Spacer(Modifier.height(8.dp))
-    val settings by rememberSettings()
     val selectedStudent = viewState.student.data
 
     LoadableView(viewState.studentInfo, retry = viewModel::refresh) { studentInfo ->
@@ -54,7 +48,7 @@ fun AccountPageView(
                 UnsupportedAccountView()
             } else {
 
-                Text(stringResource(Res.string.student), style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(Res.string.student), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
 
                 Text(
                     "${studentInfo.lastname} ${studentInfo.firstname} ${studentInfo.middlename}",
@@ -136,9 +130,9 @@ fun MarksView(
     marksLoadable: Loadable<StudentMarks>,
     retry: () -> Unit,
 ) = LoadableView(marksLoadable, retry = retry) { marks ->
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column { // (verticalArrangement = Arrangement.spacedBy(8.dp)) {
         AppCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(Res.string.statistics), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(Res.string.statistics), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
 
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyLarge) {
                 val academicDebtCount = remember(marks) { marks.debtCount() }
@@ -156,8 +150,9 @@ fun MarksView(
                 }
             }
         }
+        Spacer(Modifier.height(8.dp))
 
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             val marksBySemesters = remember(marks.marks) { marks.marks.groupBy { it.semester } }
             val currentSemester = remember(marksBySemesters) { marksBySemesters.keys.maxOrNull() }
 
@@ -179,57 +174,80 @@ fun SemesterMarksView(
     semesterNumber: Int,
     marks: List<Mark>,
     isCurrent: Boolean,
-) {
+) = Column {
     var opened by remember { mutableStateOf(isCurrent) }
+    val allMarksComplete = remember(marks) { marks.all { it.isSuccess } }
+    val allDebtsCount = remember(marks) { marks.count { !it.isSuccess } }
 
-    AppCard(onClick = { if (!opened) opened = true }) {
+    //AppCard(onClick = { if (!opened) opened = true }) {
+    AppCard {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("${stringResource(Res.string.semester)} $semesterNumber", style = MaterialTheme.typography.titleLarge)
-            IconButton(
-                onClick = { opened = !opened },
-                modifier = Modifier.size(MaterialTheme.typography.titleLarge.fontSize.asDp)
-            ) {
-                AnimatedIcon(
-                    iconPainter = FeatherIcons.ChevronUp,
-                    enabledIconPainter = FeatherIcons.ChevronDown,
-                    enabled = opened,
-                )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("${stringResource(Res.string.semester)} $semesterNumber", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+                Spacer(Modifier.width(8.dp))
+                Text("", style = MaterialTheme.typography.titleLarge)
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (allMarksComplete) MarkView(stringResource(Res.string.semesterComplete), MarkGreenColor)
+                else SimpleChip { Text("${marks.count() - allDebtsCount} / ${marks.count()}") }
+
+                Spacer(Modifier.width(8.dp))
+                IconButton(
+                    onClick = { opened = !opened },
+                    modifier = Modifier.size(MaterialTheme.typography.titleLarge.fontSize.asDp)
+                ) {
+                    AnimatedIcon(
+                        iconPainter = FeatherIcons.ChevronUp,
+                        enabledIconPainter = FeatherIcons.ChevronDown,
+                        enabled = opened,
+                    )
+                }
             }
         }
+    }
+    Spacer(Modifier.height(2.dp))
 
-        AnimatedVisibility(visible = opened) {
-            Column {
-                Spacer(Modifier.height(16.dp))
-                marks.forEach { mark ->
-                    Box(
-                        modifier = Modifier
-                            .alpha(0.1f)
-                            .background(LocalContentColor.current)
-                            .fillMaxWidth()
-                            .height(1.dp)
-                    )
+    AnimatedVisibility(visible = opened, modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            //Spacer(Modifier.height(16.dp))
+            marks.forEachIndexed { i, mark ->
+                /*Box(
+                    modifier = Modifier
+                        .alpha(0.1f)
+                        .background(LocalContentColor.current)
+                        .fillMaxWidth()
+                        .height(1.dp)
+                )*/
+
+                val cardShape = when {
+                    marks.size == 1 -> AppCardShapes.firstLast()
+                    i == 0 -> AppCardShapes.firstCompact()
+                    i == marks.lastIndex -> AppCardShapes.last()
+                    else -> AppCardShapes.middle()
+                }
+                AppCard(shape = cardShape) {
                     MarkInfoView(mark)
                 }
             }
         }
+        //}
     }
 }
 
 @Composable
 fun MarkInfoView(mark: Mark) = Column(
-    modifier = Modifier
-        .padding(vertical = 6.dp),
+    modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = mark.name.trim())
+            Text(text = mark.name.trim(), color = MaterialTheme.colorScheme.onBackground)
             if (mark.lecturer.isNotBlank()) Text(
                 text = mark.lecturer.replace(".", ". ").replace("  ", " ").capitalizeWords(),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -239,7 +257,7 @@ fun MarkInfoView(mark: Mark) = Column(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
             )
         }
-        Spacer(Modifier.width(8.dp))
+        // Spacer(Modifier.width(8.dp))
         MarkView(mark.value)
     }
 

@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerBasedShape
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +59,19 @@ object AppCardShapes {
     fun first(): RoundedCornerShape {
         val small = MaterialTheme.shapes.extraSmall
         val large = MaterialTheme.shapes.extraLarge
+
+        return RoundedCornerShape(
+            topStart = large.topStart,
+            topEnd = large.topEnd,
+            bottomStart = small.bottomStart,
+            bottomEnd = small.bottomEnd
+        )
+    }
+
+    @Composable
+    fun firstCompact(): RoundedCornerShape {
+        val small = MaterialTheme.shapes.extraSmall
+        val large = MaterialTheme.shapes.large
 
         return RoundedCornerShape(
             topStart = large.topStart,

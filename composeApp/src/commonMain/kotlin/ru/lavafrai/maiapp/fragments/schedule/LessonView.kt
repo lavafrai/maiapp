@@ -2,7 +2,6 @@
 
 package ru.lavafrai.maiapp.fragments.schedule
 
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -75,7 +74,12 @@ fun LessonView(
             ) { // Lesson name, teachers and time
                 Text(
                     lesson.name,
-                    style = MaterialTheme.typography.titleMedium.copy(lineHeight = 1.2.em, fontSize = 17.sp, fontWeight = FontWeight.Medium),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        lineHeight = 1.2.em,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
                 )
                 Spacer(modifier = Modifier.height(2.dp))
 

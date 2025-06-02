@@ -16,4 +16,7 @@ data class Mark(
 ) {
     val isDebt
         get() = value in listOf("Нзч", "Ня", "2")
+
+    val isSuccess
+        get() = value in listOf("Зч", "3", "4", "5")
 }
