@@ -48,6 +48,8 @@ buildConfig {
 kotlin {
     sourceSets.all {
         languageSettings.optIn("androidx.compose.animation.ExperimentalSharedTransitionApi")
+        languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
+        languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3ExpressiveApi")
     }
 
     jvmToolchain(17)

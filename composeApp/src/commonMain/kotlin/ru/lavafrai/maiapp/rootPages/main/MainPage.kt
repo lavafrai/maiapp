@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.VersionInfo
@@ -17,6 +21,7 @@ import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.account.AccountPage
+import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
@@ -29,8 +34,10 @@ fun MainPage(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     onClearSettings: () -> Unit,
+    /*onAddEventClick: (LocalDate) -> Unit,*/
 ) {
     var weekSelectorExpanded by remember { mutableStateOf(false) }
+    var eventCreateExpanded by remember { mutableStateOf(false) }
     var workTypeSelectorExpanded by remember { mutableStateOf(false) }
     var updateInfoExpanded by remember { mutableStateOf(false) }
     val settings by rememberSettings()
@@ -50,6 +57,7 @@ fun MainPage(
     }
     val viewState by viewModel.state.collectAsState()
     val requestRefresh = { viewModel.reloadSchedule(settings.selectedSchedule) }
+    val onAddEventClick: (LocalDate) -> Unit = { eventCreateExpanded = true }
 
     Column {
         MainPageNavigation(
@@ -110,7 +118,7 @@ fun MainPage(
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = null,
                             modifier = Modifier.fillMaxSize(),
-                            selector = remember (viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() },
+                            selector = remember (viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() }
                         )
                     }
                 }
@@ -123,6 +131,8 @@ fun MainPage(
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
                             onRefresh = viewModel::reloadSchedule,
+                            showEventAddingButton = true,
+                            onAddEventClick = onAddEventClick,
                         )
                     }
                 }
@@ -147,6 +157,14 @@ fun MainPage(
             currentVersion = VersionInfo.currentVersion,
             onDismissRequest = { updateInfoExpanded = false ; VersionInfo.updateLastVersion() },
             onOkay = { updateInfoExpanded = false ; VersionInfo.updateLastVersion() },
+        )
+    }
+
+    if (eventCreateExpanded) {
+        EventCreateDialog(
+            onDismissRequest = { eventCreateExpanded = false },
+            initialDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+            onEventCreated = { eventCreateExpanded = false },
         )
     }
 

@@ -13,9 +13,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
+import co.touchlab.kermit.Logger
+import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
+import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
@@ -112,6 +115,10 @@ fun AppNavigation(
                                 popUpTo(0)
                             }
                         },
+                        /*onAddEventClick = { date ->
+                            navController.navigate(EventCreatePage(initialDate = date))
+                            Logger.d("Add event clicked")
+                        }*/
                     )
                 }
 

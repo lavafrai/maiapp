@@ -6,8 +6,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -73,7 +73,7 @@ fun LoadableSvgIcon(
     LoadableView(
         svg,
         retry = {},
-        loading = { CircularProgressIndicator(modifier = Modifier.size(24.dp), color = tint ?: MaterialTheme.colorScheme.primary) },
+        loading = { LoadingIndicator(modifier = Modifier.size(24.dp), color = tint ?: MaterialTheme.colorScheme.primary) },
         error = { e, r -> LoadableSvgIconReload(reload, e) },
         alignment = Alignment.TopStart,
         modifier = modifier,

@@ -85,12 +85,19 @@
     <string name="average_mark">Средняя оценка</string>
     <string name="academic_debt_count">Количество долгов</string>
     <string name="academic_debt">Долг</string>
+    <string name="start">Начало</string>
+    <string name="end">Конец</string>
+    <string name="date">Дата</string>
+    <string name="name">Имя</string>
+    <string name="event_name">Имя события</string>
     <string name="attempts">Попытки</string>
     <string name="hours_genitive">Часов</string>
     <string name="unsupported_manifest_version">Манифест не поддерживается</string>
     <string name="unsupported_manifest_version_description">Попробуйте обновить приложение до актуальной версии.</string>
     <string name="supported_version">Поддерживаемая версия</string>
     <string name="received_version">Полученная версия</string>
+    <string name="new_event">Новое событие</string>
+    <string name="event">Событие</string>
 
     <string name="final_test">Зачет</string>
     <string name="control_work">Контрольная</string>
