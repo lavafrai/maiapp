@@ -267,10 +267,11 @@ fun MarkInfoView(mark: Mark) = Column(
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        AssistChip(onClick = { }, label = { Text(mark.typeControlName.localizeTypeControlName()) })
+        val chipBorder = AssistChipDefaults.assistChipBorder(true, borderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f))
+        AssistChip(onClick = { }, label = { Text(mark.typeControlName.localizeTypeControlName()) }, border = chipBorder)
         if (mark.attempts > 1) AssistChip(
             onClick = { },
             label = { Text("${mark.attempts} ${stringResource(Res.string.attempts).lowercase()}") })
-        if (mark.isDebt) AssistChip(onClick = { }, label = { Text(stringResource(Res.string.academic_debt)) })
+        if (mark.isDebt) AssistChip(onClick = { }, label = { Text(stringResource(Res.string.academic_debt)) }, border = chipBorder)
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -129,6 +130,7 @@ fun LessonView(
                 label = { Text(lesson.type.localized().uppercase(), fontSize = 13.sp) },
                 modifier = Modifier
                     .height(28.dp),
+                border = SuggestionChipDefaults.suggestionChipBorder(true, borderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)),
             )
         }
     }
