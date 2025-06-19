@@ -178,6 +178,10 @@ kotlin {
 }
 
 android {
+    lint {
+        disable.add("NullSafeMutableLiveData")
+    }
+
     namespace = "ru.lavafrai.maiapp"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
