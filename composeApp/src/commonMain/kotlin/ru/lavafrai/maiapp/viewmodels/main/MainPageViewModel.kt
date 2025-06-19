@@ -66,7 +66,7 @@ class MainPageViewModel(
         }
     }
 
-    fun reloadSchedule(scheduleId: ScheduleId? = null) {
+    fun reloadSchedule(scheduleId: ScheduleId? = null, onReloaded: (() -> Unit)? = null) {
         viewModelScope.launch(dispatchers.IO) {
             if (scheduleId != null) {
                 scheduleName = scheduleId
@@ -94,6 +94,7 @@ class MainPageViewModel(
             launchCatching(
                 onError = {
                     emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it as Exception)))
+                    onReloaded?.invoke()
                 }
             ) {
                 val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
@@ -102,6 +103,7 @@ class MainPageViewModel(
 
                 val schedule = scheduleRepository.getSchedule(scheduleName)
                 emit(stateValue.copy(schedule = Loadable.actual(schedule)))
+                onReloaded?.invoke()
             }
         }
     }

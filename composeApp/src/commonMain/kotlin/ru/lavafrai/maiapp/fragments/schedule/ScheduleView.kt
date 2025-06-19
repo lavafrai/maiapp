@@ -11,8 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.LoadingIndicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -37,6 +40,7 @@ fun ScheduleView(
     modifier: Modifier = Modifier,
     selector: LessonSelector = LessonSelector.default(),
     onRefresh: (() -> Unit)? = null,
+    refreshing: Boolean = false,
     state: ScheduleViewState = rememberScheduleViewState(),
     showEventAddingButton: Boolean = false,
     onAddEventClick: ((LocalDate) -> Unit) = {},
@@ -66,12 +70,17 @@ fun ScheduleView(
     }
 
     val scope = rememberCoroutineScope()
-    var refreshing by remember { mutableStateOf(false) }
+    // var refreshing by remember { mutableStateOf(false) }
     val refresh = suspend {
         if (onRefresh != null) onRefresh()
-        delay(1.seconds)
-        refreshing = false
+        //delay(1.seconds)
+        //refreshing = false
     }
+    /*LaunchedEffect(schedule) {
+        if (refreshing) {
+            refreshing = false
+        }
+    }*/
 
     PageColumn(scrollState = null) {
         val content = @Composable {
@@ -122,11 +131,18 @@ fun ScheduleView(
         if (onRefresh != null) PullToRefreshBox(
             onRefresh = {
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                refreshing = true
+                /*refreshing = true*/
                 scope.launch { refresh() }
             },
             isRefreshing = refreshing,
             state = pullToRefreshState,
+            indicator = {
+                LoadingIndicator(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    isRefreshing = refreshing,
+                    state = pullToRefreshState
+                )
+            }
         ) {
             content()
         } else content()

@@ -41,6 +41,7 @@ fun MainPage(
     var workTypeSelectorExpanded by remember { mutableStateOf(false) }
     var updateInfoExpanded by remember { mutableStateOf(false) }
     val settings by rememberSettings()
+    var isScheduleRefreshing by remember { mutableStateOf(false) }
 
     val viewModel: MainPageViewModel = viewModel(
         factory = MainPageViewModel.Factory(
@@ -130,7 +131,13 @@ fun MainPage(
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
-                            onRefresh = viewModel::reloadSchedule,
+                            onRefresh = {
+                                isScheduleRefreshing = true
+                                viewModel.reloadSchedule() {
+                                    isScheduleRefreshing = false
+                                }
+                            },
+                            refreshing = isScheduleRefreshing,
                             showEventAddingButton = true,
                             onAddEventClick = onAddEventClick,
                         )

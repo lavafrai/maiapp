@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.theme
 
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
@@ -34,7 +35,7 @@ internal fun AppTheme(
 
         val colorScheme = colorSchema.buildColorScheme(theme)
 
-        MaterialTheme(
+        MaterialExpressiveTheme(
             colorScheme = colorScheme.animated(),
             content = { Surface(content = content) }
         )
