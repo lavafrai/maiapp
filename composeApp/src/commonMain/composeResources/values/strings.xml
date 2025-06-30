@@ -90,6 +90,10 @@
     <string name="date">Дата</string>
     <string name="name">Имя</string>
     <string name="event_name">Имя события</string>
+    <string name="add_teacher">Добавить преподавателя</string>
+    <string name="add">Добавить</string>
+    <string name="teacher_name">Имя преподавателя</string>
+    <string name="auditorium">Аудитория</string>
     <string name="attempts">Попытки</string>
     <string name="hours_genitive">Часов</string>
     <string name="unsupported_manifest_version">Манифест не поддерживается</string>

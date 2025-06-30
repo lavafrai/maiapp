@@ -1,18 +1,26 @@
 package ru.lavafrai.maiapp.fragments.events
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -26,17 +34,30 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import co.touchlab.kermit.Logger
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.MapPin
+import compose.icons.feathericons.PlusCircle
+import compose.icons.feathericons.User
+import compose.icons.feathericons.X
+import kotlinx.coroutines.launch
 import kotlinx.datetime.*
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.data.repositories.ExlerRepository
+import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.fragments.DatePickerDialog
 import ru.lavafrai.maiapp.fragments.TimePickerDialog
 import ru.lavafrai.maiapp.localizers.localizedGenitive
 import ru.lavafrai.maiapp.models.events.Event
+import ru.lavafrai.maiapp.models.schedule.GroupName
+import ru.lavafrai.maiapp.models.schedule.ScheduleId
+import kotlin.collections.plus
 
 
 @Composable
@@ -62,6 +83,14 @@ fun EventCreateDialog(
             EventCreateContent(
                 initialDate = initialDate,
                 onDismissRequest = onDismissRequest,
+                onRequestSoftDismiss = {
+                    focusManager.clearFocus()
+                    keyboardController?.hide()
+                    scope.launch {
+                        sheetState.hide()
+                        onDismissRequest()
+                    }
+                },
                 onEventCreated = onEventCreated,
             )
         }
@@ -93,12 +122,15 @@ fun EventCreateDialog(
 fun EventCreateContent(
     initialDate: LocalDate,
     onDismissRequest: () -> Unit,
+    onRequestSoftDismiss: () -> Unit,
     onEventCreated: (Event) -> Unit,
 ) = Column(Modifier.padding(vertical = 16.dp)) {
     var date by remember { mutableStateOf(initialDate) }
     var startTime by remember { mutableStateOf(LocalTime(hour = 10, minute = 45)) }
     var endTime by remember { mutableStateOf(LocalTime(hour = 12, minute = 15)) }
     var eventName by remember { mutableStateOf("") }
+    var teachers by remember { mutableStateOf(emptyList<String>()) }
+    var rooms by remember { mutableStateOf(emptyList<String>()) }
 
     EventCreateDialogName(
         name = eventName,
@@ -115,6 +147,27 @@ fun EventCreateContent(
         onDateChanged = { date = it },
         onStartTimeChanged = { startTime = it },
         onEndTimeChanged = { endTime = it },
+    )
+
+    HorizontalDivider(Modifier.padding(bottom = 16.dp).padding(horizontal = 8.dp))
+
+    EventCreateDialogTeachers(
+        teachers = teachers,
+        onTeachersChanged = { teachers = it }
+    )
+
+    EventCreateDialogRooms(
+        rooms = rooms,
+        onRoomsChanged = { rooms = it }
+    )
+
+    val localFocusManager = LocalFocusManager.current
+    val localKeyboardController = LocalSoftwareKeyboardController.current
+    EventCreateDialogButtons(
+        onDismissRequest = onRequestSoftDismiss,
+        onEventCreateRequest = {
+
+        }
     )
 }
 
@@ -220,4 +273,307 @@ fun EventCreateDialogDateTime(
         onConfirm = { dateExpanded = false; onDateChanged(it) },
         currentDate = date
     )
+}
+
+@Composable
+fun EventCreateDialogRooms(
+    rooms: List<String>,
+    onRoomsChanged: (List<String>) -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var roomPickerOpened by remember { mutableStateOf(false) }
+
+    Column(Modifier) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(FeatherIcons.MapPin, contentDescription = null)
+                Text(
+                    stringResource(Res.string.auditorium),
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            IconButton(onClick = {
+                roomPickerOpened = true
+            }, enabled = rooms.size < 3) {
+                Icon(FeatherIcons.PlusCircle, contentDescription = null)
+            }
+        }
+
+        Row(Modifier.horizontalScroll(rememberScrollState())) {
+            Spacer(Modifier.width(8.dp))
+            rooms.forEach { room ->
+                InputChip(
+                    label = { Text(room) },
+                    trailingIcon = { Icon(FeatherIcons.X, null, modifier = Modifier.size(18.dp)) },
+                    onClick = {
+                        onRoomsChanged(rooms - room)
+                    },
+                    modifier = Modifier.padding(end = 4.dp),
+                    selected = false
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+        }
+    }
+
+    if (roomPickerOpened) {
+        RoomPickerDialog(
+            onDismissRequest = {
+                roomPickerOpened = false
+            },
+            onRoomPicked = { pickedRoom ->
+                if (pickedRoom.isNotBlank()) {
+                    onRoomsChanged(rooms + pickedRoom)
+                }
+                roomPickerOpened = false
+            }
+        )
+    }
+}
+
+@Composable
+fun RoomPickerDialog(
+    onDismissRequest: () -> Unit,
+    onRoomPicked: (String) -> Unit,
+) {
+    var pickedRoom by remember { mutableStateOf("") }
+    var cachedRoomPredictions by remember { mutableStateOf(null as List<String>?) }
+    val predictions = remember(cachedRoomPredictions, pickedRoom) {
+        cachedRoomPredictions?.filter { it.contains(pickedRoom, ignoreCase = true) }?.sorted() ?: emptyList()
+    }
+
+    LaunchedEffect(Unit) {
+        val scheduleRepository = ScheduleRepository()
+        val settings = ApplicationSettings.getCurrent()
+
+        val scheduleRooms = scheduleRepository.getScheduleFromCacheOrNull(settings.selectedSchedule ?: GroupName(""))
+            ?.days
+            ?.flatMap { it.lessons }
+            ?.flatMap { it.rooms }
+            ?.map { it.name }
+            ?.distinct() ?: emptyList<String>().also { Logger.w("Failed to fetch schedule rooms from cache") }
+        cachedRoomPredictions = scheduleRooms.filter { it.isNotBlank() }
+    }
+
+    AlertDialog(
+        confirmButton = {
+            Button(onClick = { onRoomPicked(pickedRoom) }) { Text(stringResource(Res.string.add)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) { Text(stringResource(Res.string.cancel)) }
+        },
+        onDismissRequest = onDismissRequest,
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = pickedRoom,
+                    onValueChange = { pickedRoom = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(Res.string.auditorium) + "…") },
+                    singleLine = true,
+                    maxLines = 1,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onRoomPicked(pickedRoom)
+                            onDismissRequest()
+                        }
+                    ),
+                )
+
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 200.dp)) {
+                    items(predictions) {
+                        Text(
+                            it,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    pickedRoom = it
+                                    onRoomPicked(it)
+                                    onDismissRequest()
+                                }
+                                .padding(8.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun EventCreateDialogTeachers(
+    teachers: List<String>,
+    onTeachersChanged: (List<String>) -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var teacherPickerOpened by remember { mutableStateOf(false) }
+
+    Column(Modifier) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(FeatherIcons.User, contentDescription = null)
+                Text(
+                    stringResource(Res.string.teacher),
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            IconButton(onClick = {
+                teacherPickerOpened = true
+            }, enabled = teachers.size < 3) {
+                Icon(FeatherIcons.PlusCircle, contentDescription = null)
+            }
+        }
+
+        Row(Modifier.horizontalScroll(rememberScrollState())) {
+            Spacer(Modifier.width(8.dp))
+            teachers.forEach { teacher ->
+                InputChip(
+                    label = { Text(teacher) },
+                    trailingIcon = { Icon(FeatherIcons.X, null, modifier = Modifier.size(18.dp)) },
+                    onClick = {
+                        onTeachersChanged(teachers - teacher)
+                    },
+                    modifier = Modifier.padding(end = 4.dp),
+                    selected = false
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+        }
+    }
+
+    if (teacherPickerOpened) {
+        TeacherPickerDialog(
+            onDismissRequest = {
+                teacherPickerOpened = false
+            },
+            onTeacherPicked = { pickedTeacher ->
+                if (pickedTeacher.isNotBlank()) {
+                    onTeachersChanged(teachers + pickedTeacher)
+                }
+                teacherPickerOpened = false
+            }
+        )
+    }
+}
+
+@Composable
+fun TeacherPickerDialog(
+    onDismissRequest: () -> Unit,
+    onTeacherPicked: (String) -> Unit,
+) {
+    var pickedTeacher by remember { mutableStateOf("") }
+    var cachedTeacherPredictions by remember { mutableStateOf(null as List<String>?) }
+    val predictions = remember(cachedTeacherPredictions, pickedTeacher) {
+        cachedTeacherPredictions?.filter { it.contains(pickedTeacher, ignoreCase = true) }?.sorted() ?: emptyList()
+    }
+
+    LaunchedEffect(Unit) {
+        val exlerRepository = ExlerRepository()
+        val scheduleRepository = ScheduleRepository()
+        val settings = ApplicationSettings.getCurrent()
+
+        val scheduleTeachers = scheduleRepository.getScheduleFromCacheOrNull(settings.selectedSchedule ?: GroupName(""))
+            ?.days
+            ?.flatMap { it.lessons }
+            ?.flatMap { it.lectors }
+            ?.map { it.teacherName.name }
+            ?.distinct() ?: emptyList<String>().also { Logger.w("Failed to fetch schedule teachers from cache") }
+
+        val exlerTeachers = exlerRepository.getTeachersFromCacheOrNull()
+            ?.map { it.name }
+            ?.distinct() ?: emptyList<String>().also { Logger.w("Failed to fetch exler teachers from cache") }
+
+        cachedTeacherPredictions =
+            (scheduleTeachers + exlerTeachers).distinctBy { it.lowercase().split(" ").sorted().joinToString(" ") }
+                .filter { it.isNotBlank() }
+        Logger.d("Teacher predictions loaded: ${cachedTeacherPredictions?.size} teachers")
+    }
+
+    AlertDialog(
+        confirmButton = {
+            Button(onClick = { onTeacherPicked(pickedTeacher) }) { Text(stringResource(Res.string.add)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) { Text(stringResource(Res.string.cancel)) }
+        },
+        onDismissRequest = onDismissRequest,
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = pickedTeacher,
+                    onValueChange = { pickedTeacher = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(Res.string.teacher_name) + "…") },
+                    singleLine = true,
+                    maxLines = 1,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            onTeacherPicked(pickedTeacher)
+                            onDismissRequest()
+                        }
+                    ),
+                )
+
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 200.dp)) {
+                    items(predictions) {
+                        Text(
+                            it,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    pickedTeacher = it
+                                    onTeacherPicked(it)
+                                    onDismissRequest()
+                                }
+                                .padding(8.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun EventCreateDialogButtons(
+    onDismissRequest: () -> Unit,
+    onEventCreateRequest: () -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        TextButton(onClick = onDismissRequest) {
+            Text(stringResource(Res.string.cancel))
+        }
+        Spacer(Modifier.width(8.dp))
+        Button(onClick = onEventCreateRequest) {
+            Text(stringResource(Res.string.done))
+        }
+    }
 }
