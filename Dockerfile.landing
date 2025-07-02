@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:23-latest AS build
+FROM azul/zulu-openjdk:23-latest AS build
 
 WORKDIR /opt/app
 COPY . .
