@@ -1,0 +1,12 @@
+FROM azul/zulu-openjdk-alpine:23-latest AS build
+
+WORKDIR /opt/app
+COPY . .
+
+RUN chmod +x gradlew
+RUN ./gradlew --no-daemon :landing:jsBrowserDistribution
+
+FROM nginx:alpine
+COPY --from=build /opt/app/landing/build/dist/js/productionExecutable/ /usr/share/nginx/html
+
+EXPOSE 80

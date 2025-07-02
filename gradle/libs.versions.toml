@@ -1,6 +1,15 @@
 [versions]
 
 analytics = "7.5.0"
+kotlin-wrappers = "2025.2.0"
+kotlin-wrappers-react = "2025.6.15-19.1.0"
+kotlin-wrappers-react-dom = "2025.6.15-19.1.0"
+kotlin-wrappers-react-router = "2025.7.1-6.28.2"
+kotlin-wrappers-emotion = "2025.6.15-11.13.5"
+react = "19.1.0"
+react-dom = "19.1.0"
+react-router = "6.28.2"
+
 bignum = "0.3.10"
 composeShimmer = "1.3.1"
 composeWebview = "1.9.40"
@@ -116,6 +125,12 @@ androidx-foundation-android = { group = "androidx.compose.foundation", name = "f
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
 zoomimage-view-core = { module = "io.github.panpf.zoomimage:zoomimage-compose", version.ref = "zoomimage" }
 zoomimage-view-res = { module = "io.github.panpf.zoomimage:zoomimage-compose-resources", version.ref = "zoomimage" }
+
+kotlin-wrappers-bom = { module = "org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom", version.ref = "kotlin-wrappers" }
+kotlin-wrappers-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "kotlin-wrappers-react" }
+kotlin-wrappers-react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "kotlin-wrappers-react-dom" }
+kotlin-wrappers-react-router = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-router", version.ref = "kotlin-wrappers-react-router" }
+kotlin-emotion = { module = "org.jetbrains.kotlin-wrappers:kotlin-emotion", version.ref = "kotlin-wrappers-emotion" }
 
 [plugins]
 

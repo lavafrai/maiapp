@@ -16,3 +16,4 @@ Pods/
 *yarn.lock
 /composeApp/release/
 *secrets.properties
+/kotlin-js-store/
