@@ -1,0 +1,38 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    min-width: 100vw;
+
+
+    font-family: "Roboto", Arial, sans-serif;
+
+    --primary: #0095DA;
+    --background: #e6e6e6;
+    --foreground: #111;
+    --foreground-inaccent: #222;
+    --foreground-superinaccent: #444;
+
+    color: var(--foreground);
+    background: var(--background);
+
+    overflow-x: hidden;
+}
+
+body {
+    background-image: url("/media/background-light.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+    body, html {
+        --primary: #B0DCFF;
+        --background: #0f0f0f;
+        --foreground: #fff;
+        --foreground-inaccent: #D4D4D4;
+        --foreground-superinaccent: #999;
+    }
+
+    body {
+        background-image: url("/media/background.svg");
+    }
+}

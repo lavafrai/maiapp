@@ -1,13 +1,15 @@
-FROM azul/zulu-openjdk:23-latest AS build
+FROM node:20-alpine AS build
 
 WORKDIR /opt/app
-COPY . .
+COPY landing/package.json landing/package-lock.json* ./
 
-RUN chmod +x gradlew
-RUN ./gradlew --no-daemon :landing:jsBrowserDistribution
+RUN npm install
+COPY landing/ ./
 
+RUN npm run build
 FROM nginx:alpine
-COPY landing/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /opt/app/landing/build/dist/js/productionExecutable/ /usr/share/nginx/html
 
+COPY landing/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /opt/app/dist/ /usr/share/nginx/html
 EXPOSE 80
