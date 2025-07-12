@@ -22,6 +22,7 @@ function Header() {
                 color: "var(--primary)",
                 userSelect: "none",
                 margin: 0,
+                textDecoration: "none",
             }} href="https://lavafrai.ru">lava_frai</a>
             <Row>
                 <HeaderMenuItem text="Связаться" icon="envelope" href="https://lavafrai.ru"/>
@@ -40,6 +41,7 @@ const HeaderMenuItem = ({text, icon, href}: { text: string, icon: IconName, href
         userSelect: "none",
         whiteSpace: "nowrap",
         backgroundColor: "var(--background)",
+        color: "var(--foreground)",
         transition: "background-color 0.3s ease",
         textDecoration: "none",
 
