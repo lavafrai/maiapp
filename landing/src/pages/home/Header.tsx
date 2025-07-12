@@ -22,16 +22,16 @@ function Header() {
                 color: "var(--primary)",
                 userSelect: "none",
                 margin: 0,
-            }}>lava_frai</a>
+            }} href="https://lavafrai.ru">lava_frai</a>
             <Row>
-                <HeaderMenuItem text="Связаться" icon="envelope"/>
-                <HeaderMenuItem text="Пожертвования" icon="heart"/>
+                <HeaderMenuItem text="Связаться" icon="envelope" href="https://lavafrai.ru"/>
+                <HeaderMenuItem text="Пожертвования" icon="heart" href="https://pay.cloudtips.ru/p/e930707c"/>
             </Row>
         </Row>
     </header>
 }
 
-const HeaderMenuItem = ({text, icon}: { text: string, icon: IconName }) => {
+const HeaderMenuItem = ({text, icon, href}: { text: string, icon: IconName, href: string }) => {
     return <a css={{
         padding: "10px 12px",
         margin: "6px",
@@ -51,7 +51,7 @@ const HeaderMenuItem = ({text, icon}: { text: string, icon: IconName }) => {
             marginLeft: "8px",
             fontSize: "16px"
         },
-    }}>
+    }} href={href}>
         <FontAwesomeIcon icon={["far", icon]} fontWeight={800}/>
         <span>{text}</span>
     </a>
