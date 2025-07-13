@@ -8,7 +8,7 @@ COPY landing/ ./
 
 RUN npm run build
 RUN ls -la /opt/app/dist/
-RUN ls -la /opt/app/
+RUN ls -la /opt/app/public/
 
 FROM nginx:alpine
 
