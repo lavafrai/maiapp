@@ -23,6 +23,14 @@ body {
     background-image: url("/media/background-light.svg");
 }
 
+#root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+}
+
 @media (prefers-color-scheme: dark) {
     body, html {
         --primary: #B0DCFF;
@@ -35,4 +43,31 @@ body {
     body {
         background-image: url("/media/background.svg");
     }
+}
+
+p {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5em;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    unicode-bidi: isolate;
+    color: var(--foreground-inaccent);
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+h2 {
+    font-size: 1.6em;
+    line-height: 1.5em;
+    margin: 1em 0 0.5rem;
+}
+
+li {
+    line-height: 1.5em;
+    color: var(--foreground-inaccent);
 }

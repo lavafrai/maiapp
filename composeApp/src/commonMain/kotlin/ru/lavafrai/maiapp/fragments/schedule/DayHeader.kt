@@ -86,9 +86,10 @@ fun DayHeader(
                     )
                 }
             }
-            if (showEventAddingButton) IconButton(onAddEventClick, modifier = Modifier.then(Modifier.size(24.dp))) {
+            // TODO: add event adding button
+            /*if (showEventAddingButton) IconButton(onAddEventClick, modifier = Modifier.then(Modifier.size(24.dp))) {
                 Icon(FeatherIcons.Plus, contentDescription = "add custom event", modifier = Modifier.alpha(0.5f))
-            }
+            }*/
         }
     }
 }

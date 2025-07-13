@@ -1,11 +1,17 @@
 /** @jsxImportSource @emotion/react */
 import Header from "./Header";
 import "./HomePage.css"
+import Footer from "./Footer.tsx";
+import Main from "./Main.tsx";
 
 
 function HomePage() {
     return <>
-        <Header/>
+        <div css={{width: "100%"}}>
+            <Header/>
+            <Main></Main>
+        </div>
+        <Footer/>
     </>
 }
 

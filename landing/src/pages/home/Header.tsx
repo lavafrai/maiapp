@@ -3,16 +3,18 @@ import Row from "../../layout/Row.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {type IconName, library} from "@fortawesome/fontawesome-svg-core";
 import {faEnvelope, faHeart} from "@fortawesome/free-regular-svg-icons";
+import useWindowDimensions from "../../utils/Dimensions.tsx";
 
 library.add(faEnvelope, faHeart);
 
 
 function Header() {
     return <header css={{
-        margin: "auto",
+        margin: "0 auto",
+        width: "100%",
         maxWidth: "900px",
         padding: "8px 12px",
-        boxSizing: "content-box",
+        boxSizing: "border-box",
     }}>
         <Row horizontalAlignment="space-between" verticalAlignment="center">
             <a css={{
@@ -23,7 +25,7 @@ function Header() {
                 userSelect: "none",
                 margin: 0,
                 textDecoration: "none",
-            }} href="https://lavafrai.ru">lava_frai</a>
+            }} href="https://lavafrai.ru" target="_blank">lava_frai</a>
             <Row>
                 <HeaderMenuItem text="Связаться" icon="envelope" href="https://lavafrai.ru"/>
                 <HeaderMenuItem text="Пожертвования" icon="heart" href="https://pay.cloudtips.ru/p/e930707c"/>
@@ -33,6 +35,10 @@ function Header() {
 }
 
 const HeaderMenuItem = ({text, icon, href}: { text: string, icon: IconName, href: string }) => {
+    let dimensions = useWindowDimensions();
+    let isTextVisible = dimensions.width > 900;
+    let textDisplay = isTextVisible ? "inline" : "none";
+
     return <a css={{
         padding: "10px 12px",
         margin: "6px",
@@ -55,7 +61,7 @@ const HeaderMenuItem = ({text, icon, href}: { text: string, icon: IconName, href
         },
     }} href={href}>
         <FontAwesomeIcon icon={["far", icon]} fontWeight={800}/>
-        <span>{text}</span>
+        <span css={{display: textDisplay}}>{text}</span>
     </a>
 }
 
