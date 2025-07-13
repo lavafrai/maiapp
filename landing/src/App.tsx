@@ -8,6 +8,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<HomePage/>}></Route>
+                <Route path="/download" element={<>Download</>}></Route>
             </Routes>
         </BrowserRouter>
     )
