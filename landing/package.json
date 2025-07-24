@@ -17,9 +17,13 @@
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "axios": "^1.10.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-if": "^4.1.6",
     "react-router-dom": "^7.6.3",
+    "react-shimmer-effects": "^1.0.4",
+    "react-tabs": "^6.1.0",
     "react-viewer": "^3.2.2"
   },
   "devDependencies": {

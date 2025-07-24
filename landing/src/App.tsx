@@ -1,5 +1,6 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import HomePage from "./pages/home/HomePage.tsx";
+import DownloadPage from "./pages/download/DownloadPage.tsx";
 
 function App() {
     // const [count, setCount] = useState(0)
@@ -8,7 +9,7 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<HomePage/>}></Route>
-                <Route path="/download" element={<>Download</>}></Route>
+                <Route path="/download" element={<DownloadPage/>}></Route>
             </Routes>
         </BrowserRouter>
     )

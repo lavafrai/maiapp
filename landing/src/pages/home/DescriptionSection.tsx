@@ -4,10 +4,14 @@ import logo from "../../assets/maiapp_round.webp";
 import PrimaryButton from "../../PrimaryButton.tsx";
 import {faDownload} from "@fortawesome/free-solid-svg-icons";
 import {library} from "@fortawesome/fontawesome-svg-core";
+import {useNavigate} from "react-router-dom";
 library.add(faDownload);
 
 
 export default function DescriptionSection() {
+    let navigate = useNavigate();
+
+
     return <section>
         <Row>
             <img src={logo} alt="maiapp logo" width="96px" height="96px"/>
@@ -26,6 +30,6 @@ export default function DescriptionSection() {
             </div>
         </Row>
         <div style={{height: "8px"}}></div>
-        <PrimaryButton text="Скачать" icon={["fas", "download"]}/>
+        <PrimaryButton text="Скачать" icon={["fas", "download"]} onClick={ () => { navigate("/download") } }/>
     </section>
 }
