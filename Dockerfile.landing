@@ -1,7 +1,7 @@
 FROM node:20-alpine AS build
 
 WORKDIR /opt/app
-RUN apk add --no-cache autoconf automake g++ make libtool nasm
+RUN apk add --no-cache autoconf automake g++ make libtool nasm pkgconfig
 COPY landing/package.json landing/package-lock.json* ./
 
 RUN npm install
