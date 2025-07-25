@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  server2:
+    image: ghcr.io/lavafrai/maiapp/maiserver:latest
+    container_name: server2
+    restart: unless-stopped
+    expose:
+      - "80"
+    healthcheck:
+      test: curl -sS http://127.0.0.1/groups || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  landing:
+    image: ghcr.io/lavafrai/maiapp/maiapp-landing:latest
+    container_name: landing
+    restart: unless-stopped
+    expose:
+      - "80"
+    healthcheck:
+      test: curl -sS http://127.0.0.1 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./server-nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - server2
+      - landing
+    healthcheck:
+      test: curl -sS http://
