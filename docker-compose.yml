@@ -1,9 +1,7 @@
-version: "3"
-
 services:
   server2:
     image: ghcr.io/lavafrai/maiapp/maiserver:latest
-    container_name: server2
+    container_name: mai-server2
     restart: unless-stopped
     expose:
       - "80"
@@ -15,7 +13,7 @@ services:
 
   landing:
     image: ghcr.io/lavafrai/maiapp/maiapp-landing:latest
-    container_name: landing
+    container_name: mai-landing
     restart: unless-stopped
     expose:
       - "80"
@@ -27,7 +25,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: nginx
+    container_name: mai-nginx
     restart: unless-stopped
     ports:
       - "80:80"
