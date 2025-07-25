@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.StringSerializer
 
 @Serializable//(with = BaseScheduleIdSerializer::class)
-class BaseScheduleId(val id: String): ScheduleId() {
+data class BaseScheduleId(val id: String): ScheduleId() {
     override val scheduleId: String
         get() = id
 

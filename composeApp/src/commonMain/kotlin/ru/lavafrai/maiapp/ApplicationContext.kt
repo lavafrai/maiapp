@@ -43,7 +43,7 @@ class ApplicationContext(
     }
 
     fun openSchedule(scheduleId: ScheduleId, title: String? = null) {
-        navController.navigate(DedicatedSchedulePage(scheduleId, title))
+        navController.navigate(DedicatedSchedulePage(scheduleId.toBase(), title))
     }
 
     fun requestSafeDataClean() {
