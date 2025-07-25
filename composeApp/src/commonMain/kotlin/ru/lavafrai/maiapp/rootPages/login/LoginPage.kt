@@ -46,6 +46,8 @@ fun LoginPage(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var isExpanded by rememberSaveable { mutableStateOf(false) }
     val viewModel: LoginPageViewModel = viewModel(factory = LoginPageViewModel.Factory(loginData, onNavigateBack, onLoginDone))
+    // val viewModel = viewModel { LoginPageViewModel(loginData, onNavigateBack, onLoginDone) }
+
     val viewState by viewModel.state.collectAsState()
 
     LaunchedEffect(viewState.neededLoadable.baseStatus) {
