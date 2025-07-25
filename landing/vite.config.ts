@@ -11,8 +11,9 @@ export default defineConfig({
         optimizationLevel: 4,
         interlaced: false,
       },
-      optipng: {
-        optimizationLevel: 4,
+      pngquant: {
+        speed: 4,
+        strip: true,
       },
       mozjpeg: {
         progressive: true,
