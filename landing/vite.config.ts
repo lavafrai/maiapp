@@ -8,14 +8,15 @@ export default defineConfig({
     react(),
     viteImagemin({
       gifsicle: {
-        optimizationLevel: 7,
+        optimizationLevel: 4,
         interlaced: false,
       },
       optipng: {
-        optimizationLevel: 7,
+        optimizationLevel: 4,
       },
-      jpegTran: {
+      mozjpeg: {
         progressive: true,
+        quality: 75,
       },
       svgo: {
         plugins: [
@@ -30,7 +31,7 @@ export default defineConfig({
         ],
       },
       webp: {
-        preset: "drawing",
+        quality: 75,
         method: 6,
         lossless: true
       }
