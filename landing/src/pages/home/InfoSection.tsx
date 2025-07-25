@@ -25,5 +25,6 @@ export default function InfoSection() {
             <li>Тестирование: Артем Бирюков</li>
             <li>Сотрудничество с экслером: Георгий Суворов</li>
         </ul>
+        <p>Полный список благодарностей: <a href="/thanks">здесь</a></p>
     </section>
 }

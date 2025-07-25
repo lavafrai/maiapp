@@ -1,0 +1,31 @@
+I would like to thank the following people and projects for their contributions, libraries, and resources that made this project possible:
+
+Максим Онищенко (maximon0101) for testing support throughout the development process
+Артем Лазарев (ArtemBay) for the initial development of promo-materials
+Артем Бирюков for testing of some application features and ideas for improvements
+Георгий Суворов for ideas and help with mai-exler integration and also for mai campus map
+Evgeny Meltsaykin for idea to rewrite the application in Compose Multiplatform and for code reviews
+Георгий Воложанин и Павел Голощапов for making it possible to release the app on iOS
+
+Google and JetBrains for the Kotlin language and libraries
+
+Chris Banes (chrisbanes) for material3-windowsizeclass-multiplatform library (Apache License 2.0)
+Sungyong An (fornewid) for material-motion-compose library (Apache License 2.0)
+Coil developers for Coil library (Apache License 2.0)
+Kermit developers for Kermit library (Apache License 2.0)
+Valentin Ilk (valentinilk) for compose-shimmer library (Apache License 2.0)
+panpf for ZoomImage library (Apache License 2.0)
+Jordon de Hoog (jordond) for MaterialKolor library (MIT License)
+Kevin Zou and team for compose-webview-multiplatform library (Apache License 2.0)
+Mohamed Rejeb for compose-rich-editor library (Apache License 2.0)
+Erik C. Thauvin for urlencoder library (Apache License 2.0)
+Russell Wolf (russhwolf) for multiplatform-settings library (Apache License 2.0)
+Gabriel Souza (DevSrSouza) for compose-icons library (MIT License)
+
+Feather icons teem for Feather icons (MIT License)
+Line awesome team for Line Awesome icons (Good Boy License :3 )
+
+All anonymous donators who supported the project financially.
+And of course, I would like to thank all the users of this application for their support and feedback. Your contributions, suggestions, and enthusiasm have been invaluable in shaping this project.
+
+With love, invented made and developed by lava_frai <3

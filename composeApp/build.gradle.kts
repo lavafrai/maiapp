@@ -76,36 +76,19 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.models)
-            implementation(projects.network.mymai)
-            implementation(projects.shared)
+            implementation(projects.models)  // All shared models
+            implementation(projects.network.mymai)  // MyMai client for my.mai.ru account
+            implementation(projects.shared)  // Shared code for all platforms, utils
 
+            // Compose, graphics and androidx libraries
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.kermit)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.serialization)
-            implementation(libs.ktor.serialization.json)
-            implementation(libs.ktor.client.logging)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation.compose)
-            implementation(libs.kotlinx.serialization.core)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.multiplatformSettings)
-            implementation(libs.multiplatformSettingsNoArg)
-            implementation(libs.multiplatformSettingsSerialization)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kstore)
-            implementation(libs.composeIcons.featherIcons)
-            implementation(libs.composeIcons.lineAwesomeIcons)
             implementation(libs.windowSize)
             implementation(libs.material.motion)
             implementation(libs.coil.compose)
@@ -113,21 +96,37 @@ kotlin {
             implementation(libs.coil.svg)
             implementation(libs.compose.shimmer)
             implementation(libs.zoomimage.compose.coil3)
-            // api(libs.webview) // Does not work on WEB
-            implementation(libs.sonner)
-            implementation(libs.multiplatform.settings.test)
             implementation(libs.material.kolor)
-            implementation(libs.richeditor.compose)
-            // implementation(libs.haze.materials) // Does not work idk why
-
-            implementation(libs.libres)
-            implementation(libs.coil.compose)
-            implementation(libs.coil.network.ktor3)
             implementation(libs.compose.webview)
-            //implementation(libs.zoomimage.view.coil3)
+            implementation(libs.richeditor.compose)
+
+            // Logger
+            implementation(libs.kermit)
+
+            // Some kotlin ecosystem libraries
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
+
+            // Ktor
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.serialization)
+            implementation(libs.ktor.serialization.json)
+            implementation(libs.ktor.client.logging)
             implementation(libs.zoomimage.view.core)
             implementation(libs.zoomimage.view.res)
             implementation(libs.urlencoder.lib)
+
+            // multiplatform settings for all storage operations
+            implementation(libs.multiplatformSettings)
+            implementation(libs.multiplatformSettingsNoArg)
+            implementation(libs.multiplatformSettingsSerialization)
+
+            // Just icons
+            implementation(libs.composeIcons.featherIcons)
+            implementation(libs.composeIcons.lineAwesomeIcons)
         }
 
         androidMain.dependencies {
