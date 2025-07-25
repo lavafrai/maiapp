@@ -54,10 +54,10 @@ kotlin {
 
     jvmToolchain(17)
 
-    wasmJs {
+    /*wasmJs {
         browser()
         binaries.executable()
-    }
+    }*/
 
     jvm { }
 
