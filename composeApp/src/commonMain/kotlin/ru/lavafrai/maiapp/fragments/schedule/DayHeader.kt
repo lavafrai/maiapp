@@ -1,16 +1,11 @@
 package ru.lavafrai.maiapp.fragments.schedule
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
@@ -19,7 +14,8 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.*
+import maiapp.composeapp.generated.resources.today
+import maiapp.composeapp.generated.resources.tomorrow
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.localizers.localizedGenitive
@@ -87,9 +83,9 @@ fun DayHeader(
                 }
             }
             // TODO: add event adding button
-            /*if (showEventAddingButton) IconButton(onAddEventClick, modifier = Modifier.then(Modifier.size(24.dp))) {
+            if (showEventAddingButton) IconButton(onAddEventClick, modifier = Modifier.then(Modifier.size(24.dp))) {
                 Icon(FeatherIcons.Plus, contentDescription = "add custom event", modifier = Modifier.alpha(0.5f))
-            }*/
+            }
         }
     }
 }

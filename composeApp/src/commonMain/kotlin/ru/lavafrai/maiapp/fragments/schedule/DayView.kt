@@ -1,6 +1,5 @@
 package ru.lavafrai.maiapp.fragments.schedule
 
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
@@ -12,7 +11,6 @@ import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
-import kotlin.collections.indices
 
 @Composable
 fun DayView(
@@ -26,7 +24,7 @@ fun DayView(
         verticalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier,
     ) {
-        val sortedLessons = remember(day.lessons) { day.lessons.sortedBy { it.getPairNumber() } }
+        val sortedLessons = remember(day.lessons) { day.lessons.sortedBy { it.timeStart.toLocalTime() } }
         for (lessonId in sortedLessons.indices) {
             val lesson = sortedLessons[lessonId]
 

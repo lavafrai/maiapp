@@ -11,19 +11,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,11 +41,11 @@ import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.fragments.DatePickerDialog
 import ru.lavafrai.maiapp.fragments.TimePickerDialog
+import ru.lavafrai.maiapp.fragments.schedule.SelectablePairNumber
 import ru.lavafrai.maiapp.localizers.localizedGenitive
 import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.schedule.GroupName
-import ru.lavafrai.maiapp.models.schedule.ScheduleId
-import kotlin.collections.plus
+import ru.lavafrai.maiapp.utils.PairTimeHelper
 
 
 @Composable
@@ -131,6 +119,13 @@ fun EventCreateContent(
     var eventName by remember { mutableStateOf("") }
     var teachers by remember { mutableStateOf(emptyList<String>()) }
     var rooms by remember { mutableStateOf(emptyList<String>()) }
+    val swapStartAndEndIfRequired = {
+        if (startTime > endTime) {
+            val temp = startTime
+            startTime = endTime
+            endTime = temp
+        }
+    }
 
     EventCreateDialogName(
         name = eventName,
@@ -145,8 +140,13 @@ fun EventCreateContent(
         startTime = startTime,
         endTime = endTime,
         onDateChanged = { date = it },
-        onStartTimeChanged = { startTime = it },
-        onEndTimeChanged = { endTime = it },
+        onStartTimeChanged = { startTime = it; swapStartAndEndIfRequired() },
+        onEndTimeChanged = { endTime = it; swapStartAndEndIfRequired() },
+        onTimeRangeChanged = { start, end ->
+            startTime = start
+            endTime = end
+            swapStartAndEndIfRequired()
+        }
     )
 
     HorizontalDivider(Modifier.padding(bottom = 16.dp).padding(horizontal = 8.dp))
@@ -228,6 +228,7 @@ fun EventCreateDialogDateTime(
     onDateChanged: (LocalDate) -> Unit,
     onStartTimeChanged: (LocalTime) -> Unit,
     onEndTimeChanged: (LocalTime) -> Unit,
+    onTimeRangeChanged: (LocalTime, LocalTime) -> Unit,
 ) {
     var startTimeExpanded by remember { mutableStateOf(false) }
     var endTimeExpanded by remember { mutableStateOf(false) }
@@ -249,7 +250,7 @@ fun EventCreateDialogDateTime(
         Row(Modifier.clickable { dateExpanded = true }.padding(horizontal = horizontalPadding).fillMaxWidth()) {
             Text(dateText, style = MaterialTheme.typography.displaySmall)
         }
-        Row(Modifier.padding(horizontal = horizontalPadding)) {
+        Row(Modifier.padding(horizontal = horizontalPadding).horizontalScroll(rememberScrollState())) {
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.displayLarge) {
                 Text(startTimeText, modifier = Modifier.clickable { startTimeExpanded = true })
                 Text(" - ", modifier = Modifier.alpha(0.8f))
@@ -273,6 +274,74 @@ fun EventCreateDialogDateTime(
         onConfirm = { dateExpanded = false; onDateChanged(it) },
         currentDate = date
     )
+
+    ByPairTimeSelector(
+        startTime = startTime,
+        endTime = endTime,
+        onTimeRangeChanged = onTimeRangeChanged,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    )
+}
+
+@Composable
+fun ByPairTimeSelector(
+    startTime: LocalTime,
+    endTime: LocalTime,
+    onTimeRangeChanged: (LocalTime, LocalTime) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val selectedPairs = remember(startTime, endTime) { PairTimeHelper.getPairsInRange(startTime, endTime) }
+
+    Row(
+        modifier = modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Spacer(Modifier.width(4.dp))
+
+        repeat(PairTimeHelper.pairCount) {
+            val pairNumber = it + 1
+            val pairSelected = pairNumber in selectedPairs
+
+            SelectablePairNumber(
+                text = pairNumber.toString(),
+                selected = pairSelected,
+                onSelectionChange = {
+                    if (!pairSelected) {
+                        when (pairNumber) {
+                            selectedPairs.min() - 1 -> {
+                                val newStartTime = PairTimeHelper.getPairTime(pairNumber).first
+                                val newEndTime = PairTimeHelper.getPairTime(selectedPairs.max()).second
+                                onTimeRangeChanged(newStartTime, newEndTime)
+                            }
+                            selectedPairs.max() + 1 -> {
+                                val newStartTime = PairTimeHelper.getPairTime(selectedPairs.min()).first
+                                val newEndTime = PairTimeHelper.getPairTime(pairNumber).second
+                                onTimeRangeChanged(newStartTime, newEndTime)
+                            }
+                            else -> {
+                                val newStartTime = PairTimeHelper.getPairTime(pairNumber).first
+                                val newEndTime = PairTimeHelper.getPairTime(pairNumber).second
+                                onTimeRangeChanged(newStartTime, newEndTime)
+                            }
+                        }
+                    } else {
+                        if (pairNumber in selectedPairs) {
+                            val newSelectedPairs = selectedPairs - pairNumber
+                            if (newSelectedPairs.isNotEmpty()) {
+                                val newStartTime = PairTimeHelper.getPairTime(newSelectedPairs.min()).first
+                                val newEndTime = PairTimeHelper.getPairTime(newSelectedPairs.max()).second
+                                onTimeRangeChanged(newStartTime, newEndTime)
+                            }
+                        }
+                    }
+                }
+            )
+        }
+
+        Spacer(Modifier.width(4.dp))
+    }
 }
 
 @Composable
