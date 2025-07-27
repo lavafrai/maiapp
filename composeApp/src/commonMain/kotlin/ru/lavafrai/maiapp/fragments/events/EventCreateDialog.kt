@@ -128,7 +128,7 @@ fun EventCreateContent(
     var eventType by remember { mutableStateOf(EventType.Other) }
     var period by remember { mutableStateOf(SimpleEventPeriod.Single) }
 
-    val swapStartAndEndIfRequired = {
+    val swapTimesIfRequired = {
         if (startTime > endTime) {
             val temp = startTime
             startTime = endTime
@@ -148,6 +148,13 @@ fun EventCreateContent(
         onNameChanged = {
             eventName = it
         }
+    )
+
+    EventTypeSelector(
+        typeSelected = eventType,
+        onTypeSelected = {
+            eventType = it
+        },
     )
 
     EventPeriodSelector(
@@ -170,12 +177,12 @@ fun EventCreateContent(
             endDate = end
             swapDatesIfRequired()
         },
-        onStartTimeChanged = { startTime = it; swapStartAndEndIfRequired() },
-        onEndTimeChanged = { endTime = it; swapStartAndEndIfRequired() },
+        onStartTimeChanged = { startTime = it; swapTimesIfRequired() },
+        onEndTimeChanged = { endTime = it; swapTimesIfRequired() },
         onTimeRangeChanged = { start, end ->
             startTime = start
             endTime = end
-            swapStartAndEndIfRequired()
+            swapTimesIfRequired()
         }
     )
 
@@ -191,14 +198,37 @@ fun EventCreateContent(
         onRoomsChanged = { rooms = it }
     )
 
-    val localFocusManager = LocalFocusManager.current
-    val localKeyboardController = LocalSoftwareKeyboardController.current
+    // Build the event object
     EventCreateDialogButtons(
         onDismissRequest = onRequestSoftDismiss,
         onEventCreateRequest = {
 
         }
     )
+}
+
+@Composable
+fun EventTypeSelector(
+    typeSelected: EventType,
+    onTypeSelected: (EventType) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(Modifier)
+        EventType.entries.forEach { type ->
+            val isSelected = typeSelected == type
+            InputChip(
+                label = { Text(type.localized()) },
+                onClick = { onTypeSelected(type) },
+                selected = isSelected,
+            )
+        }
+        Spacer(Modifier)
+    }
 }
 
 @Composable
@@ -289,6 +319,7 @@ fun EventCreateDialogDateTime(
     var startTimeExpanded by remember { mutableStateOf(false) }
     var endTimeExpanded by remember { mutableStateOf(false) }
     var dateExpanded by remember { mutableStateOf(false) }
+    var endDateExpanded by remember { mutableStateOf(false) }
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
     val dateText = if (now.year == date.year) "${date.dayOfMonth} ${date.month.localizedGenitive()}"
@@ -345,7 +376,7 @@ fun EventCreateDialogDateTime(
                     Text(
                         endDateText,
                         style = MaterialTheme.typography.displaySmall,
-                        modifier = Modifier.clickable { dateExpanded = true }
+                        modifier = Modifier.clickable { endDateExpanded = true }
                     )
                 }
             }
@@ -386,6 +417,13 @@ fun EventCreateDialogDateTime(
         },
         currentDate = date
     )
+    if (endDateExpanded) DatePickerDialog(
+        onDismiss = { endDateExpanded = false },
+        onConfirm = {
+            endDateExpanded = false; onDateRangeChanged(date, it)
+        },
+        currentDate = endDate
+    )
 
     ByPairTimeSelector(
         startTime = startTime,
@@ -421,6 +459,12 @@ fun ByPairTimeSelector(
                 selected = pairSelected,
                 onSelectionChange = {
                     if (!pairSelected) {
+                        if (selectedPairs.isEmpty()) {
+                            val newStartTime = PairTimeHelper.getPairTime(pairNumber).first
+                            val newEndTime = PairTimeHelper.getPairTime(pairNumber).second
+                            onTimeRangeChanged(newStartTime, newEndTime)
+                            return@SelectablePairNumber
+                        }
                         when (pairNumber) {
                             selectedPairs.min() - 1 -> {
                                 val newStartTime = PairTimeHelper.getPairTime(pairNumber).first

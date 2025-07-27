@@ -172,4 +172,7 @@
     <string name="event_period_weekly_before">Каждую неделю, начиная c</string>
     <string name="event_period_biweekly_before">Раз в две недели, начиная c</string>
     <string name="event_period_monthly_before">Раз в месяц, начиная c</string>
+
+    <string name="meeting">Встреча</string>
+    <string name="other">Прочее</string>
 </resources>
