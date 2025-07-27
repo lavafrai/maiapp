@@ -72,7 +72,7 @@ fun EventCreateDialog(
         sheetState = sheetState,
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
     ) {
-        Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
             EventCreateContent(
                 initialDate = initialDate,
                 onDismissRequest = onDismissRequest,
@@ -119,6 +119,7 @@ fun EventCreateContent(
     onEventCreated: (Event) -> Unit,
 ) = Column(Modifier.padding(vertical = 16.dp)) {
     var date by remember { mutableStateOf(initialDate) }
+    var endDate by remember { mutableStateOf(initialDate + DatePeriod(months = 1)) }
     var startTime by remember { mutableStateOf(LocalTime(hour = 10, minute = 45)) }
     var endTime by remember { mutableStateOf(LocalTime(hour = 12, minute = 15)) }
     var eventName by remember { mutableStateOf("") }
@@ -132,6 +133,13 @@ fun EventCreateContent(
             val temp = startTime
             startTime = endTime
             endTime = temp
+        }
+    }
+    val swapDatesIfRequired = {
+        if (date > endDate) {
+            val temp = date
+            date = endDate
+            endDate = temp
         }
     }
 
@@ -154,9 +162,14 @@ fun EventCreateContent(
         period = period,
         initialDate = initialDate,
         date = date,
+        endDate = endDate,
         startTime = startTime,
         endTime = endTime,
-        onDateChanged = { date = it },
+        onDateRangeChanged = { start, end ->
+            date = start
+            endDate = end
+            swapDatesIfRequired()
+        },
         onStartTimeChanged = { startTime = it; swapStartAndEndIfRequired() },
         onEndTimeChanged = { endTime = it; swapStartAndEndIfRequired() },
         onTimeRangeChanged = { start, end ->
@@ -203,8 +216,8 @@ fun EventPeriodSelector(
         SimpleEventPeriod.entries.forEach { period ->
             val isSelected = periodSelected == period
             InputChip(
-                label = {Text(period.localized())},
-                onClick = {onPeriodSelected(period)},
+                label = { Text(period.localized()) },
+                onClick = { onPeriodSelected(period) },
                 selected = isSelected,
             )
         }
@@ -265,9 +278,10 @@ fun EventCreateDialogDateTime(
     period: SimpleEventPeriod,
     initialDate: LocalDate?,
     date: LocalDate,
+    endDate: LocalDate,
     startTime: LocalTime,
     endTime: LocalTime,
-    onDateChanged: (LocalDate) -> Unit,
+    onDateRangeChanged: (LocalDate, LocalDate) -> Unit,
     onStartTimeChanged: (LocalTime) -> Unit,
     onEndTimeChanged: (LocalTime) -> Unit,
     onTimeRangeChanged: (LocalTime, LocalTime) -> Unit,
@@ -279,22 +293,26 @@ fun EventCreateDialogDateTime(
 
     val dateText = if (now.year == date.year) "${date.dayOfMonth} ${date.month.localizedGenitive()}"
     else "${date.dayOfMonth} ${date.month.localizedGenitive()} ${date.year}"
+
+    val endDateText = if (now.year == date.year) "${endDate.dayOfMonth} ${endDate.month.localizedGenitive()}"
+    else "${endDate.dayOfMonth} ${endDate.month.localizedGenitive()} ${endDate.year}"
+
     val startTimeText = "${startTime.hour}:${startTime.minute.toString().padStart(2, '0')}"
     val endTimeText = "${endTime.hour}:${endTime.minute.toString().padStart(2, '0')}"
     val horizontalPadding = 8.dp
 
     Column(
         Modifier
-            .padding(vertical = 16.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        // Date selector
         Row(
             Modifier
-                .clickable { dateExpanded = true }
                 .padding(horizontal = horizontalPadding)
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
+                .padding(bottom = 8.dp)
         ) {
             Column {
                 if (period != SimpleEventPeriod.Single) {
@@ -308,9 +326,33 @@ fun EventCreateDialogDateTime(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
-                Text(dateText, style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(bottom = 8.dp))
+                Text(
+                    dateText,
+                    style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.clickable { dateExpanded = true }
+                )
+                if (period != SimpleEventPeriod.Single) {
+                    Text(
+                        "по",
+                        style = MaterialTheme.typography.displaySmall.copy(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            lineHeight = 18.sp
+                        ),
+                        modifier = Modifier
+                    )
+                    Text(
+                        endDateText,
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier.clickable { dateExpanded = true }
+                    )
+                }
             }
         }
+
+        HorizontalDivider(Modifier.padding(bottom = 16.dp).padding(horizontal = 8.dp))
+        // Time selector
         Row(
             Modifier
                 .padding(horizontal = horizontalPadding)
@@ -336,7 +378,12 @@ fun EventCreateDialogDateTime(
     )
     if (dateExpanded) DatePickerDialog(
         onDismiss = { dateExpanded = false },
-        onConfirm = { dateExpanded = false; onDateChanged(it) },
+        onConfirm = {
+            dateExpanded = false; onDateRangeChanged(
+            it,
+            if (period == SimpleEventPeriod.Single) it + DatePeriod(days = 1) else endDate
+        )
+        },
         currentDate = date
     )
 
@@ -380,11 +427,13 @@ fun ByPairTimeSelector(
                                 val newEndTime = PairTimeHelper.getPairTime(selectedPairs.max()).second
                                 onTimeRangeChanged(newStartTime, newEndTime)
                             }
+
                             selectedPairs.max() + 1 -> {
                                 val newStartTime = PairTimeHelper.getPairTime(selectedPairs.min()).first
                                 val newEndTime = PairTimeHelper.getPairTime(pairNumber).second
                                 onTimeRangeChanged(newStartTime, newEndTime)
                             }
+
                             else -> {
                                 val newStartTime = PairTimeHelper.getPairTime(pairNumber).first
                                 val newEndTime = PairTimeHelper.getPairTime(pairNumber).second

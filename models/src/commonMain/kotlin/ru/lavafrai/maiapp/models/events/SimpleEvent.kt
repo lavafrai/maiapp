@@ -16,6 +16,7 @@ import kotlin.uuid.Uuid
 data class SimpleEvent (
     val name: String,
     val date: LocalDate,
+    val endDate: LocalDate?,
     val startTime: LocalTime,
     val endTime: LocalTime,
     val room: List<String>,
