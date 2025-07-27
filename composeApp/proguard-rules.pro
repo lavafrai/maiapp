@@ -1,3 +1,4 @@
+-dontobfuscate
 -keepattributes *Annotation*,Signature,InnerClasses
 -keepattributes SourceFile,LineNumberTable
 
