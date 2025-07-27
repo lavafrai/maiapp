@@ -11,5 +11,5 @@ import kotlin.uuid.Uuid
 @Serializable
 sealed class Event {
     abstract val uid: Uuid
-    abstract fun renderForDateRange(dateRange: DateRange): List<RenderedEvent>
+    abstract fun renderForDateRange(dateRange: DateRange?): List<RenderedEvent>
 }

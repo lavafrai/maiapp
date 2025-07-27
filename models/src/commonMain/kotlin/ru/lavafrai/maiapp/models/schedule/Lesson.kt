@@ -1,7 +1,6 @@
 package ru.lavafrai.maiapp.models.schedule
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.serializers.LocalDateComponentSerializer
 import kotlinx.serialization.SerialName
@@ -11,7 +10,7 @@ import ru.lavafrai.maiapp.models.time.now
 
 @Serializable
 data class Lesson(
-    @SerialName("name") val name: String,
+    @SerialName("name") override val name: String,
     @SerialName("time_start") val timeStart: Time,
     @SerialName("time_end") val timeEnd: Time,
     @SerialName("lectors") val lectors: List<TeacherId>,
@@ -22,7 +21,7 @@ data class Lesson(
     @SerialName("teams") val teams: String,
     @SerialName("other") val other: String,
     @SerialName("timeRange") val timeRange: String = "${timeStart.time.substring(0, timeStart.time.indexOf(":", 3))} – ${timeEnd.time.substring(0, timeEnd.time.indexOf(":", 3))}"
-) {
+): LessonLike {
     fun getPairNumber(): Int {
         return when (timeRange) {
             "9:00 – 10:30" -> 1
@@ -45,4 +44,13 @@ data class Lesson(
         if (day < LocalDate.now()) return true
         return timeEnd.toLocalTime() < LocalTime.now()
     }
+
+    override val startTime: LocalTime
+        get() = timeStart.toLocalTime()
+
+    override val endTime: LocalTime
+        get() = timeEnd.toLocalTime()
+
+    override val date: LocalDate
+        get() = day
 }

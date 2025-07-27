@@ -26,3 +26,17 @@ fun java.time.DayOfWeek.castToSerializable(): DayOfWeek {
         java.time.DayOfWeek.SUNDAY -> DayOfWeek.SUNDAY
     }
 }*/
+
+fun kotlinx.datetime.DayOfWeek.castToSerializable(): DayOfWeek {
+    return when(this) {
+        kotlinx.datetime.DayOfWeek.MONDAY -> DayOfWeek.MONDAY
+        kotlinx.datetime.DayOfWeek.TUESDAY -> DayOfWeek.TUESDAY
+        kotlinx.datetime.DayOfWeek.WEDNESDAY -> DayOfWeek.WEDNESDAY
+        kotlinx.datetime.DayOfWeek.THURSDAY -> DayOfWeek.THURSDAY
+        kotlinx.datetime.DayOfWeek.FRIDAY -> DayOfWeek.FRIDAY
+        kotlinx.datetime.DayOfWeek.SATURDAY -> DayOfWeek.SATURDAY
+        kotlinx.datetime.DayOfWeek.SUNDAY -> DayOfWeek.SUNDAY
+
+        else -> throw IllegalArgumentException("Unknown DayOfWeek: $this")
+    }
+}

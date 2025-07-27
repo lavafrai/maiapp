@@ -10,11 +10,13 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
+import ru.lavafrai.maiapp.data.repositories.EventRepository
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
 import ru.lavafrai.maiapp.data.repositories.MaiDataRepository
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
+import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
@@ -29,6 +31,7 @@ class MainPageViewModel(
     initialState = MainPageState(
         page = MainNavigationPageId.HOME,
         schedule = Loadable.loading(),
+        events = Loadable.loading(),
         selectedWeek = DateRange.currentWeek(),
         workLessonSelectors = listOf(LessonSelector.default()),
         exlerTeachers = Loadable.loading(),
@@ -48,6 +51,7 @@ class MainPageViewModel(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
     )
+    private val eventRepository = EventRepository()
 
     init {
         startLoading()
@@ -72,25 +76,6 @@ class MainPageViewModel(
                 scheduleName = scheduleId
             }
 
-            /*val scheduleHandler = CoroutineExceptionHandler { _, e ->
-                e.printStackTrace()
-                emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e as Exception)))
-            }
-
-            supervisorScope {
-                // Download schedule
-                launch(scheduleHandler) {
-                    val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
-                    if (cachedSchedule != null) emit(stateValue.copy(schedule = Loadable.updating(cachedSchedule)))
-                    else emit(stateValue.copy(schedule = Loadable.loading()))
-                }.invokeOnCompletion {
-                    launch(scheduleHandler) {
-                        val schedule = scheduleRepository.getSchedule(scheduleName)
-                        emit(stateValue.copy(schedule = Loadable.actual(schedule)))
-                    }
-                }
-            }*/
-
             launchCatching(
                 onError = {
                     emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it as Exception)))
@@ -101,10 +86,24 @@ class MainPageViewModel(
                 if (cachedSchedule != null) emit(stateValue.copy(schedule = Loadable.updating(cachedSchedule)))
                 else emit(stateValue.copy(schedule = Loadable.loading()))
 
+                reloadEvents()
+
                 val schedule = scheduleRepository.getSchedule(scheduleName)
                 emit(stateValue.copy(schedule = Loadable.actual(schedule)))
                 onReloaded?.invoke()
             }
+        }
+    }
+
+    suspend fun reloadEvents() {
+        launchCatching(
+            onError = {
+                it.printStackTrace()
+                emit(stateValue.copy(events = stateValue.events.copy(error = it as Exception)))
+            }
+        ) {
+            val events = eventRepository.listAllEvents(scheduleName)
+            emit(stateValue.copy(events = Loadable.actual(events)))
         }
     }
 
@@ -135,6 +134,11 @@ class MainPageViewModel(
                     val schedule = scheduleRepository.getSchedule(scheduleName)
                     emit(stateValue.copy(schedule = Loadable.actual(schedule)))
                 }}
+
+                launchCatching(onError = { it.printStackTrace() }) {
+                    val events = eventRepository.listAllEvents(scheduleName)
+                    emit(stateValue.copy(events = Loadable.actual(events)))
+                }
 
                 launch(exlerHandler) {
                     val exlerTeachers = exlerRepository.getTeachers()
@@ -182,6 +186,20 @@ class MainPageViewModel(
     ) {
         if (lastVersion != null) onShowUpdateInfo()
         else VersionInfo.updateLastVersion()
+    }
+
+    fun createSimpleEvent(
+        event: SimpleEvent,
+    ) {
+        viewModelScope.launch(dispatchers.IO) {
+            try {
+                eventRepository.createEvent(event, scheduleName)
+                reloadEvents()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(stateValue.copy(events = stateValue.events.copy(error = e)))
+            }
+        }
     }
 
     class Factory(

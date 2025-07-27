@@ -175,4 +175,5 @@
 
     <string name="meeting">Встреча</string>
     <string name="other">Прочее</string>
+    <string name="would_be_added_to">Будет добавлено в</string>
 </resources>

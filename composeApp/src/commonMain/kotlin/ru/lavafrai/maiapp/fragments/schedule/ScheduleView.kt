@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.LoadingIndicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
@@ -20,21 +19,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.data.repositories.LessonAnnotationsRepository
 import ru.lavafrai.maiapp.fragments.PageColumn
+import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.DateRange
+import ru.lavafrai.maiapp.models.time.castToSerializable
 import ru.lavafrai.maiapp.utils.LessonSelector
-import kotlin.time.Duration.Companion.seconds
 
 
 @Composable
 fun ScheduleView(
     schedule: Schedule,
+    events: List<Event> = emptyList(),
     dateRange: DateRange? = null,
     exlerTeachers: List<ExlerTeacher>? = null,
     modifier: Modifier = Modifier,
@@ -49,6 +50,11 @@ fun ScheduleView(
     val filteredDays =
         remember(dateRange, schedule) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
     val annotations by lessonAnnotationRepository.follow(schedule.name).collectAsState()
+    val renderedEvents = remember(events, dateRange) {
+        events.flatMap { event ->
+            event.renderForDateRange(dateRange)
+        }.sortedBy { it.date }
+    }
 
     val filteredLessons = remember(dateRange, selector, annotations, schedule, filteredDays) {
         filteredDays.map { day ->
@@ -61,8 +67,19 @@ fun ScheduleView(
             })
         }.filter { it.lessons.isNotEmpty() }
     }
+    val filteredEvents = remember(events, dateRange) {
+        events
+            .flatMap { event -> event.renderForDateRange(dateRange) }
+            .sortedBy { it.date }
+            .filter { event ->
+                dateRange?.contains(event.date) ?: true
+            }
+    }
     val filteredAnnotations = remember(annotations, dateRange) {
         annotations.filter { it.lessonUid in filteredLessons.flatMap { it.lessons.map { it.getUid() } } }
+    }
+    val filteredLessonLikes = remember(filteredLessons, filteredEvents) {
+        (filteredLessons.flatMap { it.lessons } + filteredEvents).sortedBy { it.date }
     }
 
     LaunchedEffect(dateRange, selector, schedule.id, filteredLessons) {
@@ -70,26 +87,23 @@ fun ScheduleView(
     }
 
     val scope = rememberCoroutineScope()
-    // var refreshing by remember { mutableStateOf(false) }
     val refresh = suspend {
         if (onRefresh != null) onRefresh()
-        //delay(1.seconds)
-        //refreshing = false
     }
-    /*LaunchedEffect(schedule) {
-        if (refreshing) {
-            refreshing = false
-        }
-    }*/
 
     PageColumn(scrollState = null) {
         val content = @Composable {
-            if (filteredLessons.isNotEmpty())
+            if (filteredLessonLikes.isNotEmpty())
                 LazyColumn(
                     modifier = modifier,
                     state = state.lazyScrollState,
                 ) {
-                    for (day in filteredLessons.sortedBy { it.date }) {
+                    for (date in filteredLessonLikes.map { it.date }.distinct()) {
+                        val day = filteredDays.firstOrNull { it.date == date } ?: ScheduleDay(
+                            date = date,
+                            lessons = emptyList(),
+                            dayOfWeek = date.dayOfWeek.castToSerializable(),
+                        )
                         stickyHeader {
                             DayHeader(
                                 day = day,
@@ -109,6 +123,7 @@ fun ScheduleView(
                                 exlerTeachers = exlerTeachers,
                                 annotations = filteredAnnotations,
                                 schedule = schedule,
+                                events = renderedEvents,
                             )
                         }
                     }

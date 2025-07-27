@@ -21,15 +21,15 @@ data class SimpleEvent (
     val endTime: LocalTime,
     val room: List<String>,
     val teachers: List<String>,
-    val type: EventType,
+    val eventType: EventType,
     val period: SimpleEventPeriod,
     @SerialName("uuid") val _uuid: Uuid,
 ): Event() {
     override val uid: Uuid
         get() = _uuid
 
-    override fun renderForDateRange(dateRange: DateRange): List<RenderedEvent> {
-        if (date !in dateRange) return emptyList()
+    override fun renderForDateRange(dateRange: DateRange?): List<RenderedEvent> {
+        // if (date !in dateRange) return emptyList()
         return listOf(
             RenderedEvent(
                 date = date,
@@ -38,7 +38,7 @@ data class SimpleEvent (
                 name = name,
                 teachers = teachers,
                 room = room,
-                type = type,
+                type = eventType,
                 uuid = _uuid,
             )
         )

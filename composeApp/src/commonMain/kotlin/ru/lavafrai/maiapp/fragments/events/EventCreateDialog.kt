@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.fragments.events
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -46,18 +47,20 @@ import ru.lavafrai.maiapp.fragments.schedule.SelectablePairNumber
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.localizers.localizedBeforeTime
 import ru.lavafrai.maiapp.localizers.localizedGenitive
-import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.events.EventType
+import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.events.SimpleEventPeriod
 import ru.lavafrai.maiapp.models.schedule.GroupName
 import ru.lavafrai.maiapp.utils.PairTimeHelper
+import kotlin.uuid.Uuid
 
 
 @Composable
 fun EventCreateDialog(
     initialDate: LocalDate,
     onDismissRequest: () -> Unit,
-    onEventCreated: (Event) -> Unit,
+    onEventCreated: (SimpleEvent) -> Unit,
+    scheduleName: String
 ) {
     val appContext = LocalApplicationContext.current
 
@@ -85,6 +88,7 @@ fun EventCreateDialog(
                     }
                 },
                 onEventCreated = onEventCreated,
+                scheduleName = scheduleName
             )
         }
     }
@@ -116,13 +120,15 @@ fun EventCreateContent(
     initialDate: LocalDate,
     onDismissRequest: () -> Unit,
     onRequestSoftDismiss: () -> Unit,
-    onEventCreated: (Event) -> Unit,
+    onEventCreated: (SimpleEvent) -> Unit,
+    scheduleName: String,
 ) = Column(Modifier.padding(vertical = 16.dp)) {
     var date by remember { mutableStateOf(initialDate) }
     var endDate by remember { mutableStateOf(initialDate + DatePeriod(months = 1)) }
     var startTime by remember { mutableStateOf(LocalTime(hour = 10, minute = 45)) }
     var endTime by remember { mutableStateOf(LocalTime(hour = 12, minute = 15)) }
     var eventName by remember { mutableStateOf("") }
+    var eventNameError by remember { mutableStateOf(false) }
     var teachers by remember { mutableStateOf(emptyList<String>()) }
     var rooms by remember { mutableStateOf(emptyList<String>()) }
     var eventType by remember { mutableStateOf(EventType.Other) }
@@ -147,7 +153,9 @@ fun EventCreateContent(
         name = eventName,
         onNameChanged = {
             eventName = it
-        }
+
+        },
+        error = eventNameError,
     )
 
     EventTypeSelector(
@@ -200,9 +208,32 @@ fun EventCreateContent(
 
     // Build the event object
     EventCreateDialogButtons(
+        scheduleName = scheduleName,
         onDismissRequest = onRequestSoftDismiss,
         onEventCreateRequest = {
+            val cleanEventName = eventName.trim()
+            if (cleanEventName.isEmpty()) {
+                eventNameError = true
+                Logger.w("Event name is empty")
+                return@EventCreateDialogButtons
+            } else {
+                eventNameError = false
+            }
 
+            val builtEvent = SimpleEvent(
+                name = eventName,
+                date = date,
+                endDate = if (period == SimpleEventPeriod.Single) null else endDate,
+                startTime = startTime,
+                endTime = endTime,
+                room = rooms,
+                teachers = teachers,
+                eventType = eventType,
+                period = period,
+                _uuid = Uuid.NIL
+            )
+            Logger.d("Creating event: $builtEvent")
+            onEventCreated(builtEvent)
         }
     )
 }
@@ -259,9 +290,17 @@ fun EventPeriodSelector(
 fun EventCreateDialogName(
     name: String = "",
     onNameChanged: (String) -> Unit,
+    error: Boolean,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    val placeHolderColor = animateColorAsState(
+        targetValue = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        label = "placeholderColor"
+    )
+    LaunchedEffect(error) {
+        if (error) { onNameChanged(name.trim()) }
+    }
 
     Column(
         Modifier.padding(horizontal = 8.dp)
@@ -293,7 +332,7 @@ fun EventCreateDialogName(
                         Text(
                             text = stringResource(Res.string.event_name),
                             fontSize = 28.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            color = placeHolderColor.value,
                         )
                     }
                     innerTextField()
@@ -785,22 +824,42 @@ fun TeacherPickerDialog(
 
 @Composable
 fun EventCreateDialogButtons(
+    scheduleName: String,
     onDismissRequest: () -> Unit,
     onEventCreateRequest: () -> Unit,
 ) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.End
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
     ) {
-        TextButton(onClick = onDismissRequest) {
-            Text(stringResource(Res.string.cancel))
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 4.dp, top = 8.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                "${stringResource(Res.string.would_be_added_to)} $scheduleName",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                ),
+            )
         }
-        Spacer(Modifier.width(8.dp))
-        Button(onClick = onEventCreateRequest) {
-            Text(stringResource(Res.string.done))
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(Res.string.cancel))
+            }
+            Spacer(Modifier.width(8.dp))
+            Button(onClick = onEventCreateRequest) {
+                Text(stringResource(Res.string.done))
+            }
         }
     }
 }

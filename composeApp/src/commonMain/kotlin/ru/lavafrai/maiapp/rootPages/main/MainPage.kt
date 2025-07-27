@@ -128,6 +128,7 @@ fun MainPage(
                     LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
                         ScheduleView(
                             schedule = viewState.schedule.data!!,
+                            events = viewState.events.data ?: emptyList(),
                             exlerTeachers = viewState.exlerTeachers.data,
                             dateRange = viewState.selectedWeek,
                             modifier = Modifier.fillMaxSize(),
@@ -171,7 +172,8 @@ fun MainPage(
         EventCreateDialog(
             onDismissRequest = { eventCreateExpanded = false },
             initialDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-            onEventCreated = { eventCreateExpanded = false },
+            onEventCreated = { eventCreateExpanded = false; viewModel.createSimpleEvent(it) },
+            scheduleName = viewState.schedule.data?.name ?: "unknown_schedule",
         )
     }
 
