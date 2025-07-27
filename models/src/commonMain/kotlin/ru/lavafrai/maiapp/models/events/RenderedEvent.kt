@@ -14,7 +14,7 @@ data class RenderedEvent(
     val endTime: LocalTime,
     val name: String,
     val teachers: List<String>,
-    val room: String?,
+    val room: List<String>,
     val type: EventType,
     val uuid: Uuid, // identity of event that produced this RenderedEvent, e.g. SingleEvent.uuid or GroupEvent.uuid
 )

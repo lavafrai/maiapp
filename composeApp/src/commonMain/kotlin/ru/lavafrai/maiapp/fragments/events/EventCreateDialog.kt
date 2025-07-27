@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -42,8 +43,12 @@ import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.fragments.DatePickerDialog
 import ru.lavafrai.maiapp.fragments.TimePickerDialog
 import ru.lavafrai.maiapp.fragments.schedule.SelectablePairNumber
+import ru.lavafrai.maiapp.localizers.localized
+import ru.lavafrai.maiapp.localizers.localizedBeforeTime
 import ru.lavafrai.maiapp.localizers.localizedGenitive
 import ru.lavafrai.maiapp.models.events.Event
+import ru.lavafrai.maiapp.models.events.EventType
+import ru.lavafrai.maiapp.models.events.SimpleEventPeriod
 import ru.lavafrai.maiapp.models.schedule.GroupName
 import ru.lavafrai.maiapp.utils.PairTimeHelper
 
@@ -119,6 +124,9 @@ fun EventCreateContent(
     var eventName by remember { mutableStateOf("") }
     var teachers by remember { mutableStateOf(emptyList<String>()) }
     var rooms by remember { mutableStateOf(emptyList<String>()) }
+    var eventType by remember { mutableStateOf(EventType.Other) }
+    var period by remember { mutableStateOf(SimpleEventPeriod.Single) }
+
     val swapStartAndEndIfRequired = {
         if (startTime > endTime) {
             val temp = startTime
@@ -134,7 +142,16 @@ fun EventCreateContent(
         }
     )
 
+    EventPeriodSelector(
+        periodSelected = period,
+        onPeriodSelected = { selectedPeriod ->
+            period = selectedPeriod
+        },
+        modifier = Modifier.padding(top = 8.dp)
+    )
+
     EventCreateDialogDateTime(
+        period = period,
         initialDate = initialDate,
         date = date,
         startTime = startTime,
@@ -169,6 +186,30 @@ fun EventCreateContent(
 
         }
     )
+}
+
+@Composable
+fun EventPeriodSelector(
+    periodSelected: SimpleEventPeriod,
+    onPeriodSelected: (SimpleEventPeriod) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(Modifier)
+        SimpleEventPeriod.entries.forEach { period ->
+            val isSelected = periodSelected == period
+            InputChip(
+                label = {Text(period.localized())},
+                onClick = {onPeriodSelected(period)},
+                selected = isSelected,
+            )
+        }
+        Spacer(Modifier)
+    }
 }
 
 @Composable
@@ -221,6 +262,7 @@ fun EventCreateDialogName(
 
 @Composable
 fun EventCreateDialogDateTime(
+    period: SimpleEventPeriod,
     initialDate: LocalDate?,
     date: LocalDate,
     startTime: LocalTime,
@@ -247,10 +289,33 @@ fun EventCreateDialogDateTime(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Row(Modifier.clickable { dateExpanded = true }.padding(horizontal = horizontalPadding).fillMaxWidth()) {
-            Text(dateText, style = MaterialTheme.typography.displaySmall)
+        Row(
+            Modifier
+                .clickable { dateExpanded = true }
+                .padding(horizontal = horizontalPadding)
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+            Column {
+                if (period != SimpleEventPeriod.Single) {
+                    Text(
+                        period.localizedBeforeTime(),
+                        style = MaterialTheme.typography.displaySmall.copy(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        ),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+                Text(dateText, style = MaterialTheme.typography.displaySmall, modifier = Modifier.padding(bottom = 8.dp))
+            }
         }
-        Row(Modifier.padding(horizontal = horizontalPadding).horizontalScroll(rememberScrollState())) {
+        Row(
+            Modifier
+                .padding(horizontal = horizontalPadding)
+                .horizontalScroll(rememberScrollState())
+        ) {
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.displayLarge) {
                 Text(startTimeText, modifier = Modifier.clickable { startTimeExpanded = true })
                 Text(" - ", modifier = Modifier.alpha(0.8f))

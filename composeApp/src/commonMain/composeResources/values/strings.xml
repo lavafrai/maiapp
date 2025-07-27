@@ -160,4 +160,16 @@
     <string name="open_thanks">Благодарности и лицензии</string>
     <string name="support_project">Поддержать проект</string>
     <string name="settings_info">Это приложение было разработано студентами и для студентов. Его исходный код открыт и вы, как и любой, можете внести свой вклад в его дальнейшее улучшение. Этот проект является некоммерческим и монетизируется только путем пожертвований, поэтому было бы славно, если бы вы, как пользователь, поддержали мои дальнейшие проекты и тем самым позволили подобному существовать. С любыми вопросами и предложениями, за поддержкой, вы можете обратиться в телеграм чат сообщества. Вам быстро помогут разработчики или другие пользователи.</string>
+
+    <string name="event_period_single">Не повторяется</string>
+    <string name="event_period_daily">Ежедневно</string>
+    <string name="event_period_weekly">Каждую неделю</string>
+    <string name="event_period_biweekly">Раз в две недели</string>
+    <string name="event_period_monthly">Каждый месяц</string>
+
+    <string name="event_period_single_before"></string>
+    <string name="event_period_daily_before">Каждый день c</string>
+    <string name="event_period_weekly_before">Каждую неделю, начиная c</string>
+    <string name="event_period_biweekly_before">Раз в две недели, начиная c</string>
+    <string name="event_period_monthly_before">Раз в месяц, начиная c</string>
 </resources>

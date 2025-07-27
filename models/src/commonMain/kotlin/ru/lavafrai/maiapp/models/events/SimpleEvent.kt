@@ -3,7 +3,6 @@
 package ru.lavafrai.maiapp.models.events
 
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,15 +12,16 @@ import kotlin.uuid.Uuid
 
 
 @Serializable
-@SerialName("single")
-data class SingleEvent (
+@SerialName("simple")
+data class SimpleEvent (
     val name: String,
     val date: LocalDate,
     val startTime: LocalTime,
     val endTime: LocalTime,
-    val room: String?,
+    val room: List<String>,
     val teachers: List<String>,
     val type: EventType,
+    val period: SimpleEventPeriod,
     @SerialName("uuid") val _uuid: Uuid,
 ): Event() {
     override val uid: Uuid
