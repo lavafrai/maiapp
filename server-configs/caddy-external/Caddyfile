@@ -7,7 +7,7 @@ test-maiapp.lavafrai.ru {
         respond "Hello from Caddy!"
     }
 
-    handle {
+    route {
         usage /usage-data/caddy_usage.db
 
         reverse_proxy nginx-internal:80
