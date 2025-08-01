@@ -52,5 +52,9 @@ services:
       - "443:443/udp"
     volumes:
       - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddyfile
+      - caddy-usage-data:/usage-data
     depends_on:
       - nginx-internal
+
+volumes:
+  caddy-usage-data:

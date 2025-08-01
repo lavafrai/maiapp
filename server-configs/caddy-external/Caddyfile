@@ -8,7 +8,14 @@ test-maiapp.lavafrai.ru {
     }
 
     route {
-        usage
-        reverse_proxy nginx-internal:80
+        usage /usage-data/caddy_usage.db
+
+
+        cache {
+            ttl 2m
+            match_status 200
+
+            reverse_proxy nginx-internal:80
+        }
     }
 }
