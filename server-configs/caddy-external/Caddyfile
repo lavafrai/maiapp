@@ -7,5 +7,7 @@ maiapp.lavafrai.ru {
         respond "Hello from Caddy!"
     }
 
-    reverse_proxy http://nginx-internal:80
+    handle {
+        reverse_proxy http://nginx-internal:80
+    }
 }
