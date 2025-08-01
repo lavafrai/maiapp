@@ -1,4 +1,8 @@
 test-maiapp.lavafrai.ru {
+    cache {
+        ttl 2m
+    }
+
     handle /metrics {
         metrics
     }
