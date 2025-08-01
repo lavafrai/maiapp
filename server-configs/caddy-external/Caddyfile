@@ -3,9 +3,11 @@ test-maiapp.lavafrai.ru {
 
     }
 
-    handle {
+    handle /test {
         respond "Hello from Caddy!"
     }
 
-
+    handle {
+        reverse_proxy nginx-internal:80
+    }
 }
