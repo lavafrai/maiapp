@@ -1,0 +1,13 @@
+bots:
+  - name: favicon
+    path_regex: ^/favicon.ico$
+    action: ALLOW
+  - name: robots
+    path_regex: ^/robots.txt$
+    action: ALLOW
+  - name: api
+    path_regex: ^/api/.*
+    action: ALLOW
+  - name: generic-browser
+    user_agent_regex: Mozilla
+    action: CHALLENGE
