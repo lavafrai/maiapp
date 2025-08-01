@@ -13,7 +13,7 @@ test-maiapp.lavafrai.ru {
 
         handle {
             cache {
-
+                cache_name main-cache
             }
 
             reverse_proxy nginx-internal:80
