@@ -1,6 +1,6 @@
 test-maiapp.lavafrai.ru {
-    metrics /metrics {
-
+    handle /metrics {
+        metrics
     }
 
     handle /test {
