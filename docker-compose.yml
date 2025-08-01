@@ -104,7 +104,7 @@ services:
     image: grafana/grafana:latest
     container_name: mai-grafana
     volumes:
-      - grafana_data:/var/lib/grafana
+      - grafana-data:/var/lib/grafana
       - ./server-configs/grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_USER=admin
@@ -118,3 +118,4 @@ services:
 volumes:
   caddy-usage-data:
   prometheus-data:
+  grafana-data:
