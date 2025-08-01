@@ -1,6 +1,4 @@
 test-maiapp.lavafrai.ru {
-    usage
-
     handle /metrics {
         metrics
     }
@@ -9,7 +7,7 @@ test-maiapp.lavafrai.ru {
         respond "Hello from Caddy!"
     }
 
-    handle {
+    route {
         usage
         reverse_proxy nginx-internal:80
     }
