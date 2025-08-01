@@ -72,7 +72,7 @@ services:
     container_name: mai-prometheus
     volumes:
       - ./server-configs/prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
+      - prometheus-data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -102,3 +102,4 @@ services:
 
 volumes:
   caddy-usage-data:
+  prometheus-data:
