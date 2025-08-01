@@ -1,8 +1,4 @@
 test-maiapp.lavafrai.ru {
-    cache {
-        match_path /api/v1/schedule
-        ttl 2m
-    }
 
     handle /metrics {
         metrics
@@ -14,6 +10,9 @@ test-maiapp.lavafrai.ru {
 
     route {
         usage
+        cache {
+            match_path /api/v1/schedule
+        }
 
         reverse_proxy nginx-internal:80
     }
