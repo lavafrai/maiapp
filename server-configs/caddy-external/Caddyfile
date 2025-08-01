@@ -7,7 +7,7 @@ test-maiapp.lavafrai.ru {
         respond "Hello from Caddy!"
     }
 
-    route {
+    handle {
         usage /usage-data/caddy_usage.db
         cache {
             ttl 2m
