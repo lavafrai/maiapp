@@ -11,7 +11,7 @@ test-maiapp.lavafrai.ru {
     route {
         usage
 
-        handle_path / {
+        handle {
             reverse_proxy nginx-internal:80
         }
     }
