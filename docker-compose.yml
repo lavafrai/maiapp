@@ -46,7 +46,7 @@ services:
     restart: unless-stopped
     environment:
       BIND: ":80"
-      DIFFICULTY: "4"
+      DIFFICULTY: "7"
       METRICS_BIND: ":9090"
       SERVE_ROBOTS_TXT: "false"
       TARGET: "http://nginx-internal"
