@@ -67,6 +67,23 @@ services:
     depends_on:
       - nginx-internal
 
+  prometheus:
+    image: prom/prometheus:v2.17.1
+    container_name: mai-prometheus
+    volumes:
+      - ./server-configs/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    expose:
+      - 9090
+
   caddy-external:
     build:
       context: server-configs/caddy-external
