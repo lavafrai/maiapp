@@ -47,8 +47,10 @@ services:
     container_name: mai-caddy-external
     restart: unless-stopped
     ports:
+      - "80:80"
       - "443:443"
+      - "443:443/udp"
     volumes:
-      - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddy
+      - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddyfile
     depends_on:
       - nginx-internal
