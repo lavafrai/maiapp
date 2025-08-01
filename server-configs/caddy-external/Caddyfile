@@ -10,10 +10,9 @@ test-maiapp.lavafrai.ru {
 
     route {
         usage
-        cache {
-            match_path /api/v1/schedule
-        }
 
-        reverse_proxy nginx-internal:80
+        handle_path / {
+            reverse_proxy nginx-internal:80
+        }
     }
 }
