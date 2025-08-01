@@ -8,6 +8,6 @@ maiapp.lavafrai.ru {
     }
 
     handle {
-        reverse_proxy http://nginx-internal:80
+        reverse_proxy nginx-internal:80
     }
 }
