@@ -40,6 +40,33 @@ services:
       timeout: 10s
       retries: 3
 
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    container_name: mai-anubis
+    restart: unless-stopped
+    environment:
+      BIND: ":80"
+      DIFFICULTY: "4"
+      METRICS_BIND: ":9090"
+      SERVE_ROBOTS_TXT: "false"
+      TARGET: "http://nginx-internal"
+      POLICY_FNAME: "/data/cfg/botPolicy.yaml"
+      OG_PASSTHROUGH: "true"
+      OG_EXPIRY_TIME: "24h"
+    healthcheck:
+      test: [ "CMD", "anubis", "--healthcheck" ]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 500ms
+    expose:
+      - "80"
+      - "9090"
+    volumes:
+      - ./server-configs/anubis/botPolicy.yaml:/data/cfg/botPolicy.yaml:ro
+    depends_on:
+      - nginx-internal
+
   caddy-external:
     build:
       context: server-configs/caddy-external
@@ -54,7 +81,7 @@ services:
       - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddyfile
       - caddy-usage-data:/usage-data
     depends_on:
-      - nginx-internal
+      - anubis
 
 volumes:
   caddy-usage-data:

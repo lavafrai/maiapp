@@ -12,11 +12,7 @@ test-maiapp.lavafrai.ru {
         usage
 
         handle {
-            cache {
-                default_cache_control no-store
-            }
-
-            reverse_proxy nginx-internal:80
+            reverse_proxy anubis:80
         }
     }
 }
