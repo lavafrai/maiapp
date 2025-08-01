@@ -1,0 +1,11 @@
+maiapp.lavafrai.ru {
+    reverse_proxy http://nginx-internal:80
+
+    metrics /metrics {
+
+    }
+
+    handle /test {
+        respond "Hello from Caddy!"
+    }
+}
