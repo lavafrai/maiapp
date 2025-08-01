@@ -27,8 +27,8 @@ services:
     image: nginx:alpine
     container_name: mai-nginx-internal
     restart: unless-stopped
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     volumes:
       - ./server-configs/nginx-internal/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
@@ -39,3 +39,16 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  caddy-external:
+    build:
+      context: server-configs/caddy-external
+      dockerfile: Dockerfile
+    container_name: mai-caddy-external
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddy
+    depends_on:
+      - nginx-internal
