@@ -1,4 +1,10 @@
+{
+    usage
+}
+
 test-maiapp.lavafrai.ru {
+    usage
+
     handle /metrics {
         metrics
     }
