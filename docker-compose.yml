@@ -35,7 +35,7 @@ services:
       - server2
       - landing
     healthcheck:
-      test: curl -sS https://maiapp.lavafrai.ru/ || exit 1
+      test: curl -sS http://127.0.0.1 || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
@@ -90,6 +90,11 @@ services:
       dockerfile: Dockerfile
     container_name: mai-caddy-external
     restart: unless-stopped
+    healthcheck:
+      test: curl -sS http://127.0.0.1/test || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
       - "80:80"
       - "443:443"
@@ -108,10 +113,16 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
       - ./server-configs/grafana/provisioning:/etc/grafana/provisioning
+    healthcheck:
+      test: curl -sS http://127.0.0.1:3000/api/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PLUGINS_PREINSTALL=
     restart: unless-stopped
     ports:
       - "3000:3000"

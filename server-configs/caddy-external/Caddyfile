@@ -21,3 +21,9 @@ maiapp.lavafrai.ru, test-maiapp.lavafrai.ru {
         metrics
     }
 }
+
+:80 {
+    handle /test {
+        respond "Hello from Caddy!"
+    }
+}
