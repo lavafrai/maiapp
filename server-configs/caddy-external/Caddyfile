@@ -1,4 +1,4 @@
-test-maiapp.lavafrai.ru {
+maiapp.lavafrai.ru, test-maiapp.lavafrai.ru {
     handle /metrics-anubis {
         reverse_proxy anubis:9090
     }
