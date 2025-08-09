@@ -90,17 +90,17 @@ services:
       dockerfile: Dockerfile
     container_name: mai-caddy-external
     restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
     expose:
       - "8081"
+      - "80"
     volumes:
       - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddyfile
       - caddy-usage-data:/usage-data
     depends_on:
       - anubis
+    networks:
+      - default
+      - server-local
 
   grafana:
     image: grafana/grafana:latest
@@ -127,3 +127,7 @@ volumes:
   caddy-usage-data:
   prometheus-data:
   grafana-data:
+
+networks:
+  server-local:
+    external: true

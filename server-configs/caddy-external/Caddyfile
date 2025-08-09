@@ -1,4 +1,4 @@
-maiapp.lavafrai.ru {
+:80 {
     handle /metrics-anubis {
         reverse_proxy anubis:9090
     }
@@ -19,11 +19,5 @@ maiapp.lavafrai.ru {
 :8081 {
     handle /metrics {
         metrics
-    }
-}
-
-:80 {
-    handle /test {
-        respond "Hello from Caddy!"
     }
 }
