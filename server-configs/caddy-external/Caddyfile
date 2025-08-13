@@ -7,6 +7,20 @@
         respond "Hello from Caddy!"
     }
 
+    # Redirect bare path to trailing slash for Grafana
+    @grafana_bare path /grafana
+    redir @grafana_bare /grafana/ 301
+
+    # Bypass Anubis and proxy Grafana directly
+    handle /grafana* {
+        reverse_proxy grafana:3000 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+
     route {
         usage
 
@@ -14,7 +28,6 @@
             reverse_proxy anubis:80 {
                 header_up Host {host}
                 header_up X-Forwarded-Proto https
-                header_up X-Forwarded-Port 443
                 header_up X-Forwarded-Host {host}
                 header_up X-Forwarded-For {remote}
             }
