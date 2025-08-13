@@ -1,6 +1,6 @@
 ![mai app logo](https://maiapp.lavafrai.ru/maiapp.webp)
 # Приложение МАИ
-[![GitHub release (latest SemVer)][release-badge]][release-url] ![License info badge][license-badge] ![GitHub badge][uptime-badge]
+[![GitHub release (latest SemVer)][release-badge]][release-url] ![License info badge][license-badge] [![GitHub badge][uptime-badge]][uptime-url]
  > MAI app - приложение с информацией и расписанием для студентов и преподавателей Московского Авиационного Института.
 
 ## Функции
@@ -55,4 +55,5 @@
 [release-url]: https://github.com/lavafrai/maiapp/releases
 [release-badge]: https://img.shields.io/github/v/release/lavafrai/maiapp?sort=semver&logo=github&logoColor=959DA5&labelColor=444D56
 [license-badge]: https://img.shields.io/github/license/lavafrai/maiapp
-[uptime-badge]: https://img.shields.io/uptimerobot/ratio/m801025561-d7d8e7f1325c821df0f3632a
+[uptime-badge]: https://status.lavafrai.ru/api/badge/10/uptime/24
+[uptime-url]: https://status.lavafrai.ru
