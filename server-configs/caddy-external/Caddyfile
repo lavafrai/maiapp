@@ -11,7 +11,13 @@
         usage
 
         handle {
-            reverse_proxy anubis:80
+            reverse_proxy anubis:80 {
+                header_up Host {host}
+                header_up X-Forwarded-Proto https
+                header_up X-Forwarded-Port 443
+                header_up X-Forwarded-Host {host}
+                header_up X-Forwarded-For {remote}
+            }
         }
     }
 }
