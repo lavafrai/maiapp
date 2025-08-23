@@ -7,15 +7,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.skeptick.snowfall.compose.SnowfallDrawPosition
+import io.github.skeptick.snowfall.compose.snowfall
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.viewing
 import org.jetbrains.compose.resources.stringResource
+import ru.lavafrai.maiapp.utils.SeasonedThemeHelper
 import ru.lavafrai.maiapp.utils.asDp
+import ru.lavafrai.maiapp.utils.contextual
 
 @Composable
 fun MainPageTitle(
@@ -26,7 +31,21 @@ fun MainPageTitle(
     rightButton: @Composable () -> Unit = {},
     subtitleIcon: @Composable (Dp) -> Unit = {},
 ) {
+    val newYearThemeActive = remember { SeasonedThemeHelper.isNewYearThemeActive() }
+
     Column(modifier
+        .contextual(newYearThemeActive) {
+            this.snowfall(
+                color = MaterialTheme.colorScheme.onBackground,
+                alpha = 0.3f,
+                drawPosition = SnowfallDrawPosition.Behind,
+                snowflakeMinSize = 10.dp,
+                snowflakeMaxSize = 20.dp,
+                snowflakeMinSpeed = 0.1.dp,
+                snowflakeMaxSpeed = 0.4.dp,
+                snowflakeDensity = 1f,
+            )
+        }
         .windowInsetsPadding(WindowInsets.statusBars)
         .fillMaxWidth()
         .padding(horizontal = 8.dp)

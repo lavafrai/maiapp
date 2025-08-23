@@ -21,6 +21,7 @@ Mohamed Rejeb for compose-rich-editor library (Apache License 2.0)
 Erik C. Thauvin for urlencoder library (Apache License 2.0)
 Russell Wolf (russhwolf) for multiplatform-settings library (Apache License 2.0)
 Gabriel Souza (DevSrSouza) for compose-icons library (MIT License)
+Danil Yudov (Skeptick) for snowfall compose library (Apache License 2.0)
 
 Feather icons teem for Feather icons (MIT License)
 Line awesome team for Line Awesome icons (Good Boy License :3 )

@@ -100,6 +100,7 @@ kotlin {
             implementation(libs.material.kolor)
             implementation(libs.compose.webview)
             implementation(libs.richeditor.compose)
+            implementation(libs.snowfall.compose)
 
             // Logger
             implementation(libs.kermit)

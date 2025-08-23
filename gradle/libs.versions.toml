@@ -46,6 +46,7 @@ material-motion = "2.0.1"
 uiAndroid = "1.8.3"
 androidx-browser = "1.8.0"
 logback-classic = "1.5.11"
+snowfall-compose = "1.0.2"
 
 android-compileSdk = "35"
 android-minSdk = "23"
@@ -126,6 +127,7 @@ androidx-foundation-android = { group = "androidx.compose.foundation", name = "f
 androidx-ui-text-android = { group = "androidx.compose.ui", name = "ui-text-android", version.ref = "uiTextAndroid" }
 zoomimage-view-core = { module = "io.github.panpf.zoomimage:zoomimage-compose", version.ref = "zoomimage" }
 zoomimage-view-res = { module = "io.github.panpf.zoomimage:zoomimage-compose-resources", version.ref = "zoomimage" }
+snowfall-compose = { module = "io.github.skeptick.snowfall:snowfall-compose", version.ref = "snowfall-compose" }
 
 kotlin-wrappers-bom = { module = "org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom", version.ref = "kotlin-wrappers" }
 kotlin-wrappers-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "kotlin-wrappers-react" }

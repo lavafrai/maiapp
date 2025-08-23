@@ -5,6 +5,7 @@ package ru.lavafrai.maiapp.rootPages.main
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -102,58 +103,60 @@ fun MainPage(
                 }
             },
         ) { page ->
-            when (page) {
-                MainNavigationPageId.INFORMATION -> {
-                    LoadableView(state = viewState.maidata, retry = viewModel::startLoading) {
-                        MaiDataView(
-                            manifest = viewState.maidata.data!!,
+            MainPageBackground {
+                when (page) {
+                    MainNavigationPageId.INFORMATION -> {
+                        LoadableView(state = viewState.maidata, retry = viewModel::startLoading) {
+                            MaiDataView(
+                                manifest = viewState.maidata.data!!,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+                    }
+
+                    MainNavigationPageId.WORKS -> {
+                        LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
+                            ScheduleView(
+                                schedule = viewState.schedule.data!!,
+                                exlerTeachers = viewState.exlerTeachers.data,
+                                dateRange = null,
+                                modifier = Modifier.fillMaxSize(),
+                                selector = remember(viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() }
+                            )
+                        }
+                    }
+
+                    MainNavigationPageId.HOME -> {
+                        LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
+                            ScheduleView(
+                                schedule = viewState.schedule.data!!,
+                                events = viewState.events.data ?: emptyList(),
+                                exlerTeachers = viewState.exlerTeachers.data,
+                                dateRange = viewState.selectedWeek,
+                                modifier = Modifier.fillMaxSize(),
+                                onRefresh = {
+                                    isScheduleRefreshing = true
+                                    viewModel.reloadSchedule() {
+                                        isScheduleRefreshing = false
+                                    }
+                                },
+                                refreshing = isScheduleRefreshing,
+                                showEventAddingButton = true,
+                                onAddEventClick = onAddEventClick,
+                            )
+                        }
+                    }
+
+                    MainNavigationPageId.ACCOUNT -> Column(Modifier.fillMaxSize()) {
+                        AccountPage(
+                            viewModel = accountViewModel,
                             modifier = Modifier.fillMaxSize(),
                         )
                     }
-                }
 
-                MainNavigationPageId.WORKS -> {
-                    LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
-                        ScheduleView(
-                            schedule = viewState.schedule.data!!,
-                            exlerTeachers = viewState.exlerTeachers.data,
-                            dateRange = null,
-                            modifier = Modifier.fillMaxSize(),
-                            selector = remember (viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() }
-                        )
+                    MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {
+                        SettingsPage(schedule = viewState.schedule)
                     }
-                }
-
-                MainNavigationPageId.HOME -> {
-                    LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
-                        ScheduleView(
-                            schedule = viewState.schedule.data!!,
-                            events = viewState.events.data ?: emptyList(),
-                            exlerTeachers = viewState.exlerTeachers.data,
-                            dateRange = viewState.selectedWeek,
-                            modifier = Modifier.fillMaxSize(),
-                            onRefresh = {
-                                isScheduleRefreshing = true
-                                viewModel.reloadSchedule() {
-                                    isScheduleRefreshing = false
-                                }
-                            },
-                            refreshing = isScheduleRefreshing,
-                            showEventAddingButton = true,
-                            onAddEventClick = onAddEventClick,
-                        )
-                    }
-                }
-
-                MainNavigationPageId.ACCOUNT -> Column(Modifier.fillMaxSize()) {
-                    AccountPage(
-                        viewModel = accountViewModel,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
-
-                MainNavigationPageId.SETTINGS -> Column(Modifier.fillMaxSize()) {
-                    SettingsPage(schedule = viewState.schedule)
                 }
             }
         }
@@ -196,4 +199,11 @@ fun MainPage(
             viewModel.setWorksLessonSelector(lessonTypes)
         },
     )
+}
+
+@Composable
+fun MainPageBackground(content: @Composable () -> Unit) = Box(
+    modifier = Modifier
+) {
+    content()
 }
