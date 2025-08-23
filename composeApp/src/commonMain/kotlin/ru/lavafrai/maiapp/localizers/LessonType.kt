@@ -1,7 +1,6 @@
 package ru.lavafrai.maiapp.localizers
 
 import androidx.compose.runtime.Composable
-import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.models.schedule.LessonType
@@ -32,6 +31,7 @@ fun String.localizeTypeControlName(): String {
         "Э" -> stringResource(Res.string.exam)
         "Р" -> stringResource(Res.string.rating)
         "КР" -> stringResource(Res.string.coursework)
+        "КП" -> stringResource(Res.string.courseproject)
 
         else -> stringResource(Res.string.unknown)
     }

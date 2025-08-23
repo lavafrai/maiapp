@@ -112,6 +112,7 @@
     <string name="assessment_with_mark">Зачет с оценкой</string>
     <string name="rating">Рейтинг</string>
     <string name="coursework">Курсовая работа</string>
+    <string name="courseproject">Курсовой проект</string>
 
     <string name="monday">Понедельник</string>
     <string name="tuesday">Вторник</string>
