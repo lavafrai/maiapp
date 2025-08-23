@@ -14,12 +14,10 @@ import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Calendar
 import compose.icons.feathericons.ExternalLink
-import compose.icons.feathericons.Link
-import maiapp.composeapp.generated.resources.Res
-import maiapp.composeapp.generated.resources.open_on_exler
-import maiapp.composeapp.generated.resources.schedule
+import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.fragments.AppCard
 import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.fragments.media.PhotosCarousel
 import ru.lavafrai.maiapp.fragments.schedule.TeacherReviewView
@@ -84,6 +82,13 @@ fun ColumnScope.TeacherReviewsView(
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(Res.string.schedule))
                 }
+            }
+
+            if (
+                setOf(teacherInfo.department).any { it != null }
+            ) AppCard {
+                Text(stringResource(Res.string.information), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+                if (teacherInfo.department != null) Text("${stringResource(Res.string.department)} ${teacherInfo.department!!}")
             }
 
             teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->

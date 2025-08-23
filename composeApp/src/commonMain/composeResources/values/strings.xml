@@ -102,6 +102,7 @@
     <string name="received_version">Полученная версия</string>
     <string name="new_event">Новое событие</string>
     <string name="event">Событие</string>
+    <string name="department">Кафедра</string>
 
     <string name="final_test">Зачет</string>
     <string name="control_work">Контрольная</string>
