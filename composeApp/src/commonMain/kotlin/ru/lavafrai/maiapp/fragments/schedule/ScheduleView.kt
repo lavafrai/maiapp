@@ -26,9 +26,7 @@ import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Schedule
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.DateRange
-import ru.lavafrai.maiapp.models.time.castToSerializable
 import ru.lavafrai.maiapp.utils.LessonSelector
 
 
@@ -63,10 +61,12 @@ fun ScheduleView(
                     day,
                     lesson,
                     lessonAnnotationRepository.loadAnnotations(schedule.name)
-                        .filter { it.lessonUid == lesson.getUid() })
+                        .filter { it.lessonUid == lesson.getUid() }
+                )
             })
         }.filter { it.lessons.isNotEmpty() }
     }
+
     val filteredEvents = remember(events, dateRange) {
         events
             .flatMap { event -> event.renderForDateRange(dateRange) }
@@ -98,32 +98,28 @@ fun ScheduleView(
                     modifier = modifier,
                     state = state.lazyScrollState,
                 ) {
-                    for (date in filteredLessonLikes.map { it.date }.distinct()) {
-                        val day = filteredDays.firstOrNull { it.date == date } ?: ScheduleDay(
-                            date = date,
-                            lessons = emptyList(),
-                            dayOfWeek = date.dayOfWeek.castToSerializable(),
-                        )
+                    for (day_entry in filteredLessonLikes.groupBy { it.date }) {
                         stickyHeader {
                             DayHeader(
-                                day = day,
+                                date = day_entry.key,
                                 modifier = Modifier
                                     .background(MaterialTheme.colorScheme.background)
                                     .padding(vertical = 8.dp),
                                 showEventAddingButton = showEventAddingButton,
-                                onAddEventClick = { onAddEventClick(day.date) },
+                                onAddEventClick = { onAddEventClick(day_entry.key) },
                             )
                         }
 
                         item {
                             DayView(
-                                day = day,
+                                date = day_entry.key,
+                                lessons = day_entry.value,
                                 modifier = Modifier
                                     .padding(vertical = 8.dp),
                                 exlerTeachers = exlerTeachers,
                                 annotations = filteredAnnotations,
                                 schedule = schedule,
-                                events = renderedEvents,
+                                // events = renderedEvents,
                             )
                         }
                     }

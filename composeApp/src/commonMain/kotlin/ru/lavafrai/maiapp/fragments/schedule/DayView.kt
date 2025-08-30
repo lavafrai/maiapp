@@ -6,37 +6,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.fragments.AppCardShapes
 import ru.lavafrai.maiapp.fragments.events.RenderedEventView
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.events.RenderedEvent
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
+import ru.lavafrai.maiapp.models.schedule.LessonLike
 import ru.lavafrai.maiapp.models.schedule.Schedule
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 
 @Composable
 fun DayView(
-    day: ScheduleDay,
+    date: LocalDate,
+    lessons: List<LessonLike>,
     modifier: Modifier = Modifier,
     exlerTeachers: List<ExlerTeacher>?,
     annotations: List<LessonAnnotation>,
     schedule: Schedule,
-    events: List<RenderedEvent>,
+    // events: List<RenderedEvent>,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier,
     ) {
-        val sortedLessons = remember(day.lessons) { day.lessons.sortedBy { it.timeStart.toLocalTime() } }
-        val sortedEvents = remember(events) { events.filter { it.date == day.date }.sortedBy { it.startTime } }
-        val sortedLessonsWithEvents = remember(sortedLessons, sortedEvents) {(sortedLessons + sortedEvents).sortedBy { it.startTime }}
+        val sortedLessons = remember(lessons) { lessons.sortedBy { it.startTime } }
+        //val sortedLessons = remember(day.lessons) { day.lessons.sortedBy { it.timeStart.toLocalTime() } }
+        //val sortedEvents = remember(events) { events.filter { it.date == day.date }.sortedBy { it.startTime } }
+        //val sortedLessonsWithEvents = remember(sortedLessons, sortedEvents) {(sortedLessons + sortedEvents).sortedBy { it.startTime }}
 
-        for (lessonId in sortedLessonsWithEvents.indices) {
-            val lesson = sortedLessonsWithEvents[lessonId]
+        for (lessonId in sortedLessons.indices) {
+            val lesson = sortedLessons[lessonId]
 
             val first = lessonId == 0
-            val last = lessonId == sortedLessonsWithEvents.lastIndex
+            val last = lessonId == sortedLessons.lastIndex
             val shape = when {
                 first && last -> AppCardShapes.firstLast()
                 first -> AppCardShapes.first()

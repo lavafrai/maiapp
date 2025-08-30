@@ -19,18 +19,17 @@ import maiapp.composeapp.generated.resources.tomorrow
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.localizers.localizedGenitive
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.now
 
 @Composable
 fun DayHeader(
-    day: ScheduleDay,
+    date: LocalDate,
     modifier: Modifier = Modifier,
     showEventAddingButton: Boolean = false,
     onAddEventClick: (() -> Unit) = {},
 ) {
-    val today = day.date == LocalDate.now()
-    val tomorrow = day.date == LocalDate.now().plus(1, DateTimeUnit.DAY)
+    val today = date == LocalDate.now()
+    val tomorrow = date == LocalDate.now().plus(1, DateTimeUnit.DAY)
 
     Column(
         modifier = modifier
@@ -44,7 +43,7 @@ fun DayHeader(
         ) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                    day.dayOfWeek.localized(),
+                    date.dayOfWeek.localized(),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.width(8.dp))
@@ -75,7 +74,7 @@ fun DayHeader(
                     }
 
                     else -> Text(
-                        "${day.date.dayOfMonth} ${day.date.month.localizedGenitive()}",
+                        "${date.dayOfMonth} ${date.month.localizedGenitive()}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Light,
                         modifier = Modifier.alpha(0.5f),
