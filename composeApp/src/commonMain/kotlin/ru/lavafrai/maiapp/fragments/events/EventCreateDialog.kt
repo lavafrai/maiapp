@@ -44,6 +44,10 @@ import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.fragments.DatePickerDialog
 import ru.lavafrai.maiapp.fragments.TimePickerDialog
 import ru.lavafrai.maiapp.fragments.schedule.SelectablePairNumber
+import ru.lavafrai.maiapp.fragments.shaker.ShakeConfig
+import ru.lavafrai.maiapp.fragments.shaker.ShakeController
+import ru.lavafrai.maiapp.fragments.shaker.rememberShakeController
+import ru.lavafrai.maiapp.fragments.shaker.shake
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.localizers.localizedBeforeTime
 import ru.lavafrai.maiapp.localizers.localizedGenitive
@@ -123,6 +127,8 @@ fun EventCreateContent(
     onEventCreated: (SimpleEvent) -> Unit,
     scheduleName: String,
 ) = Column(Modifier.padding(vertical = 16.dp)) {
+    val nameShakeController = rememberShakeController()
+
     var date by remember { mutableStateOf(initialDate) }
     var endDate by remember { mutableStateOf(initialDate + DatePeriod(months = 1)) }
     var startTime by remember { mutableStateOf(LocalTime(hour = 10, minute = 45)) }
@@ -153,9 +159,9 @@ fun EventCreateContent(
         name = eventName,
         onNameChanged = {
             eventName = it
-
         },
         error = eventNameError,
+        shakeController = nameShakeController,
     )
 
     EventTypeSelector(
@@ -211,10 +217,12 @@ fun EventCreateContent(
         scheduleName = scheduleName,
         onDismissRequest = onRequestSoftDismiss,
         onEventCreateRequest = {
+            val onErrorShakeConfig = ShakeConfig(4, intensity = 3e4f, translateX = 10f)
             val cleanEventName = eventName.trim()
             if (cleanEventName.isEmpty()) {
                 eventNameError = true
                 Logger.w("Event name is empty")
+                nameShakeController.shake(onErrorShakeConfig)
                 return@EventCreateDialogButtons
             } else {
                 eventNameError = false
@@ -291,6 +299,7 @@ fun EventCreateDialogName(
     name: String = "",
     onNameChanged: (String) -> Unit,
     error: Boolean,
+    shakeController: ShakeController,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -309,7 +318,8 @@ fun EventCreateDialogName(
             value = name,
             onValueChange = onNameChanged,
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .shake(shakeController),
             textStyle = TextStyle(
                 fontSize = 28.sp,
                 textAlign = TextAlign.Start,
