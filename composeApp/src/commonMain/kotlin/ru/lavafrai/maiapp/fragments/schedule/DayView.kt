@@ -57,7 +57,7 @@ fun DayView(
             if (lesson is RenderedEvent) RenderedEventView(
                 event = lesson,
                 exlerTeachers = exlerTeachers,
-                annotations = emptyList(),
+                annotations = annotations,
                 schedule = schedule,
                 shape = shape,
             )

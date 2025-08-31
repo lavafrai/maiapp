@@ -101,6 +101,7 @@
     <string name="supported_version">Поддерживаемая версия</string>
     <string name="received_version">Полученная версия</string>
     <string name="new_event">Новое событие</string>
+    <string name="delete">Удалить</string>
     <string name="event">Событие</string>
     <string name="department">Кафедра</string>
 

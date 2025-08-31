@@ -10,6 +10,7 @@ enum class LessonType {
     @SerialName("ЛР") LABORATORY,
     @SerialName("ПЗ") SEMINAR,
     @SerialName("Экзамен") EXAM,
-    @SerialName("") UNKNOWN,
+    @SerialName("Встреча") MEETING,
+    @SerialName("") OTHER,
     ;
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.CloudOff
@@ -35,6 +36,8 @@ fun MainPageHomeTitle(
     schedule: Loadable<Schedule>,
     buttonText: String? = null,
     onButtonClick: () -> Unit = { },
+    additionalButtonContent: (@Composable () -> Unit)? = null,
+    onAdditionalButtonClick: (() -> Unit)? = null,
     onRequestRefresh: () -> Unit = { },
 ) {
     val haptic = LocalHapticFeedback.current
@@ -63,6 +66,8 @@ fun MainPageHomeTitle(
                         .contextual(otherSchedules.isNotEmpty() && schedule.isNotLoading()) {
                             clickable { expanded = true }
                         },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 ExposedDropdownMenu(
@@ -117,8 +122,13 @@ fun MainPageHomeTitle(
                 }
             },
             rightButton = {
-                if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {
-                    Text(buttonText)
+                Row {
+                    if (additionalButtonContent != null) IconButton(onClick = { onAdditionalButtonClick?.invoke() }) {
+                        additionalButtonContent()
+                    }
+                    if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {
+                        Text(buttonText)
+                    }
                 }
             },
             subtitleIcon = { size ->

@@ -1,15 +1,15 @@
 package ru.lavafrai.maiapp.utils
 
+import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
-import ru.lavafrai.maiapp.models.schedule.Lesson
+import ru.lavafrai.maiapp.models.schedule.LessonLike
 import ru.lavafrai.maiapp.models.schedule.LessonType
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 
 open class LessonSelector protected constructor(
-    val selector: (ScheduleDay, Lesson, List<LessonAnnotation>) -> Boolean,
+    val selector: (LocalDate, LessonLike, List<LessonAnnotation>) -> Boolean,
 ) {
-    fun test(day: ScheduleDay, lesson: Lesson, annotations: List<LessonAnnotation>): Boolean = selector(day, lesson, annotations)
+    fun test(day: LocalDate, lesson: LessonLike, annotations: List<LessonAnnotation>): Boolean = selector(day, lesson, annotations)
 
     override fun hashCode(): Int {
         return selector.hashCode()

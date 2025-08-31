@@ -8,4 +8,6 @@ interface LessonLike {
     val startTime: LocalTime
     val endTime: LocalTime
     val date: LocalDate
+    val type: LessonType
+    fun getUid(): Int
 }

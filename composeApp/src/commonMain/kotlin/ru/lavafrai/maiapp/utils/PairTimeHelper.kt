@@ -1,6 +1,7 @@
 package ru.lavafrai.maiapp.utils
 
 import kotlinx.datetime.LocalTime
+import ru.lavafrai.maiapp.models.events.RenderedEvent
 
 object PairTimeHelper {
     private val pairTimes = listOf(
@@ -31,3 +32,13 @@ object PairTimeHelper {
         }
     }
 }
+
+val RenderedEvent.pairNumber: String
+    get() {
+        val pairs = PairTimeHelper.getPairsInRange(startTime, endTime)
+        return when {
+            pairs.isEmpty() -> "~"
+            pairs.size == 1 -> pairs.first().toString()
+            else -> "${pairs.first()}–${pairs.last()}"
+        }
+    }

@@ -23,6 +23,7 @@ import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
 import ru.lavafrai.maiapp.utils.LessonSelector
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
+import kotlin.uuid.Uuid
 
 class MainPageViewModel(
     val onClearSettings: () -> Unit,
@@ -51,9 +52,10 @@ class MainPageViewModel(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
     )
-    private val eventRepository = EventRepository()
+    private val eventRepository = EventRepository
 
     init {
+        _instance = this
         startLoading()
 
         if (VersionInfo.hasBeenUpdated()) {
@@ -199,6 +201,30 @@ class MainPageViewModel(
                 e.printStackTrace()
                 emit(stateValue.copy(events = stateValue.events.copy(error = e)))
             }
+        }
+    }
+
+    fun deleteEvent(
+        eventId: Uuid,
+    ) {
+        viewModelScope.launch(dispatchers.IO) {
+            try {
+                eventRepository.deleteEvent(eventId)
+                reloadEvents()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(stateValue.copy(events = stateValue.events.copy(error = e)))
+            } finally {
+                reloadEvents()
+            }
+        }
+    }
+
+    companion object {
+        private var _instance: MainPageViewModel? = null
+
+        fun getInstance(): MainPageViewModel {
+            return _instance ?: throw IllegalStateException("MainPageViewModel is not initialized")
         }
     }
 

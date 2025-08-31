@@ -2,6 +2,7 @@ package ru.lavafrai.maiapp
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavController
+import ru.lavafrai.maiapp.models.events.RenderedEvent
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.MaiDataItemType
 import ru.lavafrai.maiapp.models.maidata.asset.TextAsset
@@ -10,14 +11,7 @@ import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
-import ru.lavafrai.maiapp.navigation.pages.DedicatedSchedulePage
-import ru.lavafrai.maiapp.navigation.pages.ImageViewPage
-import ru.lavafrai.maiapp.navigation.pages.LessonDetailsPage
-import ru.lavafrai.maiapp.navigation.pages.LoginPage
-import ru.lavafrai.maiapp.navigation.pages.MapPage
-import ru.lavafrai.maiapp.navigation.pages.SafeDataCleanup
-import ru.lavafrai.maiapp.navigation.pages.TeacherReviewsPage
-import ru.lavafrai.maiapp.navigation.pages.WebViewPage
+import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.utils.UrlHandler
 import ru.lavafrai.maiapp.utils.resolveAsset
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
@@ -67,6 +61,16 @@ class ApplicationContext(
     ) {
         navController.navigate(LessonDetailsPage(
             lesson = lesson,
+            schedule = schedule,
+        ))
+    }
+
+    fun openEventDetails(
+        event: RenderedEvent,
+        schedule: Schedule,
+    ) {
+        navController.navigate(EventDetailsPage(
+            event = event,
             schedule = schedule,
         ))
     }

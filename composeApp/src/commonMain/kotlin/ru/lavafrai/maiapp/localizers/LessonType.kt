@@ -11,7 +11,8 @@ fun LessonType.localized() = when (this) {
     LessonType.LABORATORY -> stringResource(Res.string.laboratory)
     LessonType.SEMINAR -> stringResource(Res.string.seminar)
     LessonType.EXAM -> stringResource(Res.string.exam)
-    LessonType.UNKNOWN -> stringResource(Res.string.unknown)
+    LessonType.MEETING -> stringResource(Res.string.meeting)
+    LessonType.OTHER -> stringResource(Res.string.other)
 }
 
 @Composable
@@ -20,7 +21,8 @@ fun LessonType.localizedShortNonContext() = when (this) {
     LessonType.LABORATORY -> "ЛР"
     LessonType.SEMINAR -> "ПЗ"
     LessonType.EXAM -> "ЭК"
-    LessonType.UNKNOWN -> "ХЗ"
+    LessonType.MEETING -> "ВСТ"
+    LessonType.OTHER -> "ХЗ"
 }
 
 @Composable
