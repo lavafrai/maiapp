@@ -2,8 +2,10 @@ package ru.lavafrai.maiapp.data.repositories
 
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.Serializable
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.models.schedule.LessonLike
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
+import ru.lavafrai.maiapp.utils.contextual
 
 
 /**
@@ -17,8 +19,10 @@ class AbstractLessonRepository: BaseRepository() {
     suspend fun loadLessonsFromCacheOrNull(groupId: ScheduleId): SimpleSchedule? {
         val schedule = scheduleRepository.getScheduleFromCacheOrNull(groupId) ?: return null
         val events = eventRepository.listAllEvents(groupId)
-        val lessons = (schedule.days.flatMap { it.lessons } as List<LessonLike> +
-                events.flatMap { it.renderForDateRange(null) } as List<LessonLike>)
+        val lessons = (schedule.days.flatMap { it.lessons } as List<LessonLike> + events.flatMap { it.renderForDateRange(null) } as List<LessonLike>)
+            .contextual(ApplicationSettings.getCurrent().hideMilitaryTraining) {
+                filter { it.name != "Военная подготовка" }
+            }
 
 
         return SimpleSchedule(
