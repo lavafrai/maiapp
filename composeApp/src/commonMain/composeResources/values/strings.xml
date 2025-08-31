@@ -104,6 +104,7 @@
     <string name="delete">Удалить</string>
     <string name="event">Событие</string>
     <string name="department">Кафедра</string>
+    <string name="hide_military_training">Скрыть военную подготовку</string>
 
     <string name="final_test">Зачет</string>
     <string name="control_work">Контрольная</string>

@@ -31,6 +31,14 @@ open class LessonSelector protected constructor(
             }
         }
 
+        fun militaryHideDefault(): LessonSelector = object : LessonSelector({ day, lesson, _ ->
+            lesson.name != "Военная подготовка"
+        }) {
+            override fun hashCode(): Int {
+                return "military".hashCode()
+            }
+        }
+
         fun type(lessonType: LessonType): LessonSelector = object : LessonSelector({ _, lesson, _ -> lesson.type == lessonType }) {
             override fun hashCode(): Int {
                 return lessonType.hashCode()

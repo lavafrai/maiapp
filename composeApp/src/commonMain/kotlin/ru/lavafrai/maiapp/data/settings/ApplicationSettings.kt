@@ -12,7 +12,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.platform.getPlatform
@@ -26,6 +25,7 @@ data class ApplicationSettingsData(
     val savedSchedules: List<BaseScheduleId> = emptyList(),
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
+    val hideMilitaryTraining: Boolean = false,
 
     // official account
     val selectedStudentId: Int? = null,
@@ -115,6 +115,11 @@ object ApplicationSettings {
             val current = getCurrent()
             update(current.copy(selectedSchedule = schedule))
         }
+    }
+
+    fun setHideMilitaryTraining(hide: Boolean) {
+        val current = getCurrent()
+        update(current.copy(hideMilitaryTraining = hide))
     }
 
     fun setSelectedStudentId(student: Int) {
