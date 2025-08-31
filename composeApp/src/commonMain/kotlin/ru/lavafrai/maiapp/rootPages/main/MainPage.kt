@@ -30,6 +30,7 @@ import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
+import ru.lavafrai.maiapp.utils.LessonSelector
 import ru.lavafrai.maiapp.utils.anySelector
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
@@ -152,6 +153,7 @@ fun MainPage(
                                 refreshing = isScheduleRefreshing,
                                 showEventAddingButton = true,
                                 onAddEventClick = onAddEventClick,
+                                selector = if (settings.hideMilitaryTraining) LessonSelector.militaryHideDefault() else LessonSelector.default()
                             )
                         }
                     }

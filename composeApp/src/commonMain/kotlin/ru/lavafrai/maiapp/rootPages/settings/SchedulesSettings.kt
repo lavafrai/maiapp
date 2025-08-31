@@ -130,4 +130,14 @@ fun SchedulesSettings(
     ) {
         Text(text = stringResource(Res.string.add_schedule))
     }
+
+    Spacer(Modifier.height(8.dp))
+    HorizontalDivider()
+    Spacer(Modifier.height(8.dp))
+    SettingsToggle(
+        description = { Text(stringResource(Res.string.hide_military_training)) },
+        toggled = settings.hideMilitaryTraining,
+        onToggle = { ApplicationSettings.setHideMilitaryTraining(it) },
+        enabled = schedule.isNotLoading() && otherSchedules.isNotEmpty(),
+    )
 }
