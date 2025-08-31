@@ -23,6 +23,8 @@ import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.AppCard
 import ru.lavafrai.maiapp.fragments.AppCardShape
 import ru.lavafrai.maiapp.fragments.AppCardShapes
+import ru.lavafrai.maiapp.fragments.schedule.AnnotationsView
+import ru.lavafrai.maiapp.fragments.schedule.PairNumber
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.events.RenderedEvent
@@ -31,6 +33,7 @@ import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.theme.LinkColor
 import ru.lavafrai.maiapp.utils.conditional
+import ru.lavafrai.maiapp.utils.pairNumber
 import kotlin.uuid.Uuid
 
 
@@ -50,24 +53,23 @@ fun RenderedEventView(
         onLongClick = {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
 
-            /* TODO: Open edit dialog */
-            /* appContext.openLessonDetails(
-                lesson = lesson,
+            appContext.openEventDetails(
+                event = event,
                 schedule = schedule,
-            ) */
+            )
         },
         modifier = Modifier
     ) {
         Row {
             Column { // Pair number and annotations
-                // PairNumber(text = lesson.getPairNumber().toString())
+                PairNumber(text = event.pairNumber)
 
-                /*val lessonAnnotations = annotations.filter { it.lessonUid == lesson.getUid() }
+                val lessonAnnotations = annotations.filter { it.lessonUid == event.getUid() }
                 AnnotationsView(
                     annotations = lessonAnnotations,
                     modifier = Modifier.padding(top = 4.dp),
-                    onOpenAnnotations = { appContext.openLessonDetails(lesson, schedule) },
-                )*/
+                    onOpenAnnotations = { appContext.openEventDetails(event, schedule) },
+                )
             }
 
             Column(

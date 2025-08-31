@@ -48,36 +48,37 @@ fun ScheduleView(
     val filteredDays =
         remember(dateRange, schedule) { schedule.days.filter { if (dateRange == null) true else it.date in dateRange } }
     val annotations by lessonAnnotationRepository.follow(schedule.name).collectAsState()
-    val renderedEvents = remember(events, dateRange) {
-        events.flatMap { event ->
-            event.renderForDateRange(dateRange)
-        }.sortedBy { it.date }
-    }
 
     val filteredLessons = remember(dateRange, selector, annotations, schedule, filteredDays) {
         filteredDays.map { day ->
             day.copy(lessons = day.lessons.filter { lesson ->
                 selector.test(
-                    day,
+                    day.date,
                     lesson,
-                    lessonAnnotationRepository.loadAnnotations(schedule.name)
-                        .filter { it.lessonUid == lesson.getUid() }
+                    annotations.filter { it.lessonUid == lesson.getUid() }
                 )
             })
         }.filter { it.lessons.isNotEmpty() }
     }
 
-    val filteredEvents = remember(events, dateRange) {
+    val filteredEvents = remember(events, dateRange, annotations, selector) {
         events
             .flatMap { event -> event.renderForDateRange(dateRange) }
             .sortedBy { it.date }
             .filter { event ->
                 dateRange?.contains(event.date) ?: true
             }
+            .filter { event ->
+                selector.test(
+                    event.date,
+                    event,
+                    annotations.filter { it.lessonUid == event.getUid() }
+                )
+            }
     }
-    val filteredAnnotations = remember(annotations, dateRange) {
+    val filteredAnnotations = annotations /*remember(annotations, dateRange) {
         annotations.filter { it.lessonUid in filteredLessons.flatMap { it.lessons.map { it.getUid() } } }
-    }
+    }*/
     val filteredLessonLikes = remember(filteredLessons, filteredEvents) {
         (filteredLessons.flatMap { it.lessons } + filteredEvents).sortedBy { it.date }
     }
@@ -98,22 +99,22 @@ fun ScheduleView(
                     modifier = modifier,
                     state = state.lazyScrollState,
                 ) {
-                    for (day_entry in filteredLessonLikes.groupBy { it.date }) {
+                    for (dayEntry in filteredLessonLikes.groupBy { it.date }) {
                         stickyHeader {
                             DayHeader(
-                                date = day_entry.key,
+                                date = dayEntry.key,
                                 modifier = Modifier
                                     .background(MaterialTheme.colorScheme.background)
                                     .padding(vertical = 8.dp),
                                 showEventAddingButton = showEventAddingButton,
-                                onAddEventClick = { onAddEventClick(day_entry.key) },
+                                onAddEventClick = { onAddEventClick(dayEntry.key) },
                             )
                         }
 
                         item {
                             DayView(
-                                date = day_entry.key,
-                                lessons = day_entry.value,
+                                date = dayEntry.key,
+                                lessons = dayEntry.value,
                                 modifier = Modifier
                                     .padding(vertical = 8.dp),
                                 exlerTeachers = exlerTeachers,

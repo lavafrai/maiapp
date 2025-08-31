@@ -126,6 +126,7 @@ fun MainPage(
                         LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
                             ScheduleView(
                                 schedule = viewState.schedule.data!!,
+                                events = viewState.events.data ?: emptyList(),
                                 exlerTeachers = viewState.exlerTeachers.data,
                                 dateRange = null,
                                 modifier = Modifier.fillMaxSize(),

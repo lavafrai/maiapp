@@ -51,10 +51,10 @@ import ru.lavafrai.maiapp.fragments.shaker.shake
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.localizers.localizedBeforeTime
 import ru.lavafrai.maiapp.localizers.localizedGenitive
-import ru.lavafrai.maiapp.models.events.EventType
 import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.events.SimpleEventPeriod
 import ru.lavafrai.maiapp.models.schedule.GroupName
+import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.utils.PairTimeHelper
 import kotlin.uuid.Uuid
 
@@ -137,7 +137,7 @@ fun EventCreateContent(
     var eventNameError by remember { mutableStateOf(false) }
     var teachers by remember { mutableStateOf(emptyList<String>()) }
     var rooms by remember { mutableStateOf(emptyList<String>()) }
-    var eventType by remember { mutableStateOf(EventType.Other) }
+    var eventType by remember { mutableStateOf(LessonType.OTHER) }
     var period by remember { mutableStateOf(SimpleEventPeriod.Single) }
 
     val swapTimesIfRequired = {
@@ -248,8 +248,8 @@ fun EventCreateContent(
 
 @Composable
 fun EventTypeSelector(
-    typeSelected: EventType,
-    onTypeSelected: (EventType) -> Unit,
+    typeSelected: LessonType,
+    onTypeSelected: (LessonType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -258,7 +258,7 @@ fun EventTypeSelector(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(Modifier)
-        EventType.entries.forEach { type ->
+        LessonType.entries.forEach { type ->
             val isSelected = typeSelected == type
             InputChip(
                 label = { Text(type.localized()) },

@@ -5,13 +5,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.encodeToString
 import ru.lavafrai.maiapp.JsonProvider
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
 import ru.lavafrai.maiapp.models.annotations.isAnnotatedBy
-import ru.lavafrai.maiapp.models.schedule.Lesson
-import ru.lavafrai.maiapp.platform.getPlatform
+import ru.lavafrai.maiapp.models.schedule.LessonLike
 
 object LessonAnnotationsRepository: BaseRepository() {
     // val storage = getPlatform().storage()
@@ -28,7 +26,7 @@ object LessonAnnotationsRepository: BaseRepository() {
         }
     }
 
-    fun followLesson(group: String, lesson: Lesson): StateFlow<List<LessonAnnotation>> {
+    fun followLesson(group: String, lesson: LessonLike): StateFlow<List<LessonAnnotation>> {
         return follow(group).apply {
             repositoryScope.launch {
                 collect {
@@ -50,7 +48,7 @@ object LessonAnnotationsRepository: BaseRepository() {
         storage.putString(buildStorageKey(group), JsonProvider.tolerantJson.encodeToString(annotations))
     }
 
-    fun addAnnotation(group: String, lesson: Lesson, annotation: LessonAnnotationType, data: String? = null) {
+    fun addAnnotation(group: String, lesson: LessonLike, annotation: LessonAnnotationType, data: String? = null) {
         repositoryScope.launch {
             mutex.withLock {
                 val annotations = loadAnnotations(group).toMutableList()
@@ -61,7 +59,7 @@ object LessonAnnotationsRepository: BaseRepository() {
         }
     }
 
-    fun removeAnnotation(group: String, lesson: Lesson, annotation: LessonAnnotationType) {
+    fun removeAnnotation(group: String, lesson: LessonLike, annotation: LessonAnnotationType) {
         repositoryScope.launch {
             mutex.withLock {
                 val annotations = loadAnnotations(group).toMutableList()
@@ -72,7 +70,7 @@ object LessonAnnotationsRepository: BaseRepository() {
         }
     }
 
-    fun toggleAnnotation(group: String, lesson: Lesson, annotation: LessonAnnotationType, data: String? = null) {
+    fun toggleAnnotation(group: String, lesson: LessonLike, annotation: LessonAnnotationType, data: String? = null) {
         repositoryScope.launch {
             mutex.withLock {
                 val annotations = loadAnnotations(group).toMutableList()
