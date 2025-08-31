@@ -42,7 +42,7 @@ data class SimpleEvent(
                         endTime = endTime,
                         name = name,
                         teachers = teachers,
-                        room = room,
+                        classrooms = room,
                         type = eventType,
                         uuid = _uuid,
                     )
@@ -64,7 +64,7 @@ data class SimpleEvent(
                                 endTime = endTime,
                                 name = name,
                                 teachers = teachers,
-                                room = room,
+                                classrooms = room,
                                 type = eventType,
                                 uuid = _uuid,
                             )
@@ -91,7 +91,7 @@ data class SimpleEvent(
                                 endTime = endTime,
                                 name = name,
                                 teachers = teachers,
-                                room = room,
+                                classrooms = room,
                                 type = eventType,
                                 uuid = _uuid,
                             )

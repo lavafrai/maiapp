@@ -53,4 +53,7 @@ data class Lesson(
 
     override val date: LocalDate
         get() = day
+
+    override val classrooms: List<String>
+        get() = rooms.map { it.name }
 }

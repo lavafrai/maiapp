@@ -121,7 +121,7 @@ fun RenderedEventView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(event.room.joinToString(separator = "/"), style = MaterialTheme.typography.bodySmall)
+            Text(event.classrooms.joinToString(separator = "/"), style = MaterialTheme.typography.bodySmall)
 
             /*DefaultChip(
                 onClick = {},

@@ -18,7 +18,7 @@ data class RenderedEvent(
     override val endTime: LocalTime,
     override val date: LocalDate,
     val teachers: List<String>,
-    val room: List<String>,
+    override val classrooms: List<String>,
     override val type: LessonType,
     val uuid: Uuid, // identity of event that produced this RenderedEvent, e.g. SingleEvent.uuid or GroupEvent.uuid
 ): LessonLike {

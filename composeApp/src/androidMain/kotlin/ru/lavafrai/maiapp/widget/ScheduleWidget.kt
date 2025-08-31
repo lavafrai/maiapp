@@ -25,23 +25,21 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import ru.lavafrai.maiapp.MainActivity
 import ru.lavafrai.maiapp.R
-import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
+import ru.lavafrai.maiapp.data.repositories.AbstractLessonRepository
+import ru.lavafrai.maiapp.data.repositories.SimpleSchedule
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.localizers.localizedGenitiveNonContext
 import ru.lavafrai.maiapp.localizers.localizedNonContext
 import ru.lavafrai.maiapp.localizers.localizedShortNonContext
-import ru.lavafrai.maiapp.localizers.toApplication
 import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
-import ru.lavafrai.maiapp.models.schedule.Lesson
-import ru.lavafrai.maiapp.models.schedule.Schedule
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
+import ru.lavafrai.maiapp.models.schedule.LessonLike
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceText
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceTitle
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.LocalGlanceTextStyle
 import ru.lavafrai.maiapp.theme.MaiColor
 
-class ScheduleWidget: GlanceAppWidget() {
+class ScheduleWidget : GlanceAppWidget() {
     private val widgetBackground = Color(0xE0000000)
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -49,18 +47,21 @@ class ScheduleWidget: GlanceAppWidget() {
         val group = settings.selectedSchedule
         Logger.i("Loading schedule for widget $id")
 
-        val schedule = if (group != null) ScheduleRepository().getScheduleFromCacheOrNull(group) else null
+        val schedule = if (group != null) AbstractLessonRepository().loadLessonsFromCacheOrNull(group) else null
 
         provideContent {
-            Column(modifier = GlanceModifier
-                .fillMaxSize()
-                .cornerRadius(26.dp)
-                .appWidgetBackground()
-                .background(widgetBackground),
+            Column(
+                modifier = GlanceModifier
+                    .fillMaxSize()
+                    .cornerRadius(26.dp)
+                    .appWidgetBackground()
+                    .background(widgetBackground),
             ) {
-                CompositionLocalProvider(LocalGlanceTextStyle provides TextDefaults.defaultTextStyle.copy(
-                    color = ColorProvider(Color.White),
-                    fontSize = 14.sp,)
+                CompositionLocalProvider(
+                    LocalGlanceTextStyle provides TextDefaults.defaultTextStyle.copy(
+                        color = ColorProvider(Color.White),
+                        fontSize = 14.sp,
+                    )
                 ) {
                     ScheduleWidgetContent(group, schedule)
                 }
@@ -72,7 +73,7 @@ class ScheduleWidget: GlanceAppWidget() {
 @Composable
 fun ScheduleWidgetContent(
     group: BaseScheduleId?,
-    schedule: Schedule?,
+    schedule: SimpleSchedule?,
 ) {
     ScheduleWidgetHeader(modifier = GlanceModifier.clickable(actionStartActivity<MainActivity>()))
     if (schedule != null) ScheduleWidgetSchedule(schedule)
@@ -82,22 +83,22 @@ fun ScheduleWidgetContent(
 
 @Composable
 fun ScheduleWidgetSchedule(
-    schedule: Schedule,
+    schedule: SimpleSchedule,
 ) {
     val today = LocalDate.now()
     val filteredDays = schedule.days
-        .filter { it.date >= today }
-        .filter { it.date < today.plus(DatePeriod(days = 7)) }
-        .filter { it.lessons.isNotEmpty() }
+        .filter { it.key >= today }
+        .filter { it.key < today.plus(DatePeriod(days = 7)) }
+        .filter { it.value.isNotEmpty() }
 
     LazyColumn(modifier = GlanceModifier.padding(horizontal = 8.dp)) {
         items(7) { dayIndex ->
-            val day = today.plus(DatePeriod(days = dayIndex))
-            val daySchedule =
-                filteredDays.find { it.date == day } ?: ScheduleDay(day, day.dayOfWeek.toApplication(), emptyList())
+            val date = today.plus(DatePeriod(days = dayIndex))
+            val lessons = filteredDays[date] ?: emptyList()
+
             Column {
                 Spacer(modifier = GlanceModifier.height(8.dp))
-                ScheduleWidgetDay(daySchedule)
+                ScheduleWidgetDay(date, lessons)
             }
         }
         item {
@@ -108,16 +109,25 @@ fun ScheduleWidgetSchedule(
 
 @Composable
 fun ScheduleWidgetDay(
-    day: ScheduleDay,
+    date: LocalDate,
+    lessons: List<LessonLike>,
 ) {
     Column {
-        ScheduleWidgetHeader(day)
-        Spacer(modifier = GlanceModifier.height(6.dp))
+        Column {
+            ScheduleWidgetDayHeader(date)
+            Spacer(modifier = GlanceModifier.height(6.dp))
+        }
 
-        if (day.lessons.isNotEmpty()) day.lessons.forEach {
-            ScheduleWidgetLesson(it)
-            Spacer(modifier = GlanceModifier.height(4.dp))
-        } else {
+
+        if (lessons.isNotEmpty())
+            Column {
+                lessons.sortedBy { it.startTime }.forEach {
+                    Column {
+                        ScheduleWidgetLesson(it)
+                        Spacer(modifier = GlanceModifier.height(4.dp))
+                    }
+                }
+            } else {
             Row {
                 Spacer(modifier = GlanceModifier.width(8.dp))
                 GlanceText("В этот день нет занятий")
@@ -128,16 +138,16 @@ fun ScheduleWidgetDay(
 
 @Composable
 fun ScheduleWidgetLesson(
-    lesson: Lesson,
+    lesson: LessonLike,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(horizontalAlignment = Alignment.End) {
-            GlanceText(lesson.timeRange.split(" – ")[0].padStart(5, '0'), fontFamily = FontFamily.Monospace)
-            GlanceText(lesson.timeRange.split(" – ")[1].padStart(5, '0'), fontFamily = FontFamily.Monospace)
+            GlanceText(lesson.startTimePaddedString, fontFamily = FontFamily.Monospace)
+            GlanceText(lesson.endTimePaddedString, fontFamily = FontFamily.Monospace)
         }
 
         Spacer(GlanceModifier.width(4.dp))
-        Box(modifier = GlanceModifier.fillMaxHeight().width(2.dp).background(MaiColor)) {  }
+        Box(modifier = GlanceModifier.fillMaxHeight().width(2.dp).background(MaiColor)) { }
         Spacer(GlanceModifier.width(4.dp))
 
         Column {
@@ -146,21 +156,26 @@ fun ScheduleWidgetLesson(
                 GlanceText(lesson.type.localizedShortNonContext(), maxLines = 1, fontFamily = FontFamily.Monospace)
 
                 Spacer(GlanceModifier.width(4.dp))
-                Box(modifier = GlanceModifier.width(1.dp).background(Color.White.copy(alpha = 0.3f)).fillMaxHeight()) {}
+                if (lesson.classrooms.isNotEmpty()) Box(
+                    modifier = GlanceModifier.width(1.dp).background(Color.White.copy(alpha = 0.3f)).fillMaxHeight()
+                ) {}
                 Spacer(GlanceModifier.width(4.dp))
 
-                GlanceText(lesson.rooms.map { it.name }.joinToString(", "), maxLines = 1)
+                GlanceText(lesson.classrooms.joinToString(", "), maxLines = 1)
             }
         }
     }
 }
 
 @Composable
-fun ScheduleWidgetHeader(
-    day: ScheduleDay,
+fun ScheduleWidgetDayHeader(
+    date: LocalDate,
 ) {
     Row {
-        GlanceText("${day.date.dayOfWeek.localizedNonContext()}, ${day.date.dayOfMonth} ${day.date.month.localizedGenitiveNonContext()}", fontSize = 17.sp)
+        GlanceText(
+            "${date.dayOfWeek.localizedNonContext()}, ${date.dayOfMonth} ${date.month.localizedGenitiveNonContext()}",
+            fontSize = 17.sp
+        )
     }
 }
 
@@ -201,7 +216,11 @@ fun ScheduleWidgetHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.Start,
             ) {
-                GlanceTitle("${today.dayOfMonth} ${today.month.localizedGenitiveNonContext()}, ${today.dayOfWeek.localizedNonContext().lowercase()}")
+                GlanceTitle(
+                    "${today.dayOfMonth} ${today.month.localizedGenitiveNonContext()}, ${
+                        today.dayOfWeek.localizedNonContext().lowercase()
+                    }"
+                )
             }
 
             Row(
