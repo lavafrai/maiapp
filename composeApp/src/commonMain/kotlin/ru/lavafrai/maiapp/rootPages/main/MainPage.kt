@@ -28,6 +28,7 @@ import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.account.AccountPage
 import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
+import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.utils.LessonSelector
@@ -40,6 +41,7 @@ fun MainPage(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     onClearSettings: () -> Unit,
+    onOpenEventsEditor: (ScheduleId) -> Unit,
     /*onAddEventClick: (LocalDate) -> Unit,*/
 ) {
     var weekSelectorExpanded by remember { mutableStateOf(false) }
@@ -96,6 +98,7 @@ fun MainPage(
                             Icon(FeatherIcons.Plus, "add lesson", Modifier.alpha(0.7f))
                         },
                         onAdditionalButtonClick = { eventCreateExpanded = true },
+                        onAdditionalButtonLongClick = { if (viewState.schedule.data != null) onOpenEventsEditor(viewState.schedule.data!!.id) },
                     )
 
                     MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(

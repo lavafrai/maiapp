@@ -6,14 +6,17 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,6 +41,7 @@ fun MainPageHomeTitle(
     onButtonClick: () -> Unit = { },
     additionalButtonContent: (@Composable () -> Unit)? = null,
     onAdditionalButtonClick: (() -> Unit)? = null,
+    onAdditionalButtonLongClick: (() -> Unit)? = null,
     onRequestRefresh: () -> Unit = { },
 ) {
     val haptic = LocalHapticFeedback.current
@@ -122,8 +126,21 @@ fun MainPageHomeTitle(
                 }
             },
             rightButton = {
-                Row {
-                    if (additionalButtonContent != null) IconButton(onClick = { onAdditionalButtonClick?.invoke() }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (additionalButtonContent != null) Box(
+                        modifier = Modifier
+                            .size(40.dp) // размер зоны нажатия аналог IconButton
+                            .clip(CircleShape)
+                            .combinedClickable(
+                                role = Role.Button,
+                                onClick = { onAdditionalButtonClick?.invoke() },
+                                onLongClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onAdditionalButtonLongClick?.invoke()
+                                }
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
                         additionalButtonContent()
                     }
                     if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {

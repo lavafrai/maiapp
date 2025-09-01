@@ -105,3 +105,6 @@ data class SimpleEvent(
         }
     }
 }
+
+fun LocalTime.toPaddedString(): String = "${this.hour.toString().padStart(2, '0')}:${this.minute.toString().padStart(2, '0')}"
+fun LocalTime.toHalfPaddedString(): String = "${this.hour}:${this.minute.toString().padStart(2, '0')}"
