@@ -13,13 +13,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
-import co.touchlab.kermit.Logger
-import kotlinx.datetime.LocalDate
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
-import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
+import ru.lavafrai.maiapp.fragments.events.EventDetailsDialog
 import ru.lavafrai.maiapp.fragments.schedule.LessonDetailsDialog
+import ru.lavafrai.maiapp.models.events.RenderedEvent
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
@@ -30,9 +29,9 @@ import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
 import ru.lavafrai.maiapp.rootPages.main.MainPage
+import ru.lavafrai.maiapp.rootPages.map.MapPage
 import ru.lavafrai.maiapp.rootPages.schedule.DedicatedSchedulePage
 import ru.lavafrai.maiapp.rootPages.teacherReviewsPage.TeacherReviewsPage
-import ru.lavafrai.maiapp.rootPages.map.MapPage
 import ru.lavafrai.maiapp.rootPages.webview.WebViewPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginTarget
 import ru.lavafrai.maiapp.viewmodels.login.LoginType
@@ -167,6 +166,22 @@ fun AppNavigation(
                     LessonDetailsDialog(
                         onNavigateBack = { navController.navigateUp() },
                         lesson = lesson,
+                        schedule = schedule,
+                    )
+                }
+
+                dialog<EventDetailsPage>(
+                    typeMap = mapOf(
+                        typeOf<RenderedEvent>() to navTypeOf<RenderedEvent>(),
+                        typeOf<Schedule>() to navTypeOf<Schedule>(),
+                    ),
+                ) { backStackEntry ->
+                    val event = (backStackEntry.toRoute() as EventDetailsPage).event
+                    val schedule = (backStackEntry.toRoute() as EventDetailsPage).schedule
+
+                    EventDetailsDialog(
+                        onNavigateBack = { navController.navigateUp() },
+                        event = event,
                         schedule = schedule,
                     )
                 }

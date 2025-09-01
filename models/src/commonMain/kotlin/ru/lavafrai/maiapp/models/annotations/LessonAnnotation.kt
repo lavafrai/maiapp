@@ -1,7 +1,7 @@
 package ru.lavafrai.maiapp.models.annotations
 
 import kotlinx.serialization.Serializable
-import ru.lavafrai.maiapp.models.schedule.Lesson
+import ru.lavafrai.maiapp.models.schedule.LessonLike
 
 @Serializable
 data class LessonAnnotation(
@@ -19,7 +19,7 @@ data class LessonAnnotation(
     }
 }
 
-fun List<LessonAnnotation>.toggle(lesson: Lesson, type: LessonAnnotationType): List<LessonAnnotation> {
+fun List<LessonAnnotation>.toggle(lesson: LessonLike, type: LessonAnnotationType): List<LessonAnnotation> {
     return if (any {it.lessonUid == lesson.getUid() && it.type == type}) {
         val newList = toMutableList()
         newList.filter { it.lessonUid != lesson.getUid() || it.type != type }
@@ -30,11 +30,11 @@ fun List<LessonAnnotation>.toggle(lesson: Lesson, type: LessonAnnotationType): L
     }
 }
 
-fun List<LessonAnnotation>.getAnnotationOrNull(lesson: Lesson, type: LessonAnnotationType): LessonAnnotation? {
+fun List<LessonAnnotation>.getAnnotationOrNull(lesson: LessonLike, type: LessonAnnotationType): LessonAnnotation? {
     return find { it.lessonUid == lesson.getUid() && it.type == type }
 }
 
-fun List<LessonAnnotation>.setAnnotationData(lesson: Lesson, type: LessonAnnotationType, data: String): List<LessonAnnotation> {
+fun List<LessonAnnotation>.setAnnotationData(lesson: LessonLike, type: LessonAnnotationType, data: String): List<LessonAnnotation> {
     val newList = toMutableList().map {
         if (it.lessonUid == lesson.getUid() && it.type == type) it.copy(data = data)
         else it
@@ -42,6 +42,6 @@ fun List<LessonAnnotation>.setAnnotationData(lesson: Lesson, type: LessonAnnotat
     return newList
 }
 
-fun List<LessonAnnotation>.isAnnotatedBy(lesson: Lesson, type: LessonAnnotationType): Boolean {
+fun List<LessonAnnotation>.isAnnotatedBy(lesson: LessonLike, type: LessonAnnotationType): Boolean {
     return any {it.lessonUid == lesson.getUid() && it.type == type}
 }

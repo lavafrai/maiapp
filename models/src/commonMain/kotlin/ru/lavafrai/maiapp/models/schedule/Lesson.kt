@@ -14,7 +14,7 @@ data class Lesson(
     @SerialName("time_start") val timeStart: Time,
     @SerialName("time_end") val timeEnd: Time,
     @SerialName("lectors") val lectors: List<TeacherId>,
-    @SerialName("type") val type: LessonType,
+    @SerialName("type") override val type: LessonType,
     @SerialName("day") @Serializable(LocalDateComponentSerializer::class) val day: LocalDate,
     @SerialName("rooms") val rooms: List<Classroom>,
     @SerialName("lms") val lms: String,
@@ -35,7 +35,7 @@ data class Lesson(
         }
     }
 
-    fun getUid(): Int {
+    override fun getUid(): Int {
         return "$name $day ${getPairNumber()}".hashCode()
     }
 
@@ -53,4 +53,7 @@ data class Lesson(
 
     override val date: LocalDate
         get() = day
+
+    override val classrooms: List<String>
+        get() = rooms.map { it.name }
 }

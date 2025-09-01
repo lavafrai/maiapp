@@ -8,9 +8,13 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.lifecycle.viewmodel.compose.viewModel
+import compose.icons.FeatherIcons
+import compose.icons.feathericons.Plus
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -26,6 +30,7 @@ import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
+import ru.lavafrai.maiapp.utils.LessonSelector
 import ru.lavafrai.maiapp.utils.anySelector
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
@@ -87,6 +92,10 @@ fun MainPage(
                         buttonText = stringResource(Res.string.select_week),
                         onButtonClick = { weekSelectorExpanded = true },
                         onRequestRefresh = requestRefresh,
+                        additionalButtonContent = {
+                            Icon(FeatherIcons.Plus, "add lesson", Modifier.alpha(0.7f))
+                        },
+                        onAdditionalButtonClick = { eventCreateExpanded = true },
                     )
 
                     MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(
@@ -118,6 +127,7 @@ fun MainPage(
                         LoadableView(state = viewState.schedule, retry = viewModel::startLoading) {
                             ScheduleView(
                                 schedule = viewState.schedule.data!!,
+                                events = viewState.events.data ?: emptyList(),
                                 exlerTeachers = viewState.exlerTeachers.data,
                                 dateRange = null,
                                 modifier = Modifier.fillMaxSize(),
@@ -143,6 +153,7 @@ fun MainPage(
                                 refreshing = isScheduleRefreshing,
                                 showEventAddingButton = true,
                                 onAddEventClick = onAddEventClick,
+                                selector = if (settings.hideMilitaryTraining) LessonSelector.militaryHideDefault() else LessonSelector.default()
                             )
                         }
                     }

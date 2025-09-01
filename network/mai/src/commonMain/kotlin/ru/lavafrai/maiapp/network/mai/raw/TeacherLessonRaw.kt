@@ -12,7 +12,7 @@ data class TeacherLessonRaw(
     val name: String,
     // val lector: Map<String, String>,
     val groups: List<String>,
-    val types: List<LessonType>,
+    val types: List<LessonTypeRaw>,
     val rooms: Map<String, String>,
 ) {
     fun toLesson(day: LocalDate): Lesson {
@@ -21,7 +21,7 @@ data class TeacherLessonRaw(
             timeStart = timeStart.toTime(),
             timeEnd = timeEnd.toTime(),
             lectors = groups.map { TeacherId(TeacherName(it), TeacherUid(it)) },
-            type = types.first(),
+            type = types.first().toLessonType(),
             day = day,
             rooms = rooms.map { Classroom(it.value, it.key) },
             lms = "",

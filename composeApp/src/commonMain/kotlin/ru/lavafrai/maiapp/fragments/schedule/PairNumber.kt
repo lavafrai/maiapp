@@ -56,7 +56,7 @@ fun PairNumber(
                     text,
                     color = color,
                     textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
+                    fontSize = if (text.length == 1) 18.sp else 14.sp,
                     fontWeight = if (bold) FontWeight.Bold else FontWeight.Medium,
                 )
             }
