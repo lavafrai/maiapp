@@ -74,12 +74,14 @@ fun MainPage(
                     MainNavigationPageId.INFORMATION -> MainPageHomeTitle(
                         title = stringResource(Res.string.information),
                         schedule = viewState.schedule,
+                        events = viewState.events,
                         onRequestRefresh = requestRefresh,
                     )
 
                     MainNavigationPageId.WORKS -> MainPageHomeTitle(
                         title = stringResource(Res.string.works),
                         schedule = viewState.schedule,
+                        events = viewState.events,
                         buttonText = stringResource(Res.string.work_type),
                         onButtonClick = { workTypeSelectorExpanded = !workTypeSelectorExpanded },
                         onRequestRefresh = requestRefresh,
@@ -88,6 +90,7 @@ fun MainPage(
                     MainNavigationPageId.HOME -> MainPageHomeTitle(
                         title = stringResource(Res.string.schedule),
                         schedule = viewState.schedule,
+                        events = viewState.events,
                         buttonText = stringResource(Res.string.select_week),
                         onButtonClick = { weekSelectorExpanded = true },
                         onRequestRefresh = requestRefresh,
@@ -101,16 +104,19 @@ fun MainPage(
                     MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(
                         title = stringResource(Res.string.account),
                         schedule = viewState.schedule,
+                        events = viewState.events,
                         onRequestRefresh = requestRefresh,
                     )
 
                     MainNavigationPageId.SETTINGS -> MainPageHomeTitle(
                         title = stringResource(Res.string.settings),
                         schedule = viewState.schedule,
+                        events = viewState.events,
                         onRequestRefresh = requestRefresh,
                     )
                 }
             },
+            localMode = settings.localMode,
         ) { page ->
             MainPageBackground {
                 when (page) {
@@ -190,7 +196,7 @@ fun MainPage(
         )
     }
 
-    if (viewState.schedule.hasData()) WeekSelector(
+    if (viewState.schedule.hasData() && viewState.events.hasData()) WeekSelector(
         onWeekSelected = { dateRange ->
             viewModel.setWeek(dateRange)
         },
@@ -198,6 +204,7 @@ fun MainPage(
         expanded = weekSelectorExpanded,
         onDismissRequest = { weekSelectorExpanded = false },
         schedule = viewState.schedule.data!!,
+        events = viewState.events.data!!,
     )
 
     if (viewState.schedule.hasData()) LessonTypeSelector(

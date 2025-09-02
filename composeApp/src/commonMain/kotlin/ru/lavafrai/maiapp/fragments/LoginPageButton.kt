@@ -9,8 +9,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,21 +21,19 @@ fun LoginPageButton(
     text: String,
     onClick: () -> Unit,
 ) {
-    val windowSizeClass = calculateWindowSizeClass()
+    /*val windowSizeClass = calculateWindowSizeClass()
     val buttonFraction = when (windowSizeClass.widthSizeClass) {
         WindowWidthSizeClass.Compact -> 1f
         else -> 0.5f
-    }
+    }*/
 
     Button(
         onClick = onClick,
-        colors = ButtonDefaults
-            .buttonColors()
-            .copy(containerColor = Color.White.copy(alpha = .1f)),
+        colors = loginPageButtonColors(),
+        shapes = ButtonDefaults.shapes(),
         modifier = Modifier
             .padding(bottom = 8.dp)
-            .fillMaxWidth(buttonFraction)
-            .padding(horizontal = 32.dp)
+            .fillMaxWidth()
             .pointerCursor(),
     ) {
         Row {
@@ -45,3 +41,11 @@ fun LoginPageButton(
         }
     }
 }
+
+@Composable
+fun loginPageButtonColors() = ButtonDefaults
+    .buttonColors()
+    .copy(
+        containerColor = Color.White.copy(alpha = .1f),
+        contentColor = Color.White,
+    )

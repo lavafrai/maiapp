@@ -173,6 +173,9 @@
     <string name="event_period_monthly">Каждый месяц</string>
     <string name="edit">Изменить</string>
     <string name="type">Тип</string>
+    <string name="local_schedule_name">Локальный режим</string>
+    <string name="local_mode">Локальный режим</string>
+    <string name="local_mode_decription">В локальном режиме информация не будет загружаться из сети. Начните с пустого расписания, в котором сможете добавлять события самостоятельно.</string>
 
     <string name="event_period_single_before"></string>
     <string name="event_period_daily_before">Каждый день c</string>

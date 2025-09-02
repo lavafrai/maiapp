@@ -27,9 +27,11 @@ import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.LoadableStatus
+import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
+import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.utils.contextual
 
@@ -37,6 +39,7 @@ import ru.lavafrai.maiapp.utils.contextual
 fun MainPageHomeTitle(
     title: String,
     schedule: Loadable<Schedule>,
+    events: Loadable<List<Event>>,
     buttonText: String? = null,
     onButtonClick: () -> Unit = { },
     additionalButtonContent: (@Composable () -> Unit)? = null,
@@ -63,7 +66,7 @@ fun MainPageHomeTitle(
             titleText = { Text(title) },
             subtitleText = {
                 Text(
-                    settings.selectedSchedule!!.toString(),
+                    settings.selectedSchedule!!.readableName(),
                     modifier = Modifier
                         .padding(end = 2.dp)
                         .clip(MaterialTheme.shapes.small)
@@ -132,6 +135,7 @@ fun MainPageHomeTitle(
                             .size(40.dp) // размер зоны нажатия аналог IconButton
                             .clip(CircleShape)
                             .combinedClickable(
+                                enabled = schedule.hasData() && events.hasData(),
                                 role = Role.Button,
                                 onClick = { onAdditionalButtonClick?.invoke() },
                                 onLongClick = {
@@ -143,7 +147,7 @@ fun MainPageHomeTitle(
                     ) {
                         additionalButtonContent()
                     }
-                    if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData()) {
+                    if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData() && events.hasData()) {
                         Text(buttonText)
                     }
                 }

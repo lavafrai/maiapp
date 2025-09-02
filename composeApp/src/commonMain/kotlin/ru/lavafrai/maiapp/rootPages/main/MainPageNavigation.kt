@@ -75,14 +75,20 @@ val mainNavigationItems = listOf(
     ),
 )
 
+val nonLocalMenuItems = listOf(
+    MainNavigationPageId.ACCOUNT,
+    MainNavigationPageId.INFORMATION,
+)
+
 @Composable
 fun MainPageNavigation(
     page: MainNavigationPageId,
     setPage: (MainNavigationPageId) -> Unit,
+    localMode: Boolean,
     header: @Composable (MainNavigationPageId) -> Unit,
     content: @Composable (MainNavigationPageId) -> Unit,
 ) {
-    // var selected by rememberSaveable(saver = MainNavigationPageIdSaver, key = "main-page-selected") { mutableStateOf(MainNavigationPageId.HOME) }
+    val items = remember(localMode) {if (localMode) { mainNavigationItems.filter { it.id !in nonLocalMenuItems } } else { mainNavigationItems }}
     val selectedItem by remember(page) { mutableStateOf(mainNavigationItems.find { it.id == page }!!) }
 
     val navRail = @Composable {
@@ -90,11 +96,11 @@ fun MainPageNavigation(
             windowInsets = WindowInsets.safeDrawing
         ) {
             Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-                mainNavigationItems.forEachIndexed { index, item ->
+                items.forEachIndexed { index, item ->
                     NavigationRailItem(
                         icon = { item.icon(selectedItem.id == item.id) },
                         // label = item.title,
-                        onClick = { setPage(mainNavigationItems[index].id) },
+                        onClick = { setPage(items[index].id) },
                         selected = selectedItem.id == item.id,
                     )
                 }
@@ -105,11 +111,11 @@ fun MainPageNavigation(
         NavigationBar (
 
         ) {
-            mainNavigationItems.forEachIndexed { index, item ->
+            items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     icon = { item.icon(selectedItem.id == item.id) },
                     // label = item.title,
-                    onClick = { setPage(mainNavigationItems[index].id) },
+                    onClick = { setPage(items[index].id) },
                     selected = selectedItem.id == item.id,
                 )
             }

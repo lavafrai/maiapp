@@ -7,13 +7,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
+import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.getSettings
 import ru.lavafrai.maiapp.fragments.SafeDataCleanupView
 import ru.lavafrai.maiapp.fragments.events.EventDetailsDialog
@@ -46,6 +50,7 @@ fun AppNavigation(
 ) {
     val appContext = LocalApplicationContext.current
     val settings = remember { getSettings() }
+    val scope = rememberCoroutineScope()
 
     Box(
         modifier = modifier,
@@ -65,6 +70,15 @@ fun AppNavigation(
                         animatedContentScope = this@composable,
                         onLoginAsStudent = { navController.navigate(LoginPage(LoginType.STUDENT, LoginTarget.ADD_SCHEDULE, true)) },
                         onLoginAsTeacher = { navController.navigate(LoginPage(LoginType.TEACHER, LoginTarget.ADD_SCHEDULE, true)) },
+                        onLoginLocalMode = {
+                            scope.launch {
+                                ApplicationSettings.setSelectedGroup(ScheduleRepository.defaultLocalSchedule)
+                                ApplicationSettings.setLocalMode(true)
+                                navController.navigate(MainPage) {
+                                    popUpTo(0)
+                                }
+                            }
+                        }
                     )
                 }
 

@@ -22,8 +22,8 @@ fun DangerButton(
     content: @Composable RowScope.() -> Unit,
 ) {
     val colors = ButtonColors(
-        containerColor = MaterialTheme.colorScheme.error,
-        contentColor = MaterialTheme.colorScheme.onError,
+        containerColor = MaterialTheme.colorScheme.onError,
+        contentColor = MaterialTheme.colorScheme.error,
         disabledContainerColor = MaterialTheme.colorScheme.onSurface,
         disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
     )

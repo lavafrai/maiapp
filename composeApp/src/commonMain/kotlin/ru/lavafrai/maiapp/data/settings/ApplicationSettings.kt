@@ -26,6 +26,7 @@ data class ApplicationSettingsData(
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
     val hideMilitaryTraining: Boolean = false,
+    val localMode: Boolean = false,
 
     // official account
     val selectedStudentId: Int? = null,
@@ -125,6 +126,11 @@ object ApplicationSettings {
     fun setSelectedStudentId(student: Int) {
         val current = getCurrent()
         update(current.copy(selectedStudentId = student))
+    }
+
+    fun setLocalMode(localMode: Boolean) {
+        val current = getCurrent()
+        update(current.copy(localMode = localMode))
     }
 }
 
