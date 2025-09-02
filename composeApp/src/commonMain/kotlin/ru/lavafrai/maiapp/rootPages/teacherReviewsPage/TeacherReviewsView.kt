@@ -72,7 +72,8 @@ fun ColumnScope.TeacherReviewsView(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         appContext.openSchedule(teacherUid, title = teacherInfo.name)
-                    }
+                    },
+                    shapes = ButtonDefaults.shapes()
                 ) {
                     Icon(
                         imageVector = FeatherIcons.Calendar,

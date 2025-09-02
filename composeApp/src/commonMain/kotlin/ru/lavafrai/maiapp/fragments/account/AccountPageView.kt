@@ -71,7 +71,7 @@ fun AccountPageView(
                         }
                     }
 
-                    Button(onClick = viewModel::signOut, modifier = Modifier.align(Alignment.Bottom)) {
+                    Button(onClick = viewModel::signOut, modifier = Modifier.align(Alignment.Bottom), shapes = ButtonDefaults.shapes()) {
                         Text(stringResource(Res.string.sign_out))
                     }
                 }
@@ -198,7 +198,8 @@ fun SemesterMarksView(
                 Spacer(Modifier.width(8.dp))
                 IconButton(
                     onClick = { opened = !opened },
-                    modifier = Modifier.size(MaterialTheme.typography.titleLarge.fontSize.asDp)
+                    modifier = Modifier.size(MaterialTheme.typography.titleLarge.fontSize.asDp),
+                    shapes = IconButtonDefaults.shapes()
                 ) {
                     AnimatedIcon(
                         iconPainter = FeatherIcons.ChevronUp,

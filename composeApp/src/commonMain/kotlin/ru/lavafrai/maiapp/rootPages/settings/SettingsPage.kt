@@ -113,25 +113,25 @@ fun OpenSourceInfo() = SettingsSection(stringResource(Res.string.information)) {
         )
     )
     Spacer(Modifier.height(8.dp))
-    Button(onClick = { platform.openThanks() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { platform.openThanks() }, shapes = ButtonDefaults.shapes(), Modifier.fillMaxWidth()) {
         Icon(FeatherIcons.Edit3, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.open_thanks))
     }
 
-    Button(onClick = { platform.openGitHub() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { platform.openGitHub() }, shapes = ButtonDefaults.shapes(), Modifier.fillMaxWidth()) {
         Icon(FeatherIcons.Github, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.open_github))
     }
 
-    Button(onClick = { appContext.openDonations() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { appContext.openDonations() }, shapes = ButtonDefaults.shapes(), Modifier.fillMaxWidth()) {
         Icon(FeatherIcons.DollarSign, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.support_project))
     }
 
-    Button(onClick = { appContext.openTelegram() }, Modifier.fillMaxWidth()) {
+    Button(onClick = { appContext.openTelegram() }, shapes = ButtonDefaults.shapes(), Modifier.fillMaxWidth()) {
         Icon(LineAwesomeIcons.Telegram, contentDescription = null)
         Spacer(Modifier.width(4.dp))
         Text(stringResource(Res.string.open_telegram))
@@ -191,7 +191,7 @@ fun WidgetSettings() = SettingsSection(title = stringResource(Res.string.widget)
         }
     }
 
-    Button(onClick = { platform.requestWidgetCreation() }, enabled = widgetSupported, modifier = Modifier.fillMaxWidth()) {
+    Button(onClick = { platform.requestWidgetCreation() }, shapes = ButtonDefaults.shapes(), enabled = widgetSupported, modifier = Modifier.fillMaxWidth()) {
         Text(stringResource(Res.string.add_widget))
     }
 }
@@ -203,7 +203,8 @@ fun DataCleanButton() {
     Button(
         modifier = Modifier.fillMaxWidth(),
         onClick = { appContext.requestSafeDataClean() },
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError)
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError),
+        shapes = ButtonDefaults.shapes()
     ) {
         Text(stringResource(Res.string.clear_application_data))
     }

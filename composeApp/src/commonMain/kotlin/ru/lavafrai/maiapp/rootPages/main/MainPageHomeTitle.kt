@@ -147,7 +147,7 @@ fun MainPageHomeTitle(
                     ) {
                         additionalButtonContent()
                     }
-                    if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData() && events.hasData()) {
+                    if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData() && events.hasData(), shapes = ButtonDefaults.shapes()) {
                         Text(buttonText)
                     }
                 }
