@@ -16,3 +16,4 @@ class BaseScheduleIdSerializer: StringSerializer<BaseScheduleId>() {
     override fun serialize(data: BaseScheduleId): String = data.id
 }
 
+fun ScheduleId.toBaseScheduleId() = BaseScheduleId(this.scheduleId)

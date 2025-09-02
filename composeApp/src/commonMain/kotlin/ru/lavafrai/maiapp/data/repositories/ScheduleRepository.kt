@@ -2,14 +2,19 @@
 
 package ru.lavafrai.maiapp.data.repositories
 
+import androidx.compose.runtime.Composable
 import io.ktor.client.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.local_schedule_name
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
+import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
+import ru.lavafrai.maiapp.models.schedule.toBaseScheduleId
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.platform.getPlatform
 
@@ -20,7 +25,10 @@ class ScheduleRepository(
     private val api = MaiApi(httpClient, baseUrl)
     private val cache = getPlatform().storage()
 
-    suspend fun getSchedule(name: ScheduleId) = withCache("schedule:${name.scheduleId}") { api.schedule(name.scheduleId) }
+    suspend fun getSchedule(name: ScheduleId) = withCache("schedule:${name.scheduleId}") {
+        if (name.scheduleId !in localScheduleList) api.schedule(name.scheduleId)
+        else Schedule.empty(name.toBaseScheduleId())
+    }
     suspend fun getScheduleFromCacheOrNull(name: ScheduleId) = fromCache<Schedule>("schedule:${name.scheduleId}")
     suspend fun getScheduleSizeInCache(name: ScheduleId) = cache.getStringOrNull("schedule:${name.scheduleId}")?.length?.toLong() ?: 0L
 
@@ -41,4 +49,20 @@ class ScheduleRepository(
 
         return data
     }
+
+    companion object {
+        val localScheduleList = listOf(
+            "local",
+        )
+
+        val defaultLocalSchedule = BaseScheduleId("local")
+    }
+}
+
+
+@Composable
+fun ScheduleId.readableName(): String {
+    val id = this.scheduleId
+    if (ScheduleRepository.localScheduleList.contains(id)) return stringResource(Res.string.local_schedule_name)
+    return id
 }

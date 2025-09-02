@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.LoadableStatus
+import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
@@ -65,7 +66,7 @@ fun MainPageHomeTitle(
             titleText = { Text(title) },
             subtitleText = {
                 Text(
-                    settings.selectedSchedule!!.toString(),
+                    settings.selectedSchedule!!.readableName(),
                     modifier = Modifier
                         .padding(end = 2.dp)
                         .clip(MaterialTheme.shapes.small)

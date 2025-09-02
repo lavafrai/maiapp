@@ -15,6 +15,7 @@ import compose.icons.feathericons.ArrowLeft
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.events
 import org.jetbrains.compose.resources.stringResource
+import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
@@ -35,7 +36,7 @@ fun EventsEditorPage(
     Column {
         MainPageTitle(
             titleText = { Text(stringResource(Res.string.events)) },
-            subtitleText = { Text(viewState.scheduleId.scheduleId) },
+            subtitleText = { Text(viewState.scheduleId.readableName()) },
             leftButton = { IconButton(onNavigateBack) { Icon(FeatherIcons.ArrowLeft, "Back icon") } },
         )
 

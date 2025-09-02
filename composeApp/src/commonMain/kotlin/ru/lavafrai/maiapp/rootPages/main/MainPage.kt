@@ -116,6 +116,7 @@ fun MainPage(
                     )
                 }
             },
+            localMode = settings.localMode,
         ) { page ->
             MainPageBackground {
                 when (page) {

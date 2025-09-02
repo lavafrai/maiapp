@@ -85,6 +85,16 @@ data class Schedule(
         return days.find { it.date == day } ?: ScheduleDay(day, day.toLocalDate().dayOfWeek.castToSerializable(), listOf())
     }
     */
+
+    companion object {
+        fun empty(id: BaseScheduleId) = Schedule(
+            name = id.scheduleId,
+            id = id,
+            created = 0,
+            cached = 0,
+            days = listOf()
+        )
+    }
 }
 
 /*

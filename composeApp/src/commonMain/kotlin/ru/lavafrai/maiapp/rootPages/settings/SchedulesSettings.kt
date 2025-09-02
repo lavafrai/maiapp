@@ -24,6 +24,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
+import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.models.schedule.Schedule
@@ -58,7 +59,7 @@ fun SchedulesSettings(
         },
     ) {
         OutlinedTextField(
-            value = settings.selectedSchedule?.scheduleId ?: stringResource(Res.string.unknown),
+            value = settings.selectedSchedule?.readableName() ?: stringResource(Res.string.unknown),
             onValueChange = {},
             enabled = false,
             modifier = Modifier
@@ -94,7 +95,7 @@ fun SchedulesSettings(
 
                 DropdownMenuItem(
                     text = {
-                        Text(text = schedule.scheduleId)
+                        Text(text = schedule.readableName())
                     },
                     trailingIcon = {
                         Row(verticalAlignment = Alignment.CenterVertically) {

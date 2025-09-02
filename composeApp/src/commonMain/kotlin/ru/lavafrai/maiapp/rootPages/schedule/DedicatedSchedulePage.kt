@@ -18,6 +18,7 @@ import compose.icons.feathericons.ArrowLeft
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.schedule
 import org.jetbrains.compose.resources.stringResource
+import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
@@ -37,7 +38,7 @@ fun DedicatedSchedulePage(
     Column {
         MainPageTitle(
             titleText = { Text(stringResource(Res.string.schedule)) },
-            subtitleText = { Text(title ?: scheduleId.scheduleId) },
+            subtitleText = { Text(title ?: scheduleId.readableName()) },
             leftButton = {
                 IconButton(onClick = onNavigateBack) {
                     Icon(FeatherIcons.ArrowLeft, "Back")
