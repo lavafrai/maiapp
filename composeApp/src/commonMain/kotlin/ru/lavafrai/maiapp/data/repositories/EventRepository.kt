@@ -57,6 +57,25 @@ object EventRepository: BaseRepository() {
         return eventToCreate
     }
 
+    suspend fun updateEvent(eventId: Uuid, event: SimpleEvent) {
+        storageWriteMutex.withLock {
+            val allSchedules = listAllSchedules()
+            for (scheduleId in allSchedules) {
+                val currentEvents = listAllEvents(scheduleId)
+                val updatedEvents = currentEvents.map {
+                    // WARN: need to be reworked after adding new Event types
+                    if (it.uid == eventId) event.copy(_uuid = (it as SimpleEvent)._uuid) else it
+                }
+                if (updatedEvents.any { it.uid == eventId }) {
+                    Logger.i("Updating event with UUID: $eventId")
+                    storage.putString(buildEventKey(scheduleId), json.encodeToString(updatedEvents))
+                    flows[scheduleId]?.value = updatedEvents
+                    return
+                }
+            }
+        }
+    }
+
     suspend fun deleteEvent(eventId: Uuid) {
         storageWriteMutex.withLock {
             val allSchedules = listAllSchedules()
@@ -71,6 +90,15 @@ object EventRepository: BaseRepository() {
                 flows[scheduleId]?.value = updatedEvents
             }
         }
+    }
+
+    fun getScheduleIdForEvent(event: Event): ScheduleId {
+        val allSchedules = listAllSchedules()
+        for (scheduleId in allSchedules) {
+            val currentEvents = listAllEvents(scheduleId)
+            if (currentEvents.any { it.uid == event.uid }) return scheduleId
+        }
+        return BaseScheduleId("unknown")
     }
 
     fun buildEventKey(scheduleId: ScheduleId): String {

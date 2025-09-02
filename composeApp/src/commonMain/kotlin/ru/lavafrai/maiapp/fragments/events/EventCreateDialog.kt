@@ -61,7 +61,7 @@ import kotlin.uuid.Uuid
 
 @Composable
 fun EventCreateDialog(
-    initialDate: LocalDate,
+    initialState: SimpleEvent = defaultSimpleEvent(),
     onDismissRequest: () -> Unit,
     onEventCreated: (SimpleEvent) -> Unit,
     scheduleName: String
@@ -81,7 +81,7 @@ fun EventCreateDialog(
     ) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
             EventCreateContent(
-                initialDate = initialDate,
+                initialState = initialState,
                 onDismissRequest = onDismissRequest,
                 onRequestSoftDismiss = {
                     focusManager.clearFocus()
@@ -121,7 +121,7 @@ fun EventCreateDialog(
 
 @Composable
 fun EventCreateContent(
-    initialDate: LocalDate,
+    initialState: SimpleEvent,
     onDismissRequest: () -> Unit,
     onRequestSoftDismiss: () -> Unit,
     onEventCreated: (SimpleEvent) -> Unit,
@@ -129,16 +129,16 @@ fun EventCreateContent(
 ) = Column(Modifier.padding(vertical = 16.dp)) {
     val nameShakeController = rememberShakeController()
 
-    var date by remember { mutableStateOf(initialDate) }
-    var endDate by remember { mutableStateOf(initialDate + DatePeriod(months = 1)) }
-    var startTime by remember { mutableStateOf(LocalTime(hour = 10, minute = 45)) }
-    var endTime by remember { mutableStateOf(LocalTime(hour = 12, minute = 15)) }
-    var eventName by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf(initialState.date) }
+    var endDate by remember { mutableStateOf(initialState.endDate ?: initialState.date.plus(1, DateTimeUnit.MONTH)) }
+    var startTime by remember { mutableStateOf(initialState.startTime) }
+    var endTime by remember { mutableStateOf(initialState.endTime) }
+    var eventName by remember { mutableStateOf(initialState.name) }
     var eventNameError by remember { mutableStateOf(false) }
-    var teachers by remember { mutableStateOf(emptyList<String>()) }
-    var rooms by remember { mutableStateOf(emptyList<String>()) }
-    var eventType by remember { mutableStateOf(LessonType.OTHER) }
-    var period by remember { mutableStateOf(SimpleEventPeriod.Single) }
+    var teachers by remember { mutableStateOf(initialState.teachers) }
+    var rooms by remember { mutableStateOf(initialState.room) }
+    var eventType by remember { mutableStateOf(initialState.eventType) }
+    var period by remember { mutableStateOf(initialState.period) }
 
     val swapTimesIfRequired = {
         if (startTime > endTime) {
@@ -181,7 +181,6 @@ fun EventCreateContent(
 
     EventCreateDialogDateTime(
         period = period,
-        initialDate = initialDate,
         date = date,
         endDate = endDate,
         startTime = startTime,
@@ -355,7 +354,6 @@ fun EventCreateDialogName(
 @Composable
 fun EventCreateDialogDateTime(
     period: SimpleEventPeriod,
-    initialDate: LocalDate?,
     date: LocalDate,
     endDate: LocalDate,
     startTime: LocalTime,
@@ -873,3 +871,16 @@ fun EventCreateDialogButtons(
         }
     }
 }
+
+fun defaultSimpleEvent(): SimpleEvent = SimpleEvent(
+    name = "",
+    date = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+    endDate = null,
+    startTime = LocalTime(10, 45),
+    endTime = LocalTime(12, 15),
+    room = emptyList(),
+    teachers = emptyList(),
+    eventType = LessonType.SEMINAR,
+    period = SimpleEventPeriod.Single,
+    _uuid = Uuid.NIL
+)

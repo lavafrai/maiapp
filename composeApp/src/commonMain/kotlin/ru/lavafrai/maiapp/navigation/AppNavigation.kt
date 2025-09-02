@@ -25,6 +25,7 @@ import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.navigation.pages.*
+import ru.lavafrai.maiapp.rootPages.eventEditor.EventsEditorPage
 import ru.lavafrai.maiapp.rootPages.imageViewPage.ImageViewPage
 import ru.lavafrai.maiapp.rootPages.login.GreetingPage
 import ru.lavafrai.maiapp.rootPages.login.LoginPage
@@ -114,6 +115,9 @@ fun AppNavigation(
                                 popUpTo(0)
                             }
                         },
+                        onOpenEventsEditor = { scheduleId ->
+                            navController.navigate(EventEditorPage(scheduleId))
+                        },
                         /*onAddEventClick = { date ->
                             navController.navigate(EventCreatePage(initialDate = date))
                             Logger.d("Add event clicked")
@@ -183,6 +187,21 @@ fun AppNavigation(
                         onNavigateBack = { navController.navigateUp() },
                         event = event,
                         schedule = schedule,
+                    )
+                }
+
+                composable<EventEditorPage>(
+                    typeMap = mapOf(
+                        typeOf<ScheduleId>() to navTypeOf<ScheduleId>(),
+                    ),
+                ) { backStackEntry ->
+                    val scheduleId: ScheduleId = (backStackEntry.toRoute() as EventEditorPage).scheduleId
+
+                    EventsEditorPage(
+                        onNavigateBack = { navController.navigateUp() },
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
+                        scheduleId = scheduleId,
                     )
                 }
 

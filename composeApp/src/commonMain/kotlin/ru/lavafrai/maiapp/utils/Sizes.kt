@@ -32,3 +32,6 @@ private fun Dp.asSp(density: Density): TextUnit = with(density) {
 
 val Dp.asSp: TextUnit
     @Composable get() =  this.asSp(density = LocalDensity.current)
+
+val Int.pxAsDp: Dp
+    @Composable get() =  (this / LocalDensity.current.density).dp

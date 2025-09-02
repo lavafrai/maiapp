@@ -23,6 +23,9 @@ open class MaiAppViewModel<T>(
     val dispatchers = getPlatform().dispatchers()
 
     protected fun emit(newState: T) { _state.value = newState }
+
+    protected suspend fun emitAsync(newState: T) { _state.emit(newState) }
+
     protected val stateValue
         get() = _state.value
 

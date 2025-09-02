@@ -15,10 +15,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.lifecycle.viewmodel.compose.viewModel
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Plus
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.VersionInfo
@@ -28,6 +25,7 @@ import ru.lavafrai.maiapp.fragments.UpdateInfoDialog
 import ru.lavafrai.maiapp.fragments.account.AccountPage
 import ru.lavafrai.maiapp.fragments.events.EventCreateDialog
 import ru.lavafrai.maiapp.fragments.schedule.ScheduleView
+import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.utils.LessonSelector
@@ -40,6 +38,7 @@ fun MainPage(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     onClearSettings: () -> Unit,
+    onOpenEventsEditor: (ScheduleId) -> Unit,
     /*onAddEventClick: (LocalDate) -> Unit,*/
 ) {
     var weekSelectorExpanded by remember { mutableStateOf(false) }
@@ -96,6 +95,7 @@ fun MainPage(
                             Icon(FeatherIcons.Plus, "add lesson", Modifier.alpha(0.7f))
                         },
                         onAdditionalButtonClick = { eventCreateExpanded = true },
+                        onAdditionalButtonLongClick = { if (viewState.schedule.data != null) onOpenEventsEditor(viewState.schedule.data!!.id) },
                     )
 
                     MainNavigationPageId.ACCOUNT -> MainPageHomeTitle(
@@ -185,7 +185,6 @@ fun MainPage(
     if (eventCreateExpanded) {
         EventCreateDialog(
             onDismissRequest = { eventCreateExpanded = false },
-            initialDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
             onEventCreated = { eventCreateExpanded = false; viewModel.createSimpleEvent(it) },
             scheduleName = viewState.schedule.data?.name ?: "unknown_schedule",
         )
