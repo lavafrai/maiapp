@@ -23,6 +23,7 @@ import maiapp.composeapp.generated.resources.last_week
 import maiapp.composeapp.generated.resources.next_week
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.fragments.schedule.PairNumber
+import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.now
@@ -32,13 +33,14 @@ import ru.lavafrai.maiapp.models.time.week
 fun WeekSelector(
     onWeekSelected: (DateRange) -> Unit,
     schedule: Schedule,
+    events: List<Event>,
     selectedWeek: DateRange,
     expanded: Boolean,
     onDismissRequest: () -> Unit,
 ) {
     var visible by remember { mutableStateOf(expanded) }
     val scope = rememberCoroutineScope()
-    val weeks = remember(schedule) { schedule.weeks }
+    val weeks = remember(schedule) { schedule.weeks(events) }
     val modalBottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false,
     )

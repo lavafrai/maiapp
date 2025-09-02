@@ -2,6 +2,7 @@ package ru.lavafrai.maiapp.models.schedule
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.week
 
@@ -14,7 +15,7 @@ data class Schedule(
     @SerialName("cached") val cached: Long,
     @SerialName("days") val days: List<ScheduleDay>,
 ) {
-    val weeks: List<DateRange>
+    private val weeks: List<DateRange>
         get() {
             var firstWeek = days.minByOrNull { it.date }?.date?.week() ?: return emptyList()
             val lastWeek = days.maxByOrNull { it.date }?.date?.week() ?: return emptyList()
@@ -29,6 +30,27 @@ data class Schedule(
 
             return weeks
         }
+
+    fun weeks(events: List<Event>): List<DateRange> {
+        val firstScheduleWeek = days.minByOrNull { it.date }?.date?.week()
+        val lastScheduleWeek = days.maxByOrNull { it.date }?.date?.week()
+        val renderedEvents = events.flatMap { it.renderForDateRange(null) }
+        val firstEventWeek = renderedEvents.minByOrNull { it.date }?.date?.week()
+        val lastEventWeek = renderedEvents.maxByOrNull { it.date }?.date?.week()
+        if ((firstScheduleWeek == null && lastScheduleWeek == null) || (lastEventWeek == null && firstEventWeek == null)) return emptyList()
+
+        var firstWeek = listOfNotNull(firstScheduleWeek, firstEventWeek).minByOrNull { it.startDate }!!
+        val lastWeek = listOfNotNull(lastScheduleWeek, lastEventWeek).maxByOrNull { it.startDate }!!
+
+        val weeks = mutableListOf<DateRange>()
+        weeks.add(firstWeek)
+        do {
+            firstWeek = firstWeek.plusDays(7)
+            weeks.add(firstWeek)
+        } while (firstWeek.startDate < lastWeek.endDate)
+
+        return weeks
+    }
 
     /*
     private var weeks: MutableList<ScheduleWeekId>? = null
