@@ -4,8 +4,7 @@ package ru.lavafrai.maiapp.rootPages.main
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -67,53 +66,63 @@ fun WeekSelector(
         sheetState = modalBottomSheetState,
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        LazyColumn(modifier = Modifier) {
             // Special item for current week
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(Res.string.last_week)) },
+                    leadingContent = { Icon(FeatherIcons.ArrowLeft, "Last week", modifier = Modifier.size(24.dp)) },
+                    modifier = Modifier
+                        .clickable { onWeekSelected(selectedWeek.plusDays(-7)); close() }
+                )
+            }
 
-            ListItem(
-                headlineContent = { Text(stringResource(Res.string.last_week)) },
-                leadingContent = { Icon(FeatherIcons.ArrowLeft, "Last week", modifier = Modifier.size(24.dp)) },
-                modifier = Modifier
-                    .clickable { onWeekSelected(selectedWeek.plusDays(-7)) ; close() }
-            )
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(Res.string.current_week)) },
+                    leadingContent = { Icon(FeatherIcons.Home, "Current week", modifier = Modifier.size(24.dp)) },
+                    modifier = Modifier
+                        .clickable { onWeekSelected(LocalDate.now().week()); close() }
+                )
+            }
 
-            ListItem(
-                headlineContent = { Text(stringResource(Res.string.current_week)) },
-                leadingContent = { Icon(FeatherIcons.Home, "Current week", modifier = Modifier.size(24.dp)) },
-                modifier = Modifier
-                    .clickable { onWeekSelected(LocalDate.now().week()) ; close() }
-            )
+            item {
+                ListItem(
+                    headlineContent = { Text(stringResource(Res.string.next_week)) },
+                    leadingContent = { Icon(FeatherIcons.ArrowRight, "Next week", modifier = Modifier.size(24.dp)) },
+                    modifier = Modifier
+                        .clickable { onWeekSelected(selectedWeek.plusDays(7)); close() }
+                )
+            }
 
-            ListItem(
-                headlineContent = { Text(stringResource(Res.string.next_week)) },
-                leadingContent = { Icon(FeatherIcons.ArrowRight, "Next week", modifier = Modifier.size(24.dp)) },
-                modifier = Modifier
-                    .clickable { onWeekSelected(selectedWeek.plusDays(7)) ; close() }
-            )
-
+            item {
             Spacer(
                 modifier = Modifier
                     .height(16.dp)
                     .fillMaxWidth()
             )
+            }
+
             // Sheet content
             weeks.forEachIndexed { index, week ->
                 // WeekSelectorItem
                 val weekIsCurrent = week == LocalDate.now().week()
                 val weekIsSelected = week == selectedWeek
 
-                ListItem(
-                    headlineContent = { Text(week.toString()) },
-                    leadingContent = {
-                        PairNumber(
-                            text = "${index + 1}",
-                            background = if (weekIsCurrent) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                    modifier = Modifier
-                        .clickable { onWeekSelected(week) ; close() },
-                    colors = if (weekIsSelected) ListItemDefaults.colors(containerColor = Color.Transparent) else ListItemDefaults.colors()
-                )
+                item {
+                    ListItem(
+                        headlineContent = { Text(week.toString()) },
+                        leadingContent = {
+                            PairNumber(
+                                text = "${index + 1}",
+                                background = if (weekIsCurrent) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        modifier = Modifier
+                            .clickable { onWeekSelected(week); close() },
+                        colors = if (weekIsSelected) ListItemDefaults.colors(containerColor = Color.Transparent) else ListItemDefaults.colors()
+                    )
+                }
 
                 /*Row(
                     modifier = Modifier
