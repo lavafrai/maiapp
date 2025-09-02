@@ -7,9 +7,11 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.EventRepository
+import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
+import kotlin.uuid.Uuid
 
 class EventsEditorViewModel(
     val scheduleId: ScheduleId,
@@ -27,7 +29,6 @@ class EventsEditorViewModel(
 
     fun startLoading() {
         viewModelScope.launch (dispatchers.IO) {
-            emit(initialState)
 
             launchCatching(onError = {
                 it.printStackTrace()
@@ -35,12 +36,46 @@ class EventsEditorViewModel(
                     events = Loadable.error(it),
                 ))
             }) {
+                emitAsync(initialState)
                 val events = eventsRepository.listAllEvents(scheduleId)
-                emit(
+                emitAsync(
                     state.value.copy(
                         events = Loadable.actual(events),
                     )
                 )
+            }
+        }
+    }
+
+    fun createEvent(event: SimpleEvent) {
+        viewModelScope.launch (dispatchers.IO) {
+            launchCatching(onError = {
+                it.printStackTrace()
+            }) {
+                eventsRepository.createEvent(event, stateValue.scheduleId)
+                startLoading()
+            }
+        }
+    }
+
+    fun deleteEvent(eventId: Uuid) {
+        viewModelScope.launch (dispatchers.IO) {
+            launchCatching(onError = {
+                it.printStackTrace()
+            }) {
+                eventsRepository.deleteEvent(eventId)
+                startLoading()
+            }
+        }
+    }
+
+    fun updateEvent(eventId: Uuid, event: SimpleEvent) {
+        viewModelScope.launch (dispatchers.IO) {
+            launchCatching(onError = {
+                it.printStackTrace()
+            }) {
+                eventsRepository.updateEvent(eventId, event)
+                startLoading()
             }
         }
     }

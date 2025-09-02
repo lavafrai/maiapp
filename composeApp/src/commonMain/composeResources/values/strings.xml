@@ -171,6 +171,8 @@
     <string name="event_period_weekly">Каждую неделю</string>
     <string name="event_period_biweekly">Раз в две недели</string>
     <string name="event_period_monthly">Каждый месяц</string>
+    <string name="edit">Изменить</string>
+    <string name="type">Тип</string>
 
     <string name="event_period_single_before"></string>
     <string name="event_period_daily_before">Каждый день c</string>

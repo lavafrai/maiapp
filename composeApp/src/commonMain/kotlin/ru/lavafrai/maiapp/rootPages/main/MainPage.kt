@@ -15,10 +15,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.lifecycle.viewmodel.compose.viewModel
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Plus
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.settings.VersionInfo
@@ -188,7 +185,6 @@ fun MainPage(
     if (eventCreateExpanded) {
         EventCreateDialog(
             onDismissRequest = { eventCreateExpanded = false },
-            initialDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
             onEventCreated = { eventCreateExpanded = false; viewModel.createSimpleEvent(it) },
             scheduleName = viewState.schedule.data?.name ?: "unknown_schedule",
         )
