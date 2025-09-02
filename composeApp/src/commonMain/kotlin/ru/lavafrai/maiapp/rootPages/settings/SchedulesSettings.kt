@@ -128,6 +128,7 @@ fun SchedulesSettings(
     Button(
         onClick = { appContext.navController.navigate(LoginPage(type = LoginType.STUDENT, target = LoginTarget.ADD_SCHEDULE, navigateImmediately = true)) },
         modifier = Modifier.fillMaxWidth(),
+        shapes = ButtonDefaults.shapes(),
     ) {
         Text(text = stringResource(Res.string.add_schedule))
     }

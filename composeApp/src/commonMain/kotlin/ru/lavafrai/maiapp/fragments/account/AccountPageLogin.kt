@@ -117,6 +117,7 @@ fun AccountPageLogin(
             }
         },
         enabled = !loading,
+        shapes = ButtonDefaults.shapes(),
     ) {
         Text(stringResource(Res.string.sign_in))
     }
