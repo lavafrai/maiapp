@@ -1,7 +1,6 @@
 package ru.lavafrai.maiapp.theme
 
 import androidx.compose.material3.MaterialExpressiveTheme
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import ru.lavafrai.maiapp.data.settings.rememberSettings
@@ -37,7 +36,8 @@ internal fun AppTheme(
 
         MaterialExpressiveTheme(
             colorScheme = colorScheme.animated(),
-            content = { Surface(content = content) }
+            content = { Surface(content = content) },
+            typography = rememberTypography()
         )
     }
 }
