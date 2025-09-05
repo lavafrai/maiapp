@@ -15,6 +15,7 @@ data class Schedule(
     @SerialName("cached") val cached: Long,
     @SerialName("days") val days: List<ScheduleDay>,
 ) {
+    @Deprecated("Use weeks(List<Event>) instead")
     private val weeks: List<DateRange>
         get() {
             var firstWeek = days.minByOrNull { it.date }?.date?.week() ?: return emptyList()
@@ -37,7 +38,7 @@ data class Schedule(
         val renderedEvents = events.flatMap { it.renderForDateRange(null) }
         val firstEventWeek = renderedEvents.minByOrNull { it.date }?.date?.week()
         val lastEventWeek = renderedEvents.maxByOrNull { it.date }?.date?.week()
-        if ((firstScheduleWeek == null && lastScheduleWeek == null) || (lastEventWeek == null && firstEventWeek == null)) return emptyList()
+        if ((firstScheduleWeek == null && firstEventWeek == null) || (lastScheduleWeek == null && lastEventWeek == null)) return emptyList()
 
         var firstWeek = listOfNotNull(firstScheduleWeek, firstEventWeek).minByOrNull { it.startDate }!!
         val lastWeek = listOfNotNull(lastScheduleWeek, lastEventWeek).maxByOrNull { it.startDate }!!
