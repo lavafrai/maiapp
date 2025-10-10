@@ -6,8 +6,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import kotlinx.datetime.LocalDate
+import ru.lavafrai.maiapp.models.schedule.LessonLike
 import ru.lavafrai.maiapp.models.schedule.Schedule
-import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.utils.LessonSelector
@@ -26,15 +26,16 @@ class ScheduleViewState(
         schedule: Schedule,
         dateRange: DateRange?,
         selector: LessonSelector,
-        filteredLessons: List<ScheduleDay>,
+        filteredLessons: List<LessonLike>,
     ) {
+        val days = filteredLessons.groupBy { it.date }.toList().sortedBy { it.first }
         val newLessonsHash = filteredLessons.fold(0) { acc, day ->
             acc * 31 + day.hashCode()
         }
         if (newLessonsHash == 0) return
         if (newLessonsHash != lastLessonsHash) {
-            val pairsFinishedToday = filteredLessons.find { it.date == LocalDate.now() }?.isFinished() ?: false
-            var index = filteredLessons.indexOfFirst { it.date >= LocalDate.now() } + if (pairsFinishedToday) 1 else 0
+            val pairsFinishedToday = days.find { it.first == LocalDate.now() }?.second?.all { it.isFinished() } ?: false
+            var index = days.indexOfFirst { it.first >= LocalDate.now() } + if (pairsFinishedToday) 1 else 0
             if (index == -1) index = filteredLessons.size - 1
 
             lazyScrollState.scrollToItem((index * 2).coerceIn(0, Int.MAX_VALUE))

@@ -84,7 +84,7 @@ fun ScheduleView(
     }
 
     LaunchedEffect(dateRange, selector, schedule.id, filteredLessons) {
-        state.updateScrollIfRequired(schedule, dateRange, selector, filteredLessons)
+        state.updateScrollIfRequired(schedule, dateRange, selector, filteredLessonLikes)
     }
 
     val scope = rememberCoroutineScope()

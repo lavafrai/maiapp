@@ -6,7 +6,6 @@ import kotlinx.datetime.serializers.LocalDateComponentSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.time.Time
-import ru.lavafrai.maiapp.models.time.now
 
 @Serializable
 data class Lesson(
@@ -37,12 +36,6 @@ data class Lesson(
 
     override fun getUid(): Int {
         return "$name $day ${getPairNumber()}".hashCode()
-    }
-
-    fun isFinished(): Boolean {
-        if (day > LocalDate.now()) return false
-        if (day < LocalDate.now()) return true
-        return timeEnd.toLocalTime() < LocalTime.now()
     }
 
     override val startTime: LocalTime
