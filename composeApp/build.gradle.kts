@@ -41,7 +41,7 @@ buildConfig {
     buildConfigField("API_BASE_URL", "https://maiapp.lavafrai.ru/api/v1")
     buildConfigField("THANKS_URL", "https://maiapp.lavafrai.ru/thanks")
     buildConfigField("GITHUB_URL", "https://github.com/lavafrai/maiapp")
-    buildConfigField("APPMETRICA_APIKEY", secretProperties["appmetrica.api_key"] as String)
+    buildConfigField("APPMETRICA_APIKEY", secretProperties.getOrDefault("appmetrica.api_key", "") as String)
     buildConfigField("MAIDATA_SUPPORTED_MANIFEST_VERSION", 1)
 }
 
