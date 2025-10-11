@@ -16,9 +16,6 @@ pluginManagement {
         mavenCentral()
     }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
-}
 
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
@@ -33,7 +30,6 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven("https://jitpack.io")
-        maven("https://jogamp.org/deployment/maven")
         maven("https://oss.sonatype.org/content/repositories/snapshots") {
             name = "SonatypeSnapshots"
             mavenContent { snapshotsOnly() }
