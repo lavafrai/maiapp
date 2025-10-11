@@ -1,5 +1,6 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
+import com.android.build.gradle.internal.cxx.logging.warnln
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import java.io.FileInputStream
@@ -32,7 +33,7 @@ try {
     // secretProperties.load(FileInputStream(secretPropertiesFile))
     // Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
 
-    error("No secrets.properties file found. Please create composeApp/secrets.properties")
+    warnln("No secrets.properties file found. Please create composeApp/secrets.properties")
 }
 
 buildConfig {
