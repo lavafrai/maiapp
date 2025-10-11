@@ -54,7 +54,7 @@ kotlin {
         languageSettings.optIn("kotlin.uuid.ExperimentalUuidApi")
     }
 
-    jvmToolchain(17)
+    jvmToolchain(11)
 
     wasmJs {
         browser()
