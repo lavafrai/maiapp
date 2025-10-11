@@ -143,51 +143,51 @@ jobs:
                     name: ios-artifact
                     path: ${{ env.OUTPUT_DIR_IOS }}/*.ipa
 
-    build_windows:
-        name: Build Windows
-        runs-on: windows-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: ./.github/actions/common-build-setup
-              id: init
-              with:
-                  java-version: '17'
-                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
-
-            - name: Build with Gradle
-              run: ./gradlew :composeApp:packageMsi
-
-            - name: Rename MSI
-              run: mv composeApp\build\compose\binaries\main\msi\*.msi "composeApp\build\compose\binaries\main\msi\maiapp-${{ steps.init.outputs.current-time }}.msi"
-
-            - name: Upload MSI artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: windows-artifact
-                  path: composeApp\build\compose\binaries\main\msi\*
-
-    build_debian:
-        name: Build Debian
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: ./.github/actions/common-build-setup
-              id: init
-              with:
-                  java-version: '17'
-                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
-
-            - name: Build with Gradle
-              run: ./gradlew :composeApp:packageDeb
-
-            - name: Rename DEB
-              run: mv composeApp/build/compose/binaries/main/deb/*.deb "composeApp/build/compose/binaries/main/deb/maiapp-${{ steps.init.outputs.current-time }}.deb"
-
-            - name: Upload DEB artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: debian-artifact
-                  path: composeApp/build/compose/binaries/main/deb/*
+#    build_windows:
+#        name: Build Windows
+#        runs-on: windows-latest
+#        steps:
+#            - uses: actions/checkout@v4
+#            - uses: ./.github/actions/common-build-setup
+#              id: init
+#              with:
+#                  java-version: '17'
+#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+#
+#            - name: Build with Gradle
+#              run: ./gradlew :composeApp:packageMsi
+#
+#            - name: Rename MSI
+#              run: mv composeApp\build\compose\binaries\main\msi\*.msi "composeApp\build\compose\binaries\main\msi\maiapp-${{ steps.init.outputs.current-time }}.msi"
+#
+#            - name: Upload MSI artifact
+#              uses: actions/upload-artifact@v4
+#              with:
+#                  name: windows-artifact
+#                  path: composeApp\build\compose\binaries\main\msi\*
+#
+#    build_debian:
+#        name: Build Debian
+#        runs-on: ubuntu-latest
+#        steps:
+#            - uses: actions/checkout@v4
+#            - uses: ./.github/actions/common-build-setup
+#              id: init
+#              with:
+#                  java-version: '17'
+#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+#
+#            - name: Build with Gradle
+#              run: ./gradlew :composeApp:packageDeb
+#
+#            - name: Rename DEB
+#              run: mv composeApp/build/compose/binaries/main/deb/*.deb "composeApp/build/compose/binaries/main/deb/maiapp-${{ steps.init.outputs.current-time }}.deb"
+#
+#            - name: Upload DEB artifact
+#              uses: actions/upload-artifact@v4
+#              with:
+#                  name: debian-artifact
+#                  path: composeApp/build/compose/binaries/main/deb/*
 
 #    build_web:
 #        name: Build WEB
