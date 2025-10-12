@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.buildconfig)
-    alias(libs.plugins.libres)
 }
 
 val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.4"
@@ -283,9 +282,4 @@ compose.desktop {
             }
         }
     }
-}
-
-libres {
-    generatedClassName = "LibRes"
-    generateNamedArguments = true
 }
