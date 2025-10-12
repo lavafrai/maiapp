@@ -1,0 +1,6 @@
+[+] Enabled the events system, allowing local schedule editing
+[+] Option to hide the Military Department lessons
+[+] Local mode to create a schedule without using the MAI schedule server
+[+] Material 3 Expressive
+[+] F-Droid compatibility
+
