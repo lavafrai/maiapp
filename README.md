@@ -19,7 +19,7 @@
  - [Telegram](https://t.me/maiapp3) - актуальные сборки для Android и свежие новости проекта
  - [RuStore](https://www.rustore.ru/catalog/app/ru.lavafrai.maiapp) - автоматическое обновление, если вы пользуетесь RuStore
  - [GitHub Releases][release-url] - архив с актуальными версиями приложения 
- - [Apple App Store](https://apps.apple.com/app/mai-app/id6444168850) - для iOS, но версии появляются с задержкой, так как Apple требует ручной проверки каждой сборки
+ - [Apple App Store](https://apps.apple.com/us/app/%D1%80%D0%B0%D1%81%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B0%D0%B8/id6739470086) - для iOS, но версии появляются с задержкой, так как Apple требует ручной проверки каждой сборки
 
 
 ## Сборка
