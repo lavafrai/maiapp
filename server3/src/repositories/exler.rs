@@ -14,7 +14,7 @@ use crate::{
 };
 
 // #1: Kotlin использует mai-exler.ru, Rust ранее ошибочно использовал mai-sten.online
-const EXLER_BASE: &str = "https://mai-exler.ru";
+const EXLER_BASE: &str = "https://mai-sten.online";
 
 pub struct ExlerRepository {
     client: reqwest::Client,
@@ -161,7 +161,12 @@ impl ExlerFetcher {
     ) -> anyhow::Result<Vec<ExlerTeacher>> {
         let html = self
             .http_get(&format!("{EXLER_BASE}{}", faculty.path))
-            .await?;
+            .await;
+        if let Err(_) = &html {
+            return Ok(Vec::new());
+        };
+
+        let html = html?;
         let document = Html::parse_document(&html);
 
         // #3: Kotlin: selectFirst("body > center > table > ... > ol")
@@ -401,6 +406,7 @@ fn parse_photos(html: &str, base_url: &str) -> Vec<String> {
         .select(&selector)
         .filter_map(|img| img.value().attr("src"))
         .filter(|src| !src.contains("Jeremy-Hillary-Boob-PhD_form-header.png"))
+        .filter(|src| !src.contains("spacer.gif"))
         .map(|src| global_url(base_url, src))
         .collect()
 }
