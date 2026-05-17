@@ -1,0 +1,19 @@
+FROM rust:1.95-alpine AS build
+
+RUN apk --no-cache add musl-dev openssl-dev openssl-libs-static pkgconfig
+WORKDIR /opt/app
+COPY server3/Cargo.toml server3/Cargo.toml
+COPY server3/Cargo.lock server3/Cargo.lock
+COPY server3/src server3/src
+WORKDIR /opt/app/server3
+RUN cargo build --release
+
+FROM alpine:3.22
+
+RUN apk --no-cache add ca-certificates curl
+WORKDIR /opt/app
+COPY --from=build /opt/app/server3/target/release/server3 /opt/app/server3
+COPY server/src/main/resources/data/assets /opt/app/server/src/main/resources/data/assets
+ENV PORT=80
+ENV MAIAPP_ASSETS_DIR=/opt/app/server/src/main/resources/data/assets
+CMD ["/opt/app/server3"]
