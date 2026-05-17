@@ -99,6 +99,11 @@ pub struct TeacherId {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Time {
+    pub time: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Classroom {
     pub name: String,
     pub uid: String,
@@ -126,9 +131,9 @@ pub struct ScheduleDay {
 pub struct Lesson {
     pub name: String,
     #[serde(rename = "time_start")]
-    pub time_start: String,
+    pub time_start: Time,
     #[serde(rename = "time_end")]
-    pub time_end: String,
+    pub time_end: Time,
     pub lectors: Vec<TeacherId>,
     #[serde(rename = "type")]
     pub lesson_type: String,

@@ -184,8 +184,8 @@ fn parse_group_lessons(
         lessons.push(Lesson {
             name: name.clone(),
             time_range: time_range(&raw.time_start, &raw.time_end),
-            time_start: raw.time_start,
-            time_end: raw.time_end,
+            time_start: Time { time: raw.time_start },
+            time_end: Time { time: raw.time_end },
             lectors: raw
                 .lector
                 .into_iter()
@@ -227,8 +227,8 @@ fn parse_teacher_lessons(
         lessons.push(Lesson {
             name: raw.name,
             time_range: time_range(&raw.time_start, &raw.time_end),
-            time_start: raw.time_start,
-            time_end: raw.time_end,
+            time_start: Time { time: raw.time_start },
+            time_end: Time { time: raw.time_end },
             lectors: raw
                 .groups
                 .into_iter()
