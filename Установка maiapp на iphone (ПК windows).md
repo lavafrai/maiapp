@@ -1,6 +1,6 @@
 
 ## Предисловие 
-У меня почему-то нормально не дружат AltServer and мой телефон, точнее сказать — связь между iTunes и телефоном (я предполагаю, что ошибка где-то в драйвере iCloud или iTunes, и тем, что [Microsoft заявила, что треть кода Windows пишут нейросети](https://habr.com/ru/companies/bothub/news/905750/)). 
+У меня почему-то нормально не дружат AltServer и мой телефон, точнее сказать — связь между iTunes и телефоном (я предполагаю, что ошибка где-то в драйвере iCloud или iTunes, и тем, что [Microsoft заявила, что треть кода Windows пишут нейросети](https://habr.com/ru/companies/bothub/news/905750/)). 
 Поэтому в этой инструкции не будет связи по Wi-Fi (она у меня просто не работает). 
 <img src="images/Pasted%20image%2020260518151303.png" width="300">
 
@@ -24,7 +24,7 @@
 <img src="images/Pasted%20image%2020260518152419.png" width="300">
 <img src="images/Pasted%20image%2020260518152542.png" width="300">
 7. Нажимаем "Install AltStore" и вводим данные от Apple ID.
-8. После установки на iPhone, AltStore будет выдавать ошибка.
+8. После установки на iPhone, AltStore будет выдавать ошибку.
 <img src="images/Pasted%20image%2020260518152846.png" width="300">
 <img src="images/Pasted%20image%2020260518152909.png" width="300">
    Включаем то, что на скриншотах (доверие разработчику), после чего приложение должно заработать.
