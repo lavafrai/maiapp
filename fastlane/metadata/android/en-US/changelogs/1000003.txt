@@ -1,0 +1,7 @@
+[+] Migrated to Material 3 Expressive
+[+] Updated design; information is displayed more densely
+[+] Icons in the info section are cached on the device
+[+] Disabled obfuscation during builds to make crash logs more readable
+[+] Improved personal account; network errors should occur less often
+[+] Started work on the ability to edit the schedule manually
+

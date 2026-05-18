@@ -1,0 +1,149 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    min-width: 100vw;
+
+
+    font-family: "Roboto", Arial, sans-serif;
+
+    --primary: #0095DA;
+    --background: #e6e6e6;
+    --foreground: #111;
+    --foreground-inaccent: #222;
+    --foreground-superinaccent: #444;
+    --card: color-mix(in srgb, color-mix(in srgb, var(--primary) 5%, var(--background)), var(--foreground) 10%);
+
+    color: var(--foreground);
+    background: var(--background);
+
+    overflow-x: hidden;
+}
+
+body {
+    background-image: url("/media/background-light.svg");
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+    body, html {
+        --primary: #B0DCFF;
+        --background: #0f0f0f;
+        --foreground: #fff;
+        --foreground-inaccent: #D4D4D4;
+        --foreground-superinaccent: #999;
+    }
+
+    body {
+        background-image: url("/media/background.svg");
+    }
+}
+
+p {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5em;
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    unicode-bidi: isolate;
+    color: var(--foreground-inaccent);
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+h2 {
+    font-size: 1.6em;
+    line-height: 1.5em;
+    margin: 1em 0 0.5rem;
+}
+
+li {
+    line-height: 1.5em;
+    color: var(--foreground-inaccent);
+}
+
+.react-tabs__tab--selected:after {
+    content: "" !important;
+    position: absolute !important;
+    display: block !important;
+    bottom: 0 !important;
+    left: 100% !important;
+    height: 8px !important;
+    width: 8px !important;
+    background: radial-gradient(
+            circle at top right,
+            transparent 0,
+            transparent 8px,
+            var(--card) 8px
+    ) !important;
+}
+
+.react-tabs__tab--selected:not(:first-child):before {
+    content: "" !important;
+    position: absolute !important;
+    display: block !important;
+    bottom: 0 !important;
+    left: -8px !important;
+    height: 8px !important;
+    width: 8px !important;
+    background: radial-gradient(
+            circle at top left,
+            transparent 0,
+            transparent 8px,
+            var(--card) 8px
+    ) !important;
+}
+
+.react-tabs__tab--selected {
+    background-color: var(--card) !important;
+    color: var(--foreground-inaccent) !important;
+    border: 0 !important;
+}
+
+.react-tabs__tab--selected:first-child {
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+}
+
+.react-tabs__tab {
+    margin: 0 !important;
+    bottom: 0 !important;
+}
+
+.react-tabs__tab::before, .react-tabs__tab::after {
+    margin: 0 !important;
+}
+
+.react-tabs__tab-list {
+    margin: 0 !important;
+}
+
+.react-tabs__tab-panel {
+    background-color: var(--card) !important;
+    margin: 0 !important;
+    padding: 16px;
+}
+
+#download-tabs {
+    margin: 12px 12px 0;
+}
+
+.react-tabs__tab-panel {
+    border-radius: 8px;
+    border: 0 !important;
+}
+
+.react-tabs__tab-list {
+    border: 0 !important;
+}

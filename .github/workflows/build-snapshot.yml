@@ -1,0 +1,251 @@
+name: Build Snapshot
+
+on:
+    push:
+        branches: [ "master" ]
+        paths:
+            - '.github/workflows/build-snapshot.yml'
+            - '.github/actions/common-build-setup/**'
+            - 'composeApp/**'
+            - 'models/**'
+            - 'shared/**'
+            - 'gradle/libs.versions.toml'
+    workflow_dispatch:
+
+env:
+    ANDROID_KEYSTORE: "../android.keystore"
+    ANDROID_KEYSTORE_KEY: ${{ secrets.android_key_alias }}
+    ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.android_key_password }}
+    ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
+
+jobs:
+    build_android:
+        name: Build Android
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/common-build-setup
+              id: init
+              with:
+                  java-version: '17'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+            - name: Decode keystore
+              uses: akiojin/decode-base64-github-action@v1
+              with:
+                  base64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+                  output-path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/android.keystore'
+
+            - name: Build with Gradle
+              run: ./gradlew :composeApp:assemble
+
+            - name: Rename APK
+              run: mv composeApp/build/outputs/apk/release/*.apk "composeApp/build/outputs/apk/release/maiapp-${{ steps.init.outputs.current-time }}.apk"
+
+            - name: Upload Android artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: android-artifact
+                  path: composeApp/build/outputs/apk/release/*.apk
+
+    build_ios:
+        name: Build iOS
+        runs-on: macos-latest
+
+        env:
+            SCHEME_NAME: iosApp
+            PROJECT_PATH: iosApp/iosApp.xcodeproj
+            EXPORT_METHOD: app-store-connect
+            OUTPUT_DIR_IOS: iosApp/actions
+            ARCHIVE_NAME: maiapp.xcarchive
+            PRODUCT_NAME: maiapp
+
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/common-build-setup
+              id: init
+              with:
+                  java-version: '17'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+            -   name: Import Apple Certificate
+                uses: apple-actions/import-codesign-certs@v2
+                with:
+                    p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
+                    p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+                    keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+            -   name: Import Provisioning Profile
+                run: |
+                    mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+                    echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
+                env:
+                    APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
+
+            -   name: Create ExportOptions.plist
+                run: |
+                    cat << EOF > ExportOptions.plist
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+                    <plist version="1.0">
+                    <dict>
+                        <key>method</key>
+                        <string>${{ env.EXPORT_METHOD }}</string>
+                        <key>teamID</key>
+                        <string>${{ secrets.APPLE_TEAM_ID }}</string>
+                        <key>signingStyle</key>
+                        <string>manual</string>
+                        <key>provisioningProfiles</key>
+                        <dict>
+                            <key>ru.lavafrai.maiapp</key>
+                            <string>maiapp-dist</string> <!-- Убедитесь, что это точное имя вашего App Store профиля -->
+                        </dict>
+                        <key>signingCertificate</key>
+                        <string>Apple Distribution</string>
+                        <key>uploadBitcode</key>
+                        <false/>
+                        <key>uploadSymbols</key>
+                        <true/>
+                    </dict>
+                    </plist>
+                    EOF
+                env:
+                    APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+            -   name: Build Xcode Archive
+                run: |
+                    mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
+                    xcodebuild clean \
+                      -project "${{ env.PROJECT_PATH }}" \
+                      -scheme "${{ env.SCHEME_NAME }}" \
+                      -configuration Release
+                    xcodebuild archive \
+                      -project "${{ env.PROJECT_PATH }}" \
+                      -scheme "${{ env.SCHEME_NAME }}" \
+                      -sdk iphoneos \
+                      -configuration Release \
+                      -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
+                      DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
+
+            -   name: Export IPA
+                run: |
+                    xcodebuild -exportArchive \
+                      -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
+                      -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
+                      -exportOptionsPlist ExportOptions.plist
+
+            - name: Rename IPA
+              run: mv ${{ env.OUTPUT_DIR_IOS }}/*.ipa "${{ env.OUTPUT_DIR_IOS }}/maiapp-${{ steps.init.outputs.current-time }}.ipa"
+
+            -   name: Upload IPA Artifact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: ios-artifact
+                    path: ${{ env.OUTPUT_DIR_IOS }}/*.ipa
+
+#    build_windows:
+#        name: Build Windows
+#        runs-on: windows-latest
+#        steps:
+#            - uses: actions/checkout@v4
+#            - uses: ./.github/actions/common-build-setup
+#              id: init
+#              with:
+#                  java-version: '17'
+#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+#
+#            - name: Build with Gradle
+#              run: ./gradlew :composeApp:packageMsi
+#
+#            - name: Rename MSI
+#              run: mv composeApp\build\compose\binaries\main\msi\*.msi "composeApp\build\compose\binaries\main\msi\maiapp-${{ steps.init.outputs.current-time }}.msi"
+#
+#            - name: Upload MSI artifact
+#              uses: actions/upload-artifact@v4
+#              with:
+#                  name: windows-artifact
+#                  path: composeApp\build\compose\binaries\main\msi\*
+#
+#    build_debian:
+#        name: Build Debian
+#        runs-on: ubuntu-latest
+#        steps:
+#            - uses: actions/checkout@v4
+#            - uses: ./.github/actions/common-build-setup
+#              id: init
+#              with:
+#                  java-version: '17'
+#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+#
+#            - name: Build with Gradle
+#              run: ./gradlew :composeApp:packageDeb
+#
+#            - name: Rename DEB
+#              run: mv composeApp/build/compose/binaries/main/deb/*.deb "composeApp/build/compose/binaries/main/deb/maiapp-${{ steps.init.outputs.current-time }}.deb"
+#
+#            - name: Upload DEB artifact
+#              uses: actions/upload-artifact@v4
+#              with:
+#                  name: debian-artifact
+#                  path: composeApp/build/compose/binaries/main/deb/*
+
+#    build_web:
+#        name: Build WEB
+#        runs-on: ubuntu-latest
+#        steps:
+#            - uses: actions/checkout@v4
+#            - uses: ./.github/actions/common-build-setup
+#              with:
+#                  java-version: '21'
+#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+#
+#            - name: Build with Gradle
+#              run: ./gradlew :composeApp:wasmJsBrowserDistribution
+#
+#            - name: Upload WEB artifact
+#              uses: actions/upload-artifact@v4
+#              with:
+#                  name: web-artifact
+#                  path: composeApp/build/dist/wasmJs/productionExecutable
+#
+#            - name: Upload pages artifact
+#              uses: actions/upload-pages-artifact@v3
+#              with:
+#                  name: pages-artifact
+#                  path: composeApp/build/dist/wasmJs/productionExecutable
+
+    publish_rolling:
+        name: Publish Rolling Release
+        runs-on: ubuntu-latest
+        needs: [ build_android, build_ios ]
+        steps:
+            - uses: actions/checkout@v4
+            - name: Download artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  path: artifacts
+                  merge-multiple: true
+
+            - name: Publish to GitHub Releases
+              shell: bash
+              run: ls artifacts
+
+
+
+
+#    publish_pages:
+#      needs:
+#          - build_web
+#      runs-on: ubuntu-latest
+#      permissions:
+#          contents: read
+#          pages: write
+#          id-token: write
+#      steps:
+#          -   uses: actions/checkout@v4
+#
+#          -   name: Publish WEB artifact
+#              uses: actions/deploy-pages@v4
+#              with:
+#                  artifact_name: pages-artifact
+#                  preview: 'true'

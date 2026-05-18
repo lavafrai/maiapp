@@ -1,0 +1,178 @@
+<div style="display: flex; flex-direction: column; gap: 8px">
+    <card>
+        <span style="font-size: 18px;">Студенческий строительный отряд МАИ "Взлет"</span>
+        <button class="copy-button" data-phone="+7 919 192-42-07" onclick="handleCopyClick(this)">
+            +7 919 192-42-07
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Студенческий пожарно-спасательный отряд</span>
+        <button class="copy-button" data-phone="+7 950 539-01-30" onclick="handleCopyClick(this)">
+            +7 950 539-01-30
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Профсоюзный комитет студентов и аспирантов МАИ</span>
+        <span class="secondary-color" style="font-size: 14px;">Волоколамское шоссе, дом 4, корпус 26 (ГУК зона "В"), комната 301</span>
+        <button class="copy-button" data-phone="+7 499 158-42-40" onclick="handleCopyClick(this)">
+            +7 499 158-42-40
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Авиационный клуб МАИ</span>
+        <span class="secondary-color" style="font-size: 14px;">улица Панфилова, дом 20, корпус 3</span>
+        <button class="copy-button" data-phone="+7 499 960-18-03" onclick="handleCopyClick(this)">
+            +7 499 960-18-03
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Авиамодельный клуб МАИ</span>
+        <span class="secondary-color" style="font-size: 14px;">Волоколамское шоссе, дом 4, корпус 4, 1 этаж</span>
+        <button class="copy-button" data-phone="+7 499 158-49-05" onclick="handleCopyClick(this)">
+            +7 499 158-49-05
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Студенческий парламентский клуб</span>
+        <span class="secondary-color" style="font-size: 14px;">Волоколамское шоссе, дом 4, корпус 20, ГУК зона "А", комната 519</span>
+        <button class="copy-button" data-phone="+7 499 158-49-50" onclick="handleCopyClick(this)">
+            +7 499 158-49-50
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Волонтерский центр</span>
+        <span class="secondary-color" style="font-size: 14px;">Волоколамское шоссе, дом 4, корпус 20, ГУК зона "А", комната 219</span>
+        <button class="copy-button" data-phone="+7 499 158-47-20" onclick="handleCopyClick(this)">
+            +7 499 158-47-20
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Спортивный клуб МАИ</span>
+        <span class="secondary-color" style="font-size: 14px;">улица Константина Царева, дом 12а</span>
+        <button class="copy-button" data-phone="+7 499 158-57-58" onclick="handleCopyClick(this)">
+            +7 499 158-57-58
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Клуб "Дебаты" МАИ</span>
+        <button class="copy-button" data-phone="+7 977 805-53-66" onclick="handleCopyClick(this)">
+            +7 977 805-53-66
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Клуб веселых и находчивых</span>
+        <button class="copy-button" data-phone="+7 965 292-25-82" onclick="handleCopyClick(this)">
+            +7 965 292-25-82
+        </button>
+    </card>
+
+    <card>
+        <span style="font-size: 18px;">Клуб любителей программирования "Lambda IT"</span>
+        <span class="secondary-color" style="font-size: 14px;">улица Дубосековская, дом 9, корпус 1, комната 101</span>
+        <button class="copy-button" data-phone="+7 495 055-28-96" onclick="handleCopyClick(this)">
+            +7 495 055-28-96
+        </button>
+    </card>
+
+</div>
+
+<!-- JavaScript for handling copy clicks and UI feedback -->
+<script>
+    function handleCopyClick(buttonElement) {
+        const phoneRaw = buttonElement.getAttribute('data-phone');
+        // Check if the injected 'copy' function exists
+        if (!phoneRaw || typeof copy !== 'function') {
+            console.error('Copy function not available or no phone number found.');
+            return;
+        }
+
+        // Remove spaces and hyphens before copying
+        const phoneFormatted = phoneRaw.replace(/[\s-]/g, '');
+
+        const originalText = buttonElement.innerHTML;
+        buttonElement.disabled = true; // Disable button
+
+        try {
+            // Call the injected copy function
+            copy(phoneFormatted);
+
+            // Show feedback (assuming copy was successful)
+            buttonElement.innerHTML = "Скопировано!";
+            buttonElement.classList.add('copied');
+
+            // Revert back after a delay
+            setTimeout(() => {
+                buttonElement.innerHTML = originalText;
+                buttonElement.classList.remove('copied');
+                buttonElement.disabled = false; // Re-enable button
+            }, 1500); // 1.5 seconds delay
+
+        } catch (err) {
+            // Handle potential errors during the call to `copy`
+            console.error('Error calling injected copy function: ', err);
+            buttonElement.innerHTML = originalText; // Revert text on error
+            buttonElement.disabled = false; // Re-enable button
+        }
+    }
+</script>
+
+<!-- CSS for button styling and animations -->
+<style>
+    /* Base Button Style */
+    .copy-button {
+        background-color: var(--primary, #0066CC);
+        color: var(--on-primary, #FFFFFF);
+        border: none;
+        border-radius: 20px; /* Fully rounded */
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        align-self: flex-start;
+        margin-top: 4px;
+        /* Smooth Transitions */
+        transition: background-color 0.25s ease-out, transform 0.15s ease-out, filter 0.25s ease-out, opacity 0.2s linear;
+        /* Prevent text selection */
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+
+    /* Hover State (only when not disabled) */
+    .copy-button:hover:not(:disabled) {
+        filter: brightness(1.1);
+    }
+
+    /* Active/Press State (only when not disabled) */
+    .copy-button:active:not(:disabled) {
+        transform: scale(0.97);
+        filter: brightness(0.9);
+        transition-duration: 0.1s;
+    }
+
+    /* "Copied!" State */
+    .copy-button.copied {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+
+    /* Disabled State */
+    .copy-button:disabled {
+        cursor: default;
+        opacity: 0.7;
+    }
+</style>

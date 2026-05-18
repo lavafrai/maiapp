@@ -1,0 +1,98 @@
+{
+  "id": null,
+  "uid": "mai-overview",
+  "title": "MAI App - Traffic Overview",
+  "tags": ["maiapp", "overview", "caddy"],
+  "timezone": "",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "job",
+        "type": "query",
+        "datasource": {"type":"prometheus","uid":"Prometheus"},
+        "query": "label_values(up, job)",
+        "refresh": 2,
+        "includeAll": false,
+        "multi": false,
+        "current": {"selected": true, "text": "maiapp", "value": "maiapp"}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Requests per second",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "datasource": {"type":"prometheus","uid":"Prometheus"},
+      "targets": [
+        {
+          "expr": "sum(rate(caddy_http_requests_total{job=\"$job\"}[5m]))",
+          "legendFormat": "RPS",
+          "refId": "A"
+        }
+      ],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "orientation":"auto"}
+    },
+    {
+      "type": "stat",
+      "title": "Error rate (5xx)",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "datasource": {"type":"prometheus","uid":"Prometheus"},
+      "targets": [
+        {"expr": "sum(rate(caddy_http_requests_total{job=\"$job\",code=~\"5..\"}[5m])) / sum(rate(caddy_http_requests_total{job=\"$job\"}[5m]))", "refId": "A"}
+      ],
+      "options": {"reduceOptions": {"calcs":["lastNotNull"], "values": false}, "colorMode": "value", "textMode": "auto", "text": {}, "graphMode": "none"},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "min": 0, "max": 1}, "overrides": []}
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p50/p90/p99 (s)",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type":"prometheus","uid":"Prometheus"},
+      "targets": [
+        {"expr": "histogram_quantile(0.5, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{job=\"$job\"}[5m])))", "legendFormat": "p50", "refId": "A"},
+        {"expr": "histogram_quantile(0.9, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{job=\"$job\"}[5m])))", "legendFormat": "p90", "refId": "B"},
+        {"expr": "histogram_quantile(0.99, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{job=\"$job\"}[5m])))", "legendFormat": "p99", "refId": "C"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []}
+    },
+    {
+      "type": "bargauge",
+      "title": "Status codes (rate)",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 6},
+      "datasource": {"type":"prometheus","uid":"Prometheus"},
+      "targets": [
+        {"expr": "sum by (code) (rate(caddy_http_requests_total{job=\"$job\"}[5m]))", "legendFormat": "{{code}}", "refId": "A"}
+      ],
+      "options": {"displayMode": "basic", "valueMode": "color"}
+    },
+    {
+      "type": "timeseries",
+      "title": "In-flight requests",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 6},
+      "datasource": {"type":"prometheus","uid":"Prometheus"},
+      "targets": [
+        {"expr": "sum(caddy_http_requests_in_flight{job=\"$job\"})", "legendFormat": "in_flight", "refId": "A"}
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Top paths (rate)",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type":"prometheus","uid":"Prometheus"},
+      "targets": [
+        {"expr": "topk(10, sum by (path) (rate(caddy_http_requests_total{job=\"$job\"}[5m])))", "legendFormat": "{{path}}", "refId": "A"}
+      ],
+      "transformations": [
+        {"id":"labelsToFields", "options": {"mode":"columns"}},
+        {"id":"organize", "options": {"indexByName": {"Time": 0, "Value": 2, "path": 1}, "renameByName": {"Value": "rps"}}}
+      ],
+      "fieldConfig": {"defaults": {"custom": {"align": "auto"}}, "overrides": []}
+    }
+  ]
+}
+

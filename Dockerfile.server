@@ -1,0 +1,14 @@
+FROM azul/zulu-openjdk-alpine:23-latest AS build
+
+COPY . /opt/app/
+WORKDIR /opt/app
+
+RUN chmod +x gradlew
+RUN ./gradlew --warning-mode all :server:buildFatJar
+
+FROM azul/zulu-openjdk-alpine:23-latest
+
+RUN apk --no-cache add curl
+COPY --from=build /opt/app/server/build/libs/server-all.jar /opt/app/server.jar
+WORKDIR /opt/app
+CMD java -jar server.jar

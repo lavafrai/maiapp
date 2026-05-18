@@ -1,0 +1,4 @@
+An app with information about MAI for students and faculty.
+Get quick access to university data. You can view your group's schedule.
+All information is downloaded on first launch and is available offline, so you always have your class timetable at hand.
+

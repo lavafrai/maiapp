@@ -1,0 +1,41 @@
+name: 'Common Build Setup'
+description: 'Sets up Java, checks out code, and decodes secrets.'
+inputs:
+    java-version:
+        description: 'The Java version to set up'
+        required: true
+    secrets-properties:
+        description: 'The secrets.properties file to decode'
+        required: true
+
+outputs:
+    current-time:
+        description: 'The current time'
+        value: ${{ steps.set-time.outputs.formattedTime }}
+
+
+runs:
+    using: "composite"
+    steps:
+        - name: Set up JDK ${{ inputs.java-version }}
+          uses: actions/setup-java@v4
+          with:
+              distribution: 'zulu' # Or 'graalvm' as needed
+              java-version: ${{ inputs.java-version }}
+
+        - name: Allow to run Gradle
+          shell: bash
+          run: chmod +x gradlew
+
+        - name: Decode secret.properties
+          uses: DamianReeves/write-file-action@master
+          with:
+              path: 'composeApp/secrets.properties'
+              contents: ${{ inputs.secrets-properties }}
+
+        - name: Set current time
+          id: set-time
+          uses: josStorer/get-current-time@v2
+          with:
+              format: 'yyyyMMDDHHmm'
+              utcOffset: '+03:00'

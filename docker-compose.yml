@@ -1,0 +1,154 @@
+services:
+  server3:
+    image: ghcr.io/lavafrai/maiapp/maiserver3:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.server3
+    container_name: mai-server3
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      - MAIAPP_ADMIN_USER=${MAIAPP_ADMIN_USER:-admin}
+      - MAIAPP_ADMIN_PASSWORD=${MAIAPP_ADMIN_PASSWORD:-admin}
+      - MAIAPP_UPSTREAM_PROBE_INTERVAL_SECONDS=${MAIAPP_UPSTREAM_PROBE_INTERVAL_SECONDS:-60}
+      - MAIAPP_TELEMETRY_PATH=/var/lib/maiapp-server3/telemetry.json
+      - MAIAPP_CACHE_DIR=/var/lib/maiapp-server3/cache
+      - MAIAPP_TELEMETRY_FLUSH_INTERVAL_SECONDS=${MAIAPP_TELEMETRY_FLUSH_INTERVAL_SECONDS:-30}
+      - MAIAPP_TELEMETRY_RETENTION_DAYS=${MAIAPP_TELEMETRY_RETENTION_DAYS:-30}
+      - MAIAPP_CACHE_FRESH_TTL_SECONDS=${MAIAPP_CACHE_FRESH_TTL_SECONDS:-900}
+      - MAIAPP_CACHE_VALID_TTL_SECONDS=${MAIAPP_CACHE_VALID_TTL_SECONDS:-21600}
+      - MAIAPP_CACHE_WORKER_TIMEOUT_SECONDS=${MAIAPP_CACHE_WORKER_TIMEOUT_SECONDS:-45}
+      - MAIAPP_CACHE_MAX_WORKERS=${MAIAPP_CACHE_MAX_WORKERS:-8}
+    volumes:
+      - server3-telemetry:/var/lib/maiapp-server3
+    healthcheck:
+      test: curl -sS http://127.0.0.1/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  landing:
+    image: ghcr.io/lavafrai/maiapp/maiapp-landing:latest
+    container_name: mai-landing
+    restart: unless-stopped
+    expose:
+      - "80"
+    healthcheck:
+      test: curl -sS http://127.0.0.1 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx-internal:
+    image: nginx:alpine
+    container_name: mai-nginx-internal
+    restart: unless-stopped
+    expose:
+      - "80"
+    volumes:
+      - ./server-configs/nginx-internal/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - server3
+      - landing
+    healthcheck:
+      test: curl -sS http://127.0.0.1 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    container_name: mai-anubis
+    restart: unless-stopped
+    environment:
+      BIND: ":80"
+      DIFFICULTY: "4"
+      METRICS_BIND: ":9090"
+      SERVE_ROBOTS_TXT: "false"
+      TARGET: "http://nginx-internal"
+      POLICY_FNAME: "/data/cfg/botPolicy.yaml"
+      OG_PASSTHROUGH: "true"
+      OG_EXPIRY_TIME: "24h"
+    healthcheck:
+      test: [ "CMD", "anubis", "--healthcheck" ]
+      interval: 5s
+      timeout: 30s
+      retries: 5
+      start_period: 500ms
+    expose:
+      - "80"
+      - "9090"
+    volumes:
+      - ./server-configs/anubis/botPolicy.yaml:/data/cfg/botPolicy.yaml:ro
+    depends_on:
+      - nginx-internal
+
+  prometheus:
+    image: prom/prometheus:v2.17.1
+    container_name: mai-prometheus
+    volumes:
+      - ./server-configs/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    expose:
+      - 9090
+
+  caddy-external:
+    build:
+      context: server-configs/caddy-external
+      dockerfile: Dockerfile
+    container_name: mai-caddy-external
+    restart: unless-stopped
+    expose:
+      - "8081"
+      - "80"
+    volumes:
+      - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddyfile
+      - caddy-usage-data:/usage-data
+    depends_on:
+      - anubis
+    networks:
+      - default
+      - server-local
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mai-grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./server-configs/grafana/provisioning:/etc/grafana/provisioning
+    healthcheck:
+      test: curl -sS http://127.0.0.1:3000/api/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PLUGINS_PREINSTALL=
+      - GF_SERVER_ROOT_URL=https://maiapp.lavafrai.ru/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_DOMAIN=maiapp.lavafrai.ru
+    restart: unless-stopped
+    expose:
+      - "3000"
+
+
+volumes:
+  server3-telemetry:
+  caddy-usage-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  server-local:
+    external: true
