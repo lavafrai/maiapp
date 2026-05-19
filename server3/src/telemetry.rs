@@ -39,6 +39,8 @@ struct DailyStats {
     cache_worker_errors: HashMap<String, u64>,
     cache_worker_timeouts: HashMap<String, u64>,
     cache_waiters: HashMap<String, u64>,
+    max_cache_workers_active: u64,
+    max_cache_workers_queued: u64,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -84,10 +86,10 @@ pub struct UpstreamSnapshot {
 
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 struct CacheWorkerStore {
+    #[serde(skip)]
     active: u64,
+    #[serde(skip)]
     queued: u64,
-    max_active: u64,
-    max_queued: u64,
     queue_timeline: VecDeque<CacheQueueSample>,
     recent_failures: VecDeque<CacheWorkerFailure>,
 }
@@ -193,6 +195,8 @@ impl Telemetry {
         let mut cache_worker_timeouts = HashMap::new();
         let mut cache_waiters = HashMap::new();
         let mut total_requests = 0;
+        let mut max_active_month = 0u64;
+        let mut max_queued_month = 0u64;
 
         for day in &store.days {
             total_requests += day.total_requests;
@@ -203,6 +207,8 @@ impl Telemetry {
             merge_counts(&mut cache_worker_errors, &day.cache_worker_errors);
             merge_counts(&mut cache_worker_timeouts, &day.cache_worker_timeouts);
             merge_counts(&mut cache_waiters, &day.cache_waiters);
+            max_active_month = max_active_month.max(day.max_cache_workers_active);
+            max_queued_month = max_queued_month.max(day.max_cache_workers_queued);
         }
 
         TelemetrySnapshot {
@@ -222,8 +228,8 @@ impl Telemetry {
             cache_workers: CacheWorkerSnapshot {
                 active: store.cache_workers.active,
                 queued: store.cache_workers.queued,
-                max_active_month: store.cache_workers.max_active,
-                max_queued_month: store.cache_workers.max_queued,
+                max_active_month,
+                max_queued_month,
                 waiters: top_counts(&cache_waiters, usize::MAX),
                 errors: top_counts(&cache_worker_errors, usize::MAX),
                 timeouts: top_counts(&cache_worker_timeouts, usize::MAX),
@@ -251,10 +257,9 @@ impl Telemetry {
         let mut store = self.inner.write().await;
         prune_store(&mut store, self.retention_days);
         store.cache_workers.queued += 1;
-        store.cache_workers.max_queued = store
-            .cache_workers
-            .max_queued
-            .max(store.cache_workers.queued);
+        let queued = store.cache_workers.queued;
+        let day = today_mut(&mut store);
+        day.max_cache_workers_queued = day.max_cache_workers_queued.max(queued);
         push_queue_sample(&mut store, namespace, None);
     }
 
@@ -267,10 +272,9 @@ impl Telemetry {
         prune_store(&mut store, self.retention_days);
         store.cache_workers.queued = store.cache_workers.queued.saturating_sub(1);
         store.cache_workers.active += 1;
-        store.cache_workers.max_active = store
-            .cache_workers
-            .max_active
-            .max(store.cache_workers.active);
+        let active = store.cache_workers.active;
+        let day = today_mut(&mut store);
+        day.max_cache_workers_active = day.max_cache_workers_active.max(active);
         push_queue_sample(&mut store, namespace, Some(wait.as_millis()));
     }
 
