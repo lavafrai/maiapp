@@ -19,3 +19,5 @@ Pods/
 /composeApp/release/
 *secrets.properties
 /kotlin-js-store/
+/build-ios-sideload/
+/dist/
