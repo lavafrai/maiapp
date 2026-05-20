@@ -7,6 +7,8 @@ I would like to thank the following people and projects for their contributions,
 Evgeny Meltsaykin for idea to rewrite the application in Compose Multiplatform and for code reviews
 Георгий Воложанин и Павел Голощапов for making it possible to release the app on iOS
 
+Qirieshka за инструкцию по установке приложения на iOS без AppStore и тестирование
+
 Google and JetBrains for the Kotlin language and libraries
 
 Chris Banes (chrisbanes) for material3-windowsizeclass-multiplatform library (Apache License 2.0)

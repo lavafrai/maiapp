@@ -147,3 +147,214 @@ li {
 .react-tabs__tab-list {
     border: 0 !important;
 }
+
+.ios-install-page {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.ios-install-back {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    color: var(--foreground);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.ios-install-back:hover {
+    color: var(--primary);
+}
+
+.ios-install-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+}
+
+.ios-install-kicker {
+    margin-bottom: 4px !important;
+    color: var(--primary);
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.ios-install-hero h2,
+.ios-install-section h3 {
+    margin: 0;
+}
+
+.ios-install-hero h2 {
+    max-width: 620px;
+    font-size: 1.9em;
+    line-height: 1.2em;
+}
+
+.ios-install-hero p {
+    max-width: 680px;
+    margin-top: 10px !important;
+}
+
+.ios-install-note,
+.ios-install-warning,
+.ios-install-footer-note {
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    border-radius: 8px;
+}
+
+.ios-install-note {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    color: var(--foreground-inaccent);
+}
+
+.ios-install-note b {
+    color: var(--foreground);
+}
+
+.ios-install-warning {
+    padding: 14px;
+}
+
+.ios-install-warning b {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.ios-install-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ios-install-requirements {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 8px;
+}
+
+.ios-install-requirements span {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 9px 10px;
+    border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+    border-radius: 8px;
+    color: var(--foreground-inaccent);
+    background: color-mix(in srgb, var(--background) 58%, transparent);
+}
+
+.ios-install-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ios-install-step {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--background) 58%, transparent);
+}
+
+.ios-install-step-number {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--background);
+    background: var(--primary);
+    font-weight: 800;
+}
+
+.ios-install-step-content {
+    min-width: 0;
+}
+
+.ios-install-step-content h4 {
+    margin: 4px 0 6px;
+    color: var(--foreground);
+    font-size: 1.05em;
+}
+
+.ios-install-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.ios-install-image {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--foreground) 14%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--background) 80%, #000 20%);
+    cursor: zoom-in;
+}
+
+.ios-install-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.ios-install-warning .ios-install-image {
+    max-width: 260px;
+    justify-self: end;
+}
+
+.ios-install-warning .ios-install-image img,
+.ios-install-images .ios-install-image img {
+    object-position: top center;
+}
+
+.ios-install-footer-note {
+    padding: 14px;
+}
+
+@media (max-width: 680px) {
+    .ios-install-hero,
+    .ios-install-warning {
+        grid-template-columns: 1fr;
+    }
+
+    .ios-install-hero h2 {
+        font-size: 1.55em;
+    }
+
+    .ios-install-warning .ios-install-image {
+        max-width: none;
+        justify-self: stretch;
+        aspect-ratio: 16 / 9;
+    }
+
+    .ios-install-step {
+        grid-template-columns: 30px minmax(0, 1fr);
+        padding: 12px;
+    }
+
+    .ios-install-step-number {
+        width: 30px;
+        height: 30px;
+    }
+}

@@ -25,9 +25,13 @@ impl ScheduleService {
     }
 
     pub async fn schedule(&self, id: &str) -> AppResult<Cached<Schedule>> {
-        self.repository
-            .schedule_by_id(id)
-            .await
-            .map_err(|error| AppError::not_found(error.to_string()))
+        self.repository.schedule_by_id(id).await.map_err(|error| {
+            let message = error.to_string();
+            if message.contains("not found") || message.contains("invalid format") {
+                AppError::not_found(message)
+            } else {
+                AppError::from(error)
+            }
+        })
     }
 }

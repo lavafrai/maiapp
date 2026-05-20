@@ -1,4 +1,8 @@
-use std::{collections::{BTreeMap, HashSet}, sync::Arc, time::Duration};
+use std::{
+    collections::{BTreeMap, HashSet},
+    sync::Arc,
+    time::Duration,
+};
 
 use anyhow::anyhow;
 use encoding_rs::WINDOWS_1251;

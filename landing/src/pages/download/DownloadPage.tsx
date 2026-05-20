@@ -13,12 +13,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import PrimaryButton from "../../PrimaryButton.tsx";
 import {faArrowLeft, faDesktop} from "@fortawesome/free-solid-svg-icons";
 import Footer from "../home/Footer.tsx";
+import IosAltStorePage from "./IosAltStorePage.tsx";
 
 library.add(faAndroid, faApple, faTelegram, faArrowLeft, faAppStore, faAppStoreIos, faDesktop)
 
 
 function DownloadPage() {
-    let [latestVersionInfo, setLatestVersionInfo] = useState<{
+    const [selectedTabIndex, setSelectedTabIndex] = useState(() => window.location.hash === '#sideload' ? 1 : 0);
+    const [latestVersionInfo, setLatestVersionInfo] = useState<{
         version: string,
         url: string,
         description: string
@@ -81,7 +83,7 @@ function DownloadPage() {
                 </If>
             </section>
             <section>
-                <Tabs id="download-tabs">
+                <Tabs id="download-tabs" selectedIndex={selectedTabIndex} onSelect={setSelectedTabIndex}>
                     <TabList>
                         <Tab><FontAwesomeIcon icon={['fab', 'android']}/> Android</Tab>
                         <Tab><FontAwesomeIcon icon={['fab', 'apple']}/> iOS</Tab>
@@ -130,22 +132,38 @@ function DownloadPanelAndroid() {
 }
 
 function DownloadPanelIos() {
+    const [showSideload, setShowSideload] = useState(() => window.location.hash === '#sideload');
+
+    const goToSideload = () => { window.location.hash = '#sideload'; setShowSideload(true); };
+    const goBack = () => { history.pushState(null, '', window.location.pathname); setShowSideload(false); };
+
+    if (showSideload) {
+        return <IosAltStorePage onBack={goBack}/>;
+    }
+
     return <div style={{
         display: "flex",
         gap: "8px",
         flexDirection: "column"
     }}>
-        <p>Требуется iOS 15.6 и выше.</p>
-        <p>Загрузите приложение из App Store:</p>
+        <div style={{opacity: 0.5, textDecoration: "line-through"}}>
+            <p>Требуется iOS 15.6 и выше.</p>
+            <p>Загрузите приложение из App Store:</p>
+            <span>
+                <PrimaryButton text="Скачать из App Store" icon={['fab', 'app-store-ios']} target="_blank"
+                               href="https://apps.apple.com/us/app/%D1%80%D0%B0%D1%81%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B0%D0%B8/id6739470086"/>
+            </span>
+            <p>Сами понимаете, тут вариантов, как установить, немного, поэтому спасибо профбюро 4-го факультета МАИ за то,
+                что оплатили публикацию в AppStore.</p>
+            <p>Будет славно, если совершите небольшое пожертвование, чтобы помочь с оплатой подписки Apple Developer.</p>
+        </div>
+        <p>К сожалению, приложение больше не доступно в App Store — закончились деньги на подписку Apple Developer. Установите приложение вручную через sideload:</p>
         <span>
-            <PrimaryButton text="Скачать из App Store" icon={['fab', 'app-store-ios']} target="_blank"
-                           href="https://apps.apple.com/us/app/%D1%80%D0%B0%D1%81%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B0%D0%B8/id6739470086"/>
+            <PrimaryButton text="Установка через AltStore (Windows)" icon={['fab', 'apple']} onClick={goToSideload} href="#sideload"/>
         </span>
-        <p>Сами понимаете, тут вариантов, как установить, немного, поэтому спасибо профбюро 4-го факультета МАИ за то,
-            что оплатили публикацию в AppStore.</p>
-        <p>Будет славно, если совершите небольшое пожертвование, чтобы помочь с оплатой подписки Apple Developer.</p>
     </div>
 }
+
 
 function DownloadPanelOther() {
     return <div style={{

@@ -6,9 +6,9 @@ use serde::{Deserialize, Serialize};
 pub mod naive_date_format {
     use chrono::NaiveDate;
     use serde::{
+        Deserializer, Serializer,
         de::{self, MapAccess, Visitor},
         ser::SerializeStruct,
-        Deserializer, Serializer,
     };
     use std::fmt;
 
@@ -17,9 +17,18 @@ pub mod naive_date_format {
         S: Serializer,
     {
         let mut s = serializer.serialize_struct("NaiveDate", 3)?;
-        s.serialize_field("year", &date.format("%Y").to_string().parse::<i32>().unwrap())?;
-        s.serialize_field("month", &date.format("%m").to_string().parse::<u32>().unwrap())?;
-        s.serialize_field("day", &date.format("%d").to_string().parse::<u32>().unwrap())?;
+        s.serialize_field(
+            "year",
+            &date.format("%Y").to_string().parse::<i32>().unwrap(),
+        )?;
+        s.serialize_field(
+            "month",
+            &date.format("%m").to_string().parse::<u32>().unwrap(),
+        )?;
+        s.serialize_field(
+            "day",
+            &date.format("%d").to_string().parse::<u32>().unwrap(),
+        )?;
         s.end()
     }
 

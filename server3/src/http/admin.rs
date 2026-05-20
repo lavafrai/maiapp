@@ -184,6 +184,7 @@ a {{ color: #8db7ff; }}
   <section class="card"><h2>Cache worker errors</h2><div id="cache-errors"></div></section>
   <section class="card"><h2>Cache worker timeouts</h2><div id="cache-timeouts"></div></section>
   <section class="card"><h2>Cache waiters</h2><div id="cache-waiters"></div></section>
+  <section class="card wide"><h2>Active cache workers</h2><div id="active-workers"></div></section>
 </div>
 <div class="grid">{}</div>
 <section class="card wide">
@@ -218,6 +219,20 @@ function table(entries) {{
     entries.map(e => `<tr><td>${{escapeHtml(e.key)}}</td><td>${{e.count}}</td></tr>`).join('') +
     '</tbody></table>';
 }}
+function duration(ms) {{
+  const seconds = Math.floor(Number(ms || 0) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  if (hours) return `${{hours}}h ${{minutes % 60}}m ${{seconds % 60}}s`;
+  if (minutes) return `${{minutes}}m ${{seconds % 60}}s`;
+  return `${{seconds}}s`;
+}}
+function activeWorkerTable(workers) {{
+  if (!workers.length) return '<p class="muted">No active workers</p>';
+  return '<table><thead><tr><th>Namespace</th><th>Key</th><th>Running</th><th>Started</th><th>Wait</th></tr></thead><tbody>' +
+    workers.map(w => `<tr><td>${{escapeHtml(w.namespace)}}</td><td>${{escapeHtml(w.key)}}</td><td>${{duration(w.running_ms)}}</td><td>${{new Date(w.started_at * 1000).toLocaleString()}}</td><td>${{duration(w.wait_ms)}}</td></tr>`).join('') +
+    '</tbody></table>';
+}}
 function escapeHtml(value) {{
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }}
@@ -241,6 +256,7 @@ document.getElementById('cache-max').textContent = `${{stats.cache_workers.max_a
 document.getElementById('cache-errors').innerHTML = table(stats.cache_errors);
 document.getElementById('cache-timeouts').innerHTML = table(stats.cache_timeouts);
 document.getElementById('cache-waiters').innerHTML = table(stats.cache_waiters);
+document.getElementById('active-workers').innerHTML = activeWorkerTable(stats.cache_workers.active_workers || []);
 ['dataset', 'search', 'limit'].forEach(id => document.getElementById(id).addEventListener('input', renderBrowser));
 renderBrowser();
 setInterval(() => location.reload(), 30000);
