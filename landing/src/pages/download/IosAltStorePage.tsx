@@ -38,8 +38,8 @@ const requirements = [
     "ПК с Windows",
     "Кабель для подключения iPhone",
     "iTunes и iCloud на ПК",
-    "Apple ID для входа в AltStore",
-    "Иностранный iCloud, например из ЕС",
+    "Apple ID из ЕС для входа в AltStore",
+    "Регион аккаунта Apple обязательно должен быть европейским",
 ];
 
 const steps = [
@@ -85,7 +85,10 @@ const steps = [
     },
     {
         title: "Войдите в AltStore",
-        body: <>Откройте AltStore на iPhone, перейдите в настройки и войдите в Apple ID.</>,
+        body: <>
+            Откройте AltStore на iPhone, перейдите в настройки и войдите в Apple ID.
+            Аккаунт обязательно должен быть из ЕС.
+        </>,
         images: ["altstore-login.png"],
     },
     {
