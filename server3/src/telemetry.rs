@@ -90,8 +90,20 @@ struct CacheWorkerStore {
     active: u64,
     #[serde(skip)]
     queued: u64,
+    #[serde(skip)]
+    active_workers: HashMap<String, ActiveCacheWorker>,
     queue_timeline: VecDeque<CacheQueueSample>,
     recent_failures: VecDeque<CacheWorkerFailure>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActiveCacheWorker {
+    pub id: String,
+    pub namespace: String,
+    pub key: String,
+    pub started_at: i64,
+    pub running_ms: u128,
+    pub wait_ms: u128,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -117,6 +129,7 @@ pub struct CacheWorkerSnapshot {
     pub queued: u64,
     pub max_active_month: u64,
     pub max_queued_month: u64,
+    pub active_workers: Vec<ActiveCacheWorker>,
     pub waiters: Vec<CountEntry>,
     pub errors: Vec<CountEntry>,
     pub timeouts: Vec<CountEntry>,
@@ -210,6 +223,25 @@ impl Telemetry {
             max_active_month = max_active_month.max(day.max_cache_workers_active);
             max_queued_month = max_queued_month.max(day.max_cache_workers_queued);
         }
+        let now = Utc::now().timestamp_millis();
+        let mut active_workers = store
+            .cache_workers
+            .active_workers
+            .values()
+            .cloned()
+            .map(|mut worker| {
+                worker.running_ms = now
+                    .saturating_sub(worker.started_at.saturating_mul(1000))
+                    .max(0) as u128;
+                worker
+            })
+            .collect::<Vec<_>>();
+        active_workers.sort_by(|a, b| {
+            b.running_ms
+                .cmp(&a.running_ms)
+                .then_with(|| a.namespace.cmp(&b.namespace))
+                .then_with(|| a.key.cmp(&b.key))
+        });
 
         TelemetrySnapshot {
             started_at: self.started_at.to_rfc3339(),
@@ -226,10 +258,11 @@ impl Telemetry {
                 .map(|(name, timeline)| upstream_snapshot(name, timeline))
                 .collect(),
             cache_workers: CacheWorkerSnapshot {
-                active: store.cache_workers.active,
+                active: active_workers.len() as u64,
                 queued: store.cache_workers.queued,
                 max_active_month,
                 max_queued_month,
+                active_workers,
                 waiters: top_counts(&cache_waiters, usize::MAX),
                 errors: top_counts(&cache_worker_errors, usize::MAX),
                 timeouts: top_counts(&cache_worker_timeouts, usize::MAX),
@@ -266,6 +299,7 @@ impl Telemetry {
     pub async fn record_cache_worker_started(
         &self,
         namespace: &'static str,
+        key: &str,
         wait: std::time::Duration,
     ) {
         let mut store = self.inner.write().await;
@@ -273,20 +307,45 @@ impl Telemetry {
         store.cache_workers.queued = store.cache_workers.queued.saturating_sub(1);
         store.cache_workers.active += 1;
         let active = store.cache_workers.active;
+        let id = cache_worker_id(namespace, key);
+        store.cache_workers.active_workers.insert(
+            id.clone(),
+            ActiveCacheWorker {
+                id,
+                namespace: namespace.to_owned(),
+                key: key.to_owned(),
+                started_at: Utc::now().timestamp(),
+                running_ms: 0,
+                wait_ms: wait.as_millis(),
+            },
+        );
         let day = today_mut(&mut store);
         day.max_cache_workers_active = day.max_cache_workers_active.max(active);
         push_queue_sample(&mut store, namespace, Some(wait.as_millis()));
     }
 
-    pub async fn record_cache_worker_finished(&self, namespace: &'static str) {
+    pub async fn record_cache_worker_finished(&self, namespace: &'static str, key: &str) {
         let mut store = self.inner.write().await;
         store.cache_workers.active = store.cache_workers.active.saturating_sub(1);
+        store
+            .cache_workers
+            .active_workers
+            .remove(&cache_worker_id(namespace, key));
         push_queue_sample(&mut store, namespace, None);
     }
 
-    pub async fn record_cache_worker_failed(&self, namespace: &'static str, message: String) {
+    pub async fn record_cache_worker_failed(
+        &self,
+        namespace: &'static str,
+        key: &str,
+        message: String,
+    ) {
         let mut store = self.inner.write().await;
         store.cache_workers.active = store.cache_workers.active.saturating_sub(1);
+        store
+            .cache_workers
+            .active_workers
+            .remove(&cache_worker_id(namespace, key));
         *today_mut(&mut store)
             .cache_worker_errors
             .entry(namespace.to_owned())
@@ -295,9 +354,18 @@ impl Telemetry {
         push_queue_sample(&mut store, namespace, None);
     }
 
-    pub async fn record_cache_worker_timeout(&self, namespace: &'static str, message: String) {
+    pub async fn record_cache_worker_timeout(
+        &self,
+        namespace: &'static str,
+        key: &str,
+        message: String,
+    ) {
         let mut store = self.inner.write().await;
         store.cache_workers.active = store.cache_workers.active.saturating_sub(1);
+        store
+            .cache_workers
+            .active_workers
+            .remove(&cache_worker_id(namespace, key));
         *today_mut(&mut store)
             .cache_worker_timeouts
             .entry(namespace.to_owned())
@@ -499,6 +567,10 @@ fn push_failure(
     while store.cache_workers.recent_failures.len() > 200 {
         store.cache_workers.recent_failures.pop_front();
     }
+}
+
+fn cache_worker_id(namespace: &'static str, key: &str) -> String {
+    format!("{namespace}:{key}")
 }
 
 fn top_counts(counts: &HashMap<String, u64>, limit: usize) -> Vec<CountEntry> {
