@@ -1,10 +1,20 @@
-name: Build KMP iOS App (maiapp)
+name: Build KMP iOS Sideload IPA (maiapp)
 
 on:
   push:
     branches: [ "master" ]
     paths:
       - '.github/workflows/build-ios.yml'
+      - '.github/actions/common-build-setup/**'
+      - 'iosApp/**'
+      - 'composeApp/**'
+      - 'models/**'
+      - 'shared/**'
+      - 'network/**'
+      - 'gradle/**'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - 'gradle.properties'
   workflow_dispatch:
 
 jobs:
@@ -14,10 +24,10 @@ jobs:
     env:
       SCHEME_NAME: iosApp
       PROJECT_PATH: iosApp/iosApp.xcodeproj
-      EXPORT_METHOD: app-store-connect
+      DERIVED_DATA_PATH: build-ios-sideload
       OUTPUT_DIR_IOS: iosApp/actions
-      ARCHIVE_NAME: maiapp.xcarchive
       PRODUCT_NAME: maiapp
+      IPA_NAME: maiapp-sideload.ipa
 
     steps:
       - name: Checkout code
@@ -29,83 +39,97 @@ jobs:
           java-version: '17'
           secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
-      - name: Import Apple Certificate
-        uses: apple-actions/import-codesign-certs@v2
-        with:
-          p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-
-      - name: Import Provisioning Profile
+      - name: Build iPhoneOS app without Apple signing
         run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ env.APPLE_PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/"${{ env.SCHEME_NAME }}_profile.mobileprovision"
-        env:
-          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_MOBILEPROVISION_B64 }}
+          rm -rf "${DERIVED_DATA_PATH}"
+          rm -rf "${OUTPUT_DIR_IOS}"
+          mkdir -p "${OUTPUT_DIR_IOS}"
 
-      - name: Create ExportOptions.plist
-        run: |
-          cat << EOF > ExportOptions.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>${{ env.EXPORT_METHOD }}</string>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>ru.lavafrai.maiapp</key>
-                  <string>maiapp-dist</string> <!-- Убедитесь, что это точное имя вашего App Store профиля -->
-              </dict>
-              <key>signingCertificate</key>
-              <string>Apple Distribution</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-          </dict>
-          </plist>
-          EOF
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-
-      - name: Build Xcode Archive
-        run: |
-          mkdir -p "${{ env.OUTPUT_DIR_IOS }}"
-          xcodebuild clean \
-            -project "${{ env.PROJECT_PATH }}" \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -configuration Release
-          xcodebuild archive \
-            -project "${{ env.PROJECT_PATH }}" \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -sdk iphoneos \
+          xcodebuild clean build \
+            -project "${PROJECT_PATH}" \
+            -scheme "${SCHEME_NAME}" \
             -configuration Release \
-            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "${DERIVED_DATA_PATH}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM=""
 
-      - name: Export IPA
+      - name: Pack app as sideload IPA
         run: |
-          xcodebuild -exportArchive \
-            -archivePath "${{ env.OUTPUT_DIR_IOS }}/${{ env.ARCHIVE_NAME }}" \
-            -exportPath "${{ env.OUTPUT_DIR_IOS }}/" \
-            -exportOptionsPlist ExportOptions.plist
+          APP_PATH="$(find "${DERIVED_DATA_PATH}/Build/Products/Release-iphoneos" -maxdepth 1 -type d -name "*.app" | head -n 1)"
 
-      - name: Upload to App Store Connect (TestFlight)
-        uses: Apple-Actions/upload-testflight-build@v3.0.0
-        with:
-          app-path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
-          api-key-id: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          issuer-id: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app found in ${DERIVED_DATA_PATH}/Build/Products/Release-iphoneos"
+            find "${DERIVED_DATA_PATH}/Build/Products" -maxdepth 5 -type d -name "*.app" || true
+            exit 1
+          fi
 
-      - name: Upload IPA Artifact
+          echo "Using app: $APP_PATH"
+
+          rm -rf "${OUTPUT_DIR_IOS}/Payload"
+          mkdir -p "${OUTPUT_DIR_IOS}/Payload"
+
+          cp -R "$APP_PATH" "${OUTPUT_DIR_IOS}/Payload/"
+
+          APP_BUNDLE="$(find "${OUTPUT_DIR_IOS}/Payload" -maxdepth 1 -type d -name "*.app" | head -n 1)"
+
+          # Optional structural ad-hoc signature.
+          # AltStore/Sideloadly will re-sign the app with the user's Apple ID anyway.
+          codesign --force --deep --sign - "$APP_BUNDLE" || true
+
+          cd "${OUTPUT_DIR_IOS}"
+          zip -qry "${IPA_NAME}" Payload
+
+      - name: Validate IPA structure
+        run: |
+          IPA_PATH="${OUTPUT_DIR_IOS}/${IPA_NAME}"
+
+          echo "IPA: $IPA_PATH"
+          test -f "$IPA_PATH"
+
+          rm -rf ipa-check
+          mkdir ipa-check
+          unzip -q "$IPA_PATH" -d ipa-check
+
+          APP_BUNDLE="$(find ipa-check/Payload -maxdepth 1 -type d -name "*.app" | head -n 1)"
+
+          if [ -z "$APP_BUNDLE" ]; then
+            echo "Invalid IPA: Payload/*.app not found"
+            exit 1
+          fi
+
+          echo "App bundle: $APP_BUNDLE"
+
+          EXECUTABLE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP_BUNDLE/Info.plist")
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_BUNDLE/Info.plist")
+          MIN_IOS=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$APP_BUNDLE/Info.plist")
+
+          echo "Executable: $EXECUTABLE"
+          echo "Bundle ID: $BUNDLE_ID"
+          echo "Minimum iOS: $MIN_IOS"
+
+          test -f "$APP_BUNDLE/$EXECUTABLE"
+
+          file "$APP_BUNDLE/$EXECUTABLE"
+
+          if ! file "$APP_BUNDLE/$EXECUTABLE" | grep -q "arm64"; then
+            echo "Invalid binary: expected arm64 iPhoneOS binary"
+            exit 1
+          fi
+
+          if /usr/libexec/PlistBuddy -c 'Print :CFBundleSupportedPlatforms:0' "$APP_BUNDLE/Info.plist" | grep -q "iPhoneOS"; then
+            echo "Platform OK: iPhoneOS"
+          else
+            echo "Invalid platform: expected iPhoneOS"
+            exit 1
+          fi
+
+      - name: Upload sideload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-artifact
-          path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.PRODUCT_NAME }}.ipa
+          name: ios-sideload-artifact
+          path: ${{ env.OUTPUT_DIR_IOS }}/${{ env.IPA_NAME }}
           retention-days: 7
