@@ -31,11 +31,11 @@ import kotlin.reflect.typeOf
 @OptIn(ExperimentalStdlibApi::class, DelicateCryptographyApi::class)
 class MyMaiApi(
     private val credentials: MyMaiCredentials,
-    private val httpClient: HttpClient = HttpClientProvider.default,
+    private val httpClient: HttpClient = HttpClientProvider.myMai,
 ) {
     private suspend inline fun <reified T>method(methodName: String, urlQueryParams: Map<String, String> = mapOf()): T {
         val signatures = getSignatures()
-        val response = client.get {
+        val response = httpClient.get {
             url {
                 protocol = URLProtocol.HTTPS
                 host = "my.mai.ru"
@@ -88,7 +88,7 @@ class MyMaiApi(
     }
 
     companion object {
-        val client = HttpClientProvider.default
+        val client = HttpClientProvider.myMai
         val json = JsonProvider.tolerantJson
 
         @OptIn(InternalAPI::class)
