@@ -2,20 +2,18 @@ package ru.lavafrai.maiapp
 
 import io.ktor.client.*
 import io.ktor.client.engine.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 
 actual fun platformHttpClientProvider(): HttpClientEngineFactory<*> = CIO
 
-actual fun createMyMaiHttpClient(): HttpClient = HttpClient(CIO) {
+actual fun createMyMaiHttpClient(): HttpClient = HttpClient(Android) {
     engine {
-        https {
-            trustManager = MaiDomainTrustManager.instance
+        sslManager = { connection ->
+            if (isMyMaiHost(connection.url.host)) {
+                connection.sslSocketFactory = myMaiSocketFactory
+            }
         }
     }
-
-    install(ContentNegotiation) {
-        json(JsonProvider.tolerantJson)
-    }
+    configureMyMaiClient()
 }

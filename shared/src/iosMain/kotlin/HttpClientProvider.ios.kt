@@ -3,8 +3,6 @@ package ru.lavafrai.maiapp
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.darwin.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.serialization.kotlinx.json.*
 import kotlinx.cinterop.*
 import platform.CoreFoundation.*
 import platform.Foundation.*
@@ -12,88 +10,62 @@ import platform.Security.*
 
 actual fun platformHttpClientProvider(): HttpClientEngineFactory<*> = Darwin
 
-private fun isMaiDomain(host: String): Boolean {
-    val clean = host.lowercase().trimEnd('.')
-    return clean == "mai.ru" || clean.endsWith(".mai.ru")
-}
-
 @OptIn(ExperimentalForeignApi::class)
-private inline fun <T : CPointed, R> CPointer<T>.use(block: (CPointer<T>) -> R): R {
+private inline fun <T : CPointed, R> CPointer<T>.useCF(block: (CPointer<T>) -> R): R =
     try {
-        return block(this)
+        block(this)
     } finally {
-        CFBridgingRelease(this)
+        CFRelease(this)
     }
-}
 
-@OptIn(ExperimentalForeignApi::class)
-private val russianRootCertificate: SecCertificateRef? by lazy {
-    val cleanBase64 = RUSSIAN_TRUSTED_ROOT_CA_PEM
-        .lines()
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+private val russianRootCertificate: SecCertificateRef by lazy {
+    val base64 = RUSSIAN_TRUSTED_ROOT_CA_PEM.lines()
         .filterNot { it.startsWith("-----") }
         .joinToString("")
-        .trim()
+    val data = checkNotNull(NSData.create(base64EncodedString = base64, options = 0u))
+    val cfData = checkNotNull(CFBridgingRetain(data)).reinterpret<cnames.structs.__CFData>()
+    // Retain this certificate for the lifetime of the process; each trust retains its anchors.
+    cfData.useCF { checkNotNull(SecCertificateCreateWithData(null, it)) }
+}
 
-    val certData = NSData.create(base64EncodedString = cleanBase64, options = 0u) ?: return@lazy null
-    val cfData = CFBridgingRetain(certData)?.reinterpret<cnames.structs.__CFData>() ?: return@lazy null
-    cfData.use {
-        SecCertificateCreateWithData(null, it)
+@OptIn(ExperimentalForeignApi::class)
+private fun evaluateMyMaiTrust(trust: SecTrustRef, host: String): Boolean = memScoped {
+    val hostname = CFStringCreateWithCString(null, host, kCFStringEncodingUTF8)
+        ?: return@memScoped false
+    val policyStatus = hostname.useCF { name ->
+        val policy = SecPolicyCreateSSL(true, name) ?: return@memScoped false
+        policy.useCF { SecTrustSetPolicies(trust, it) }
     }
+    if (policyStatus != errSecSuccess) return@memScoped false
+
+    val certificate = alloc<SecCertificateRefVar>()
+    certificate.value = russianRootCertificate
+    val anchors = CFArrayCreate(null, certificate.ptr.reinterpret(), 1L, kCFTypeArrayCallBacks.ptr)
+        ?: return@memScoped false
+    anchors.useCF {
+        if (SecTrustSetAnchorCertificates(trust, it) != errSecSuccess) return@memScoped false
+    }
+    if (SecTrustSetAnchorCertificatesOnly(trust, false) != errSecSuccess) return@memScoped false
+    return@memScoped SecTrustEvaluateWithError(trust, null)
 }
 
 @OptIn(ExperimentalForeignApi::class, UnsafeNumber::class)
 actual fun createMyMaiHttpClient(): HttpClient = HttpClient(Darwin) {
     engine {
-        handleChallenge { _, _, challenge, completionHandler ->
-            val host = challenge.protectionSpace.host
-            if (challenge.protectionSpace.authenticationMethod != NSURLAuthenticationMethodServerTrust || !isMaiDomain(host)) {
-                completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
+        handleChallenge { _, _, challenge, complete ->
+            val space = challenge.protectionSpace
+            if (space.authenticationMethod != NSURLAuthenticationMethodServerTrust || !isMyMaiHost(space.host)) {
+                complete(NSURLSessionAuthChallengePerformDefaultHandling, null)
                 return@handleChallenge
             }
-
-            val trust = challenge.protectionSpace.serverTrust
-            val cert = russianRootCertificate
-            if (trust == null || cert == null) {
-                completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
-                return@handleChallenge
-            }
-
-            memScoped {
-                val hostCFString = CFStringCreateWithCString(null, host, kCFStringEncodingUTF8)
-                hostCFString?.use { hostStr ->
-                    SecPolicyCreateSSL(true, hostStr)?.use { policy ->
-                        SecTrustSetPolicies(trust, policy)
-                    }
-                }
-
-                val certPtr = alloc<SecCertificateRefVar>()
-                certPtr.value = cert
-
-                var trusted = false
-                val anchors = CFArrayCreate(
-                    null,
-                    certPtr.ptr.reinterpret(),
-                    1L,
-                    kCFTypeArrayCallBacks.ptr
-                )
-                anchors?.use { array ->
-                    SecTrustSetAnchorCertificates(trust, array)
-                    SecTrustSetAnchorCertificatesOnly(trust, false)
-                    trusted = SecTrustEvaluateWithError(trust, null)
-                }
-
-                if (trusted) {
-                    completionHandler(
-                        NSURLSessionAuthChallengeUseCredential,
-                        NSURLCredential.credentialForTrust(trust)
-                    )
-                } else {
-                    completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, null)
-                }
+            val trust = space.serverTrust
+            if (trust != null && evaluateMyMaiTrust(trust, space.host)) {
+                complete(NSURLSessionAuthChallengeUseCredential, NSURLCredential.credentialForTrust(trust))
+            } else {
+                complete(NSURLSessionAuthChallengeCancelAuthenticationChallenge, null)
             }
         }
     }
-    install(ContentNegotiation) {
-        json(JsonProvider.tolerantJson)
-    }
+    configureMyMaiClient()
 }

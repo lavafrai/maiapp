@@ -12,7 +12,7 @@ object HttpClientProvider {
         }
     }
 
-    val myMai = createMyMaiHttpClient()
+    val myMai by lazy { createMyMaiHttpClient() }
 }
 
 expect fun platformHttpClientProvider(): HttpClientEngineFactory<*>

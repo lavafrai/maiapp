@@ -25,6 +25,12 @@ kotlin {
     iosSimulatorArm64()
 
     sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
+        }
+
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
@@ -35,12 +41,20 @@ kotlin {
             implementation(libs.ktor.serialization.json)
         }
 
+        getByName("androidInstrumentedTest").dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.test.junit)
+        }
+
         androidMain.dependencies {
             implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.android)
         }
 
         jvmMain.dependencies {
             implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.android)
         }
 
         wasmJsMain.dependencies {
@@ -58,5 +72,6 @@ android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 }

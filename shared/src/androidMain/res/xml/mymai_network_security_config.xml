@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Keep these exact hosts in sync with MyMaiTls.kt and the iOS ATS exceptions.
+         The Android Ktor engine uses the platform trust and hostname checks. -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">esia.mai.ru</domain>
+        <domain includeSubdomains="false">my.mai.ru</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/russian_trusted_root_ca" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
