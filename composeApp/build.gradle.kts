@@ -134,7 +134,6 @@ kotlin {
             implementation(compose.uiTooling)
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
-            implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
             implementation(libs.analytics)

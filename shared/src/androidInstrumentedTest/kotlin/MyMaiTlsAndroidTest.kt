@@ -11,6 +11,7 @@ import javax.net.ssl.SSLException
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.ktor.client.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -20,6 +21,19 @@ import kotlin.test.*
 /** Live TLS integration checks: requires Internet access, no account or password. */
 @RunWith(AndroidJUnit4::class)
 class MyMaiTlsAndroidTest {
+    @Test fun defaultClientWorksWithDomainSpecificTrust() = runBlocking {
+        // Network Security Config applies to every client, not only MyMai.
+        assertEquals(200, HttpClientProvider.default.get("https://example.com/").status.value)
+    }
+
+    @Test fun autoSelectedEngineWorksWithDomainSpecificTrust() = runBlocking {
+        // Asset loading also creates HttpClient() without an explicit engine.
+        val client = HttpClient()
+        try {
+            assertEquals(200, client.get("https://example.com/").status.value)
+        } finally { client.close() }
+    }
+
     @Test fun accountHostsAndSystemRootsWork() = runBlocking {
         val client = createMyMaiHttpClient()
         try {
