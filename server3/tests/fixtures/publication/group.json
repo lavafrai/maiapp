@@ -1,0 +1,135 @@
+{
+  "name": "М4О-306Б-23",
+  "id": {
+    "id": "М4О-306Б-23"
+  },
+  "created": 1788782400,
+  "cached": 0,
+  "days": [
+    {
+      "date": {
+        "year": 2026,
+        "month": 9,
+        "day": 7
+      },
+      "day": "Пн",
+      "lessons": [
+        {
+          "name": "Математика",
+          "time_start": {
+            "time": "09:00:00"
+          },
+          "time_end": {
+            "time": "10:30:00"
+          },
+          "lectors": [
+            {
+              "name": {
+                "name": "Тестовый Преподаватель"
+              },
+              "uid": {
+                "uid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+              }
+            }
+          ],
+          "type": "ЛК",
+          "day": {
+            "year": 2026,
+            "month": 9,
+            "day": 7
+          },
+          "rooms": [
+            {
+              "name": "ГАК-101",
+              "uid": "room-1"
+            }
+          ],
+          "lms": "https://example.org/course?a=1&b=2",
+          "teams": "",
+          "other": "",
+          "timeRange": "09:00 – 10:30"
+        },
+        {
+          "name": "Физика",
+          "time_start": {
+            "time": "10:45:00"
+          },
+          "time_end": {
+            "time": "12:15:00"
+          },
+          "lectors": [
+            {
+              "name": {
+                "name": "Тестовый Преподаватель"
+              },
+              "uid": {
+                "uid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+              }
+            }
+          ],
+          "type": "ПЗ",
+          "day": {
+            "year": 2026,
+            "month": 9,
+            "day": 7
+          },
+          "rooms": [
+            {
+              "name": "ГАК-202",
+              "uid": "room-1"
+            }
+          ],
+          "lms": "https://example.org/course?a=1&b=2",
+          "teams": "",
+          "other": "",
+          "timeRange": "10:45 – 12:15"
+        }
+      ]
+    },
+    {
+      "date": {
+        "year": 2026,
+        "month": 9,
+        "day": 8
+      },
+      "day": "Вт",
+      "lessons": [
+        {
+          "name": "Лабораторная работа",
+          "time_start": {
+            "time": "13:00:00"
+          },
+          "time_end": {
+            "time": "14:30:00"
+          },
+          "lectors": [
+            {
+              "name": {
+                "name": "Тестовый Преподаватель"
+              },
+              "uid": {
+                "uid": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+              }
+            }
+          ],
+          "type": "ЛР",
+          "day": {
+            "year": 2026,
+            "month": 9,
+            "day": 8
+          },
+          "rooms": [
+            {
+              "name": "ГАК-303",
+              "uid": "room-1"
+            }
+          ],
+          "lms": "https://example.org/course?a=1&b=2",
+          "teams": "",
+          "other": "",
+          "timeRange": "13:00 – 14:30"
+        }
+      ]
+    }
+  ]
+}

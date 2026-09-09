@@ -21,8 +21,23 @@
         }
     }
 
+    # Calendar subscription clients cannot execute browser challenges. Keep the
+    # exception read-only and restricted to publication documents, not the API.
+    @schedule_exports {
+        method GET HEAD
+        path_regexp schedule_exports ^/api/v1/exports/(group|teacher)/[^/]+/[a-z0-9-]+$
+    }
+
     route {
         usage
+
+        handle @schedule_exports {
+            reverse_proxy nginx-internal:80 {
+                header_up Host {host}
+                header_up X-Forwarded-Proto https
+                header_up X-Forwarded-Host {host}
+            }
+        }
 
         handle {
             reverse_proxy anubis:80 {
