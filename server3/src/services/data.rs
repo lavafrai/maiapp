@@ -29,10 +29,10 @@ impl MaiDataService {
                     "Студгородок",
                     "assets/icons/map.svg",
                     Asset::Web {
-                        text: "images/MAIapp3_day_2025-05.png",
+                        text: "images/MAIapp3_day_2026-04.png",
                     },
                     Some(Asset::Web {
-                        text: "images/MAIapp3_night_2025-05.png",
+                        text: "images/MAIapp3_night_2026-04.png",
                     }),
                 ),
                 item(
