@@ -1,0 +1,44 @@
+name: Check schedule publications
+
+on:
+  pull_request:
+    paths:
+      - 'server3/**'
+      - 'landing/**'
+      - 'server-configs/caddy-external/**'
+      - 'server-configs/nginx-internal/**'
+      - '.github/workflows/check-publications.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install stable Rust
+        run: rustup toolchain install stable --profile minimal
+      - name: Compile and run offline publication tests
+        working-directory: server3
+        run: cargo +stable test --locked
+
+  landing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+          cache: npm
+          cache-dependency-path: landing/package-lock.json
+      - name: Install existing locked dependencies
+        working-directory: landing
+        run: npm ci
+      - name: Test export API and URL handling
+        working-directory: landing
+        run: node --experimental-strip-types --test tests/export.test.mjs
+      - name: Type-check and build landing
+        working-directory: landing
+        run: npm run build
