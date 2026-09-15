@@ -6,5 +6,23 @@
 	<true/>
 	<key>CFBundleIconName</key>
     <string>AppIcon</string>
+    <!-- Required for the custom CA in createMyMaiHttpClient; HTTPS and certificate
+         validation are still enforced by that client. Keep domains in sync with MyMaiTls.kt. -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>esia.mai.ru</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+            </dict>
+            <key>my.mai.ru</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+            </dict>
+        </dict>
+    </dict>
 </dict>
 </plist>

@@ -11,6 +11,10 @@ object HttpClientProvider {
             json(JsonProvider.tolerantJson)
         }
     }
+
+    val myMai by lazy { createMyMaiHttpClient() }
 }
 
 expect fun platformHttpClientProvider(): HttpClientEngineFactory<*>
+
+expect fun createMyMaiHttpClient(): HttpClient
