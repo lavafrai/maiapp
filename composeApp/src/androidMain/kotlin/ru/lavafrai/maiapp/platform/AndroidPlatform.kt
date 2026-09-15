@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import com.materialkolor.dynamicColorScheme
 import com.russhwolf.settings.Settings
-import io.ktor.client.engine.cio.*
+import ru.lavafrai.maiapp.platformHttpClientProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class AndroidPlatform: Platform {
     val context = AndroidApplication.instance()
 
     override fun name() = "Android"
-    override fun ktorEngine() = CIO
+    override fun ktorEngine() = platformHttpClientProvider()
     override fun dispatchers() = Dispatchers(
         IO = kotlinx.coroutines.Dispatchers.IO,
         Main = kotlinx.coroutines.Dispatchers.Main,
