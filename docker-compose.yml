@@ -84,23 +84,6 @@ services:
     depends_on:
       - nginx-internal
 
-  prometheus:
-    image: prom/prometheus:v2.17.1
-    container_name: mai-prometheus
-    volumes:
-      - ./server-configs/prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    restart: unless-stopped
-    expose:
-      - 9090
-
   caddy-external:
     build:
       context: server-configs/caddy-external
@@ -108,7 +91,6 @@ services:
     container_name: mai-caddy-external
     restart: unless-stopped
     expose:
-      - "8081"
       - "80"
     volumes:
       - ./server-configs/caddy-external/Caddyfile:/etc/caddy/Caddyfile
@@ -119,35 +101,10 @@ services:
       - default
       - server-local
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: mai-grafana
-    volumes:
-      - grafana-data:/var/lib/grafana
-      - ./server-configs/grafana/provisioning:/etc/grafana/provisioning
-    healthcheck:
-      test: curl -sS http://127.0.0.1:3000/api/health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_PLUGINS_PREINSTALL=
-      - GF_SERVER_ROOT_URL=https://maiapp.lavafrai.ru/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      - GF_SERVER_DOMAIN=maiapp.lavafrai.ru
-    restart: unless-stopped
-    expose:
-      - "3000"
-
 
 volumes:
   server3-telemetry:
   caddy-usage-data:
-  prometheus-data:
-  grafana-data:
 
 networks:
   server-local:
