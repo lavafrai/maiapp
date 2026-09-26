@@ -1,0 +1,160 @@
+name: Publish release builds
+
+on:
+    release:
+        types: [ published ]
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Version to build (e.g. 1.0.5 or v1.0.5)'
+                required: true
+            upload:
+                description: 'Attach builds to the GitHub release with this tag (otherwise only upload workflow artifacts)'
+                type: boolean
+                default: false
+
+permissions:
+    contents: write
+
+concurrency:
+    group: release-${{ github.event.release.tag_name || inputs.tag }}
+    cancel-in-progress: false
+
+env:
+    RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    # Manual runs build the ref picked in "Run workflow"; release runs build the release tag.
+    CHECKOUT_REF: ${{ github.event.release.tag_name || github.ref }}
+    PUBLISH: ${{ github.event_name == 'release' || inputs.upload }}
+
+jobs:
+    version:
+        name: Resolve version
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.version.outputs.version }}
+        steps:
+            - name: Parse version from tag
+              id: version
+              shell: bash
+              run: |
+                  version="${RELEASE_TAG#v}"
+                  if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                    echo "Release tag '$RELEASE_TAG' must look like 1.2.3 or v1.2.3"
+                    exit 1
+                  fi
+                  echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    build_android:
+        name: Build Android
+        runs-on: ubuntu-latest
+        needs: version
+        env:
+            MAIAPP_BUILD_VERSION: ${{ needs.version.outputs.version }}
+            ANDROID_KEYSTORE: "../android.keystore"
+            ANDROID_KEYSTORE_KEY: ${{ secrets.android_key_alias }}
+            ANDROID_KEYSTORE_KEY_PASSWORD: ${{ secrets.android_key_password }}
+            ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
+        steps:
+            - name: Check out release tag
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.CHECKOUT_REF }}
+                  persist-credentials: false
+
+            - uses: ./.github/actions/common-build-setup
+              with:
+                  java-version: '17'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+            - name: Decode keystore
+              uses: akiojin/decode-base64-github-action@v1
+              with:
+                  base64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+                  output-path: '${{ github.workspace }}/android.keystore'
+
+            - name: Build release APK
+              run: ./gradlew :composeApp:assembleRelease
+
+            - name: Rename APK
+              run: mv composeApp/build/outputs/apk/release/*.apk "maiapp-${MAIAPP_BUILD_VERSION}.apk"
+
+            - name: Upload APK artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: android-release
+                  path: maiapp-${{ env.MAIAPP_BUILD_VERSION }}.apk
+
+            - name: Upload APK to release
+              if: env.PUBLISH == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: gh release upload "$RELEASE_TAG" "maiapp-${MAIAPP_BUILD_VERSION}.apk" --clobber --repo "${{ github.repository }}"
+
+    build_ios:
+        name: Build iOS (sideload IPA)
+        runs-on: macos-latest
+        needs: version
+        env:
+            VERSION: ${{ needs.version.outputs.version }}
+            SCHEME_NAME: iosApp
+            PROJECT_PATH: iosApp/iosApp.xcodeproj
+            DERIVED_DATA_PATH: build-ios-sideload
+            OUTPUT_DIR_IOS: iosApp/actions
+        steps:
+            - name: Check out release tag
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ env.CHECKOUT_REF }}
+                  persist-credentials: false
+
+            - uses: ./.github/actions/common-build-setup
+              with:
+                  java-version: '17'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+            - name: Build iPhoneOS app without Apple signing
+              run: |
+                  xcodebuild clean build \
+                    -project "${PROJECT_PATH}" \
+                    -scheme "${SCHEME_NAME}" \
+                    -configuration Release \
+                    -sdk iphoneos \
+                    -destination 'generic/platform=iOS' \
+                    -derivedDataPath "${DERIVED_DATA_PATH}" \
+                    MARKETING_VERSION="${VERSION}" \
+                    CODE_SIGNING_ALLOWED=NO \
+                    CODE_SIGNING_REQUIRED=NO \
+                    CODE_SIGN_IDENTITY="" \
+                    DEVELOPMENT_TEAM=""
+
+            - name: Pack app as sideload IPA
+              run: |
+                  APP_PATH="$(find "${DERIVED_DATA_PATH}/Build/Products/Release-iphoneos" -maxdepth 1 -type d -name "*.app" | head -n 1)"
+                  if [ -z "$APP_PATH" ]; then
+                    echo "No .app found in ${DERIVED_DATA_PATH}/Build/Products/Release-iphoneos"
+                    exit 1
+                  fi
+
+                  mkdir -p "${OUTPUT_DIR_IOS}/Payload"
+                  cp -R "$APP_PATH" "${OUTPUT_DIR_IOS}/Payload/"
+                  APP_BUNDLE="$(find "${OUTPUT_DIR_IOS}/Payload" -maxdepth 1 -type d -name "*.app" | head -n 1)"
+
+                  # Structural ad-hoc signature; AltStore/Sideloadly re-sign with the user's Apple ID anyway.
+                  codesign --force --deep --sign - "$APP_BUNDLE" || true
+
+                  file "$APP_BUNDLE/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP_BUNDLE/Info.plist")" | grep -q arm64
+
+                  cd "${OUTPUT_DIR_IOS}"
+                  zip -qry "maiapp-${VERSION}-sideload.ipa" Payload
+
+            - name: Upload IPA artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ios-release
+                  path: ${{ env.OUTPUT_DIR_IOS }}/maiapp-${{ env.VERSION }}-sideload.ipa
+
+            - name: Upload IPA to release
+              if: env.PUBLISH == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: gh release upload "$RELEASE_TAG" "${OUTPUT_DIR_IOS}/maiapp-${VERSION}-sideload.ipa" --clobber --repo "${{ github.repository }}"
