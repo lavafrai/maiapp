@@ -15,6 +15,8 @@ data class MainPageState(
     val events: Loadable<List<Event>>,
     val maidata: Loadable<MaiDataManifest>,
     val selectedWeek: DateRange,
+    // Set once the week is picked by default or by the user; after that it's never changed automatically
+    val weekChosen: Boolean = false,
     val workLessonSelectors: List<LessonSelector>,
     val exlerTeachers: Loadable<List<ExlerTeacher>>,
 )

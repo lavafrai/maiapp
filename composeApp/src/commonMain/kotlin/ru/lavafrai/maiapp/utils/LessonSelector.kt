@@ -1,6 +1,7 @@
 package ru.lavafrai.maiapp.utils
 
 import kotlinx.datetime.LocalDate
+import ru.lavafrai.maiapp.data.settings.ApplicationSettingsData
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
 import ru.lavafrai.maiapp.models.schedule.LessonLike
@@ -38,6 +39,10 @@ open class LessonSelector protected constructor(
                 return "military".hashCode()
             }
         }
+
+        /** Lessons shown on the main schedule page */
+        fun mainSchedule(settings: ApplicationSettingsData): LessonSelector =
+            if (settings.hideMilitaryTraining) militaryHideDefault() else default()
 
         fun type(lessonType: LessonType): LessonSelector = object : LessonSelector({ _, lesson, _ -> lesson.type == lessonType }) {
             override fun hashCode(): Int {

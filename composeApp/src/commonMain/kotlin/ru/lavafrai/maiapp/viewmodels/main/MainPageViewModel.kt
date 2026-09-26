@@ -10,6 +10,7 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
+import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.repositories.EventRepository
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
 import ru.lavafrai.maiapp.data.repositories.MaiDataRepository
@@ -55,9 +56,6 @@ class MainPageViewModel(
     )
     private val eventRepository = EventRepository
 
-    // Until the user picks a week, the selected week follows the loaded schedule and events
-    private var weekSelectedByUser = false
-
     init {
         _instance = this
         startLoading()
@@ -75,15 +73,14 @@ class MainPageViewModel(
     }
 
     private fun MainPageState.withDefaultWeek(): MainPageState {
-        if (weekSelectedByUser) return this
+        if (weekChosen) return this
         val schedule = schedule.data ?: return this
-        val scheduleOrEventsChanged = schedule !== stateValue.schedule.data || events.data !== stateValue.events.data
-        if (!scheduleOrEventsChanged) return this
+        // Picking the week without user events could pick the wrong one
+        if (events.status == LoadableStatus.Loading) return this
 
-        val selector = if (ApplicationSettings.getCurrent().hideMilitaryTraining) LessonSelector.militaryHideDefault()
-        else LessonSelector.default()
+        val selector = LessonSelector.mainSchedule(ApplicationSettings.getCurrent())
         val week = schedule.defaultWeek(events.data ?: emptyList()) { selector.test(it.date, it, emptyList()) }
-        return copy(selectedWeek = week)
+        return copy(selectedWeek = week, weekChosen = true)
     }
 
     fun setPage(page: MainNavigationPageId) {
@@ -94,8 +91,13 @@ class MainPageViewModel(
 
     fun reloadSchedule(scheduleId: ScheduleId? = null, onReloaded: (() -> Unit)? = null) {
         viewModelScope.launch(dispatchers.IO) {
+            val scheduleChanged = scheduleId != null && scheduleId != scheduleName
             if (scheduleId != null) {
                 scheduleName = scheduleId
+            }
+            if (scheduleChanged) {
+                // Events belong to the previous schedule; the week is picked again once the new ones are loaded
+                emit(stateValue.copy(events = Loadable.loading(), weekChosen = false))
             }
 
             launchCatching(
@@ -131,7 +133,6 @@ class MainPageViewModel(
 
     fun startLoading() {
         scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
-        weekSelectedByUser = false
         viewModelScope.launch(dispatchers.IO) {
             emit(initialState.copy(page = stateValue.page))
 
@@ -158,7 +159,7 @@ class MainPageViewModel(
                     emit(stateValue.copy(schedule = Loadable.actual(schedule)))
                 }}
 
-                launchCatching(onError = { it.printStackTrace() }) {
+                launchCatching(onError = { emit(stateValue.copy(events = stateValue.events.copy(error = it))) }) {
                     val events = eventRepository.listAllEvents(scheduleName)
                     emit(stateValue.copy(events = Loadable.actual(events)))
                 }
@@ -192,9 +193,8 @@ class MainPageViewModel(
     }
 
     fun setWeek(dateRange: DateRange) {
-        weekSelectedByUser = true
         viewModelScope.launch(dispatchers.IO) {
-            emit(stateValue.copy(selectedWeek = dateRange))
+            emit(stateValue.copy(selectedWeek = dateRange, weekChosen = true))
         }
     }
 

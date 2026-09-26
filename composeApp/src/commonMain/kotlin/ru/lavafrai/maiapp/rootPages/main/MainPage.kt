@@ -159,7 +159,7 @@ fun MainPage(
                                 refreshing = isScheduleRefreshing,
                                 showEventAddingButton = true,
                                 onAddEventClick = onAddEventClick,
-                                selector = if (settings.hideMilitaryTraining) LessonSelector.militaryHideDefault() else LessonSelector.default()
+                                selector = LessonSelector.mainSchedule(settings)
                             )
                         }
                     }
