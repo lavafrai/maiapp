@@ -7,7 +7,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import ru.lavafrai.maiapp.models.schedule.ScheduleDay
 import ru.lavafrai.maiapp.models.time.DayOfWeek
-import kotlinx.datetime.serializers.LocalDateIso8601Serializer
+import ru.lavafrai.maiapp.models.time.RussianDateFormat
 import kotlinx.serialization.json.decodeFromJsonElement
 
 @Serializable
@@ -16,10 +16,7 @@ data class ScheduleDayRaw (
     @SerialName("pairs") val lessons: Map<String, JsonObject>
 ) {
     fun toScheduleDay(json: Json, dateText: String, teacherLessons: Boolean = false): ScheduleDay {
-        val date: LocalDate = json.decodeFromString(
-            deserializer = LocalDateIso8601Serializer,
-            dateText.split('.').reversed().joinToString("-")
-        )
+        val date = LocalDate.parse(dateText, RussianDateFormat)
         return if (teacherLessons) ScheduleDay(
             // if (date != null) { { Date.parseMaiFormat(date)} errorCase {Date.parse(date)} } else null,
             date = date,

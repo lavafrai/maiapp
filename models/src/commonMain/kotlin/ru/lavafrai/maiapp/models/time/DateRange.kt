@@ -2,6 +2,8 @@ package ru.lavafrai.maiapp.models.time
 
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
 import kotlinx.datetime.plus
 import kotlinx.datetime.serializers.LocalDateComponentSerializer
 import kotlinx.serialization.Serializable
@@ -88,6 +90,6 @@ internal fun String.zFill(length: Int): String {
     return this.padStart(length, '0')
 }
 
-fun LocalDate.toRussianFormatString(): String {
-    return "${dayOfMonth.toString().zFill(2)}.${monthNumber.toString().zFill(2)}.${year}"
-}
+val RussianDateFormat = LocalDate.Format { day(); char('.'); monthNumber(); char('.'); year() }
+
+fun LocalDate.toRussianFormatString(): String = format(RussianDateFormat)

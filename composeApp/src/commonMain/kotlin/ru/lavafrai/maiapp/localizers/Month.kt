@@ -52,9 +52,9 @@ fun Month.localizedGenitive(): String = stringResource(genitiveNameResource)
 /** "28 сентября" or "September 28": the order depends on the language */
 @Composable
 fun LocalDate.localizedDayMonth(withYear: Boolean = false): String =
-    if (withYear) stringResource(Res.string.date_day_month_year, dayOfMonth, month.localizedGenitive(), year)
-    else stringResource(Res.string.date_day_month, dayOfMonth, month.localizedGenitive())
+    if (withYear) stringResource(Res.string.date_day_month_year, day, month.localizedGenitive(), year)
+    else stringResource(Res.string.date_day_month, day, month.localizedGenitive())
 
 /** [localizedDayMonth] without composition, e.g. for the widget */
 suspend fun LocalDate.loadDayMonth(): String =
-    getString(Res.string.date_day_month, dayOfMonth, getString(month.genitiveNameResource))
+    getString(Res.string.date_day_month, day, getString(month.genitiveNameResource))

@@ -28,6 +28,7 @@ import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.events.SimpleEventPeriod
 import ru.lavafrai.maiapp.models.events.toHalfPaddedString
+import ru.lavafrai.maiapp.models.time.toRussianFormatString
 import kotlin.uuid.Uuid
 
 // Ключи для shared transition во избежание magic string
@@ -232,11 +233,7 @@ private fun LabeledSection(title: String, content: @Composable () -> Unit) {
 }
 
 // Вспомогательные функции форматирования (простые, без локали)
-private fun formatDate(date: kotlinx.datetime.LocalDate): String = listOf(
-    date.dayOfMonth.toString().padStart(2, '0'),
-    date.monthNumber.toString().padStart(2, '0'),
-    date.year.toString()
-).joinToString(".")
+private fun formatDate(date: kotlinx.datetime.LocalDate): String = date.toRussianFormatString()
 
 private fun formatDateRange(start: kotlinx.datetime.LocalDate, end: kotlinx.datetime.LocalDate): String =
     if (start == end) formatDate(start) else "${formatDate(start)} – ${formatDate(end)}"

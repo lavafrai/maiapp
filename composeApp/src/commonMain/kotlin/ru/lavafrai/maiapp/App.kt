@@ -7,13 +7,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.setSingletonImageLoaderFactory
 import ru.lavafrai.maiapp.navigation.AppNavigation
 import ru.lavafrai.maiapp.navigation.pages.GreetingPage
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.AppTheme
+import ru.lavafrai.maiapp.utils.buildAppImageLoader
 
 @Composable
 internal fun App() = AppTheme {
+    setSingletonImageLoaderFactory(::buildAppImageLoader)
     val platform = remember { getPlatform() }
     val navController = rememberNavController()
     val applicationContext = remember { ApplicationContext(

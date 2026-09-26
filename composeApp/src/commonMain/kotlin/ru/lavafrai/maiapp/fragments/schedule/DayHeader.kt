@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.in_days
@@ -35,7 +36,7 @@ fun DayHeader(
     val today = date == LocalDate.now()
     val tomorrow = date == LocalDate.now().plus(1, DateTimeUnit.DAY)
     val dateText = date.localizedDayMonth()
-    val daysUntil = date.toEpochDays() - LocalDate.now().toEpochDays()
+    val daysUntil = LocalDate.now().daysUntil(date)
 
     // Shown in a frame instead of the plain date
     val highlightedText = when {

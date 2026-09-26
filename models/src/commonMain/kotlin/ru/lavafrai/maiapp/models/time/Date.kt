@@ -1,6 +1,7 @@
 package ru.lavafrai.maiapp.models.time
 
 import kotlinx.datetime.*
+import kotlin.time.Clock
 
 fun LocalDate.Companion.now(): LocalDate {
     val clock: Clock = Clock.System
@@ -17,8 +18,7 @@ fun LocalTime.Companion.now(): LocalTime {
     return clock.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
 }
 
-fun LocalDate.week(): DateRange {
-    val startOfWeek = this.minus(this.dayOfWeek.ordinal.toLong(), DateTimeUnit.DAY)
-    val endOfWeek = startOfWeek.plus(6, DateTimeUnit.DAY)
-    return DateRange(startOfWeek, endOfWeek)
-}
+fun LocalDate.week(): DateRange = DateRange(
+    previousOrSame(kotlinx.datetime.DayOfWeek.MONDAY),
+    nextOrSame(kotlinx.datetime.DayOfWeek.SUNDAY),
+)

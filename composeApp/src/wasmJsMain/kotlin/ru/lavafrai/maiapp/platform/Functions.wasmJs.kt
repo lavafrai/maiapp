@@ -9,6 +9,8 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.input.PlatformImeOptions
+import coil3.ImageLoader
 import kotlinx.browser.document
 
 
@@ -35,3 +37,7 @@ actual fun Modifier.pointerCursor(): Modifier = composed {
 }
 
 actual fun getPlatform(): Platform = WebPlatform()
+
+actual fun credentialImeOptions(field: CredentialField): PlatformImeOptions? = null
+
+actual fun ImageLoader.Builder.trimMemoryCacheInBackground(): ImageLoader.Builder = this

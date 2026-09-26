@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
-import com.android.build.gradle.internal.cxx.logging.warnln
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.*
@@ -11,14 +11,13 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose)
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.buildconfig)
 }
 
-val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.5"
-val versionPlain = System.getenv("MAIAPP_BUILD_VERSION") ?: version
-val calculatedVersionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
+val version = System.getenv("MAIAPP_BUILD_VERSION") ?: providers.gradleProperty("maiapp.version").get()
+val versionPlain = version
 
 
 
@@ -32,7 +31,7 @@ try {
     // secretProperties.load(FileInputStream(secretPropertiesFile))
     // Logging.getLogger("SECRETS_LOAGER").warn("Compiling with example secrets.properties")
 
-    warnln("No secrets.properties file found. Please create composeApp/secrets.properties")
+    logger.warn("No secrets.properties file found. Please create composeApp/secrets.properties")
 }
 
 buildConfig {
@@ -60,10 +59,20 @@ kotlin {
 
     jvm { }
 
-    androidTarget { }
+    // The Android application itself is the androidApp module: AGP 9 doesn't allow it in a KMP module
+    android {
+        namespace = "ru.lavafrai.maiapp"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+        androidResources {
+            enable = true
+        }
+    }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach {
@@ -82,7 +91,7 @@ kotlin {
             // Compose, graphics and androidx libraries
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3)
+            implementation(libs.compose.material3)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -131,6 +140,10 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation(libs.androidx.ui.android)
+            implementation(libs.androidx.runtime.saveable.android)
+            implementation(libs.androidx.foundation.android)
+            implementation(libs.androidx.ui.text.android)
             implementation(compose.uiTooling)
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
@@ -152,94 +165,13 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            val osName = System.getProperty("os.name")
-            val targetOs = when {
-                osName == "Mac OS X" -> "macos"
-                osName.startsWith("Win") -> "windows"
-                osName.startsWith("Linux") -> "linux"
-                else -> error("Unsupported OS: $osName")
-            }
-
-            val targetArch = when (val osArch = System.getProperty("os.arch")) {
-                "x86_64", "amd64" -> "x64"
-                "aarch64" -> "arm64"
-                else -> error("Unsupported arch: $osArch")
-            }
-
-            val version = "0.8.18" // or any more recent version
-            val target = "${targetOs}-${targetArch}"
-
+            implementation(compose.desktop.currentOs)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.logback.classic)
-            implementation("org.jetbrains.skiko:skiko-awt-runtime-$target:$version")
         }
     }
 }
 
-android {
-    lint {
-        disable.add("NullSafeMutableLiveData")
-    }
-
-    namespace = "ru.lavafrai.maiapp"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-
-        applicationId = "ru.lavafrai.maiapp"
-        versionCode = calculatedVersionCode
-        versionName = version
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    signingConfigs {
-        create("release") {
-            storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "maiapp.keystore")
-            keyAlias = System.getenv("ANDROID_KEYSTORE_KEY") ?: "maiapp"
-            keyPassword = System.getenv("ANDROID_KEYSTORE_KEY_PASSWORD") ?: "password"
-            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
-        }
-    }
-
-    println(signingConfigs)
-
-    buildTypes {
-        debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-            isMinifyEnabled = false
-            isShrinkResources = false
-        }
-
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
-            signingConfig = signingConfigs.getByName("release")
-        }
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-}
-
-dependencies {
-    implementation(libs.androidx.ui.android)
-    implementation(libs.androidx.runtime.saveable.android)
-    implementation(libs.androidx.foundation.android)
-    implementation(libs.androidx.ui.text.android)
-}
 
 compose.desktop {
     application {

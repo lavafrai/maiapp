@@ -1,6 +1,6 @@
 package ru.lavafrai.maiapp.fragments.shaker
 
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 data class ShakeConfig(
     val iterations: Int,

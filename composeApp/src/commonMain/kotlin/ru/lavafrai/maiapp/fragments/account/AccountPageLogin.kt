@@ -25,6 +25,8 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.fragments.AnimatedIcon
 import ru.lavafrai.maiapp.fragments.PageColumn
+import ru.lavafrai.maiapp.platform.CredentialField
+import ru.lavafrai.maiapp.platform.credentialImeOptions
 import ru.lavafrai.maiapp.utils.autofill
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 
@@ -68,7 +70,10 @@ fun AccountPageLogin(
             ),
             //.semantics { contentType = ContentType.Username },
         isError = error != null,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            platformImeOptions = credentialImeOptions(CredentialField.Username),
+        ),
     )
     OutlinedTextField(
         value = password,
@@ -87,7 +92,10 @@ fun AccountPageLogin(
             ),
             //.semantics { contentType = ContentType.Password },
         isError = error != null,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            platformImeOptions = credentialImeOptions(CredentialField.Password),
+        ),
         visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }) {

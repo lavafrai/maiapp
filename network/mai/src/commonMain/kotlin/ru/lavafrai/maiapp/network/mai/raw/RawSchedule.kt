@@ -1,6 +1,6 @@
 package ru.lavafrai.maiapp.network.mai.raw
 
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlinx.serialization.json.*
 import ru.lavafrai.maiapp.JsonProvider
 import ru.lavafrai.maiapp.models.schedule.BaseScheduleId

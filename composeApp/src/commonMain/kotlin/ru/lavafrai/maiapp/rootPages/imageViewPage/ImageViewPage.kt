@@ -2,33 +2,55 @@
 
 package ru.lavafrai.maiapp.rootPages.imageViewPage
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import coil3.ImageLoader
-import coil3.compose.LocalPlatformContext
-import coil3.request.CachePolicy
-import coil3.request.crossfade
 import com.github.panpf.zoomimage.CoilZoomAsyncImage
 import compose.icons.FeatherIcons
-import compose.icons.feathericons.*
+import compose.icons.feathericons.ArrowLeft
+import compose.icons.feathericons.Copy
+import compose.icons.feathericons.MoreVertical
+import compose.icons.feathericons.Repeat
+import compose.icons.feathericons.Share2
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.copy
-import maiapp.composeapp.generated.resources.copy_stacktrace
 import maiapp.composeapp.generated.resources.share
 import org.jetbrains.compose.resources.stringResource
-import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.utils.loadableImageUrl
@@ -42,15 +64,7 @@ fun ImageViewPage(
 ) {
     var controlsVisible by remember { mutableStateOf(true) }
     var state by remember { mutableStateOf(LoadableStatus.Loading) }
-    val context = LocalPlatformContext.current
     var retryHash by remember { mutableStateOf(0) }
-    val imageLoader = remember(retryHash) {
-        ImageLoader.Builder(context)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .crossfade(false)
-            .build()
-    }
 
     Surface(
         color = Color.Black,
@@ -62,23 +76,24 @@ fun ImageViewPage(
             .windowInsetsPadding(WindowInsets.safeDrawing)
         ) {
             with(sharedTransitionScope) {
-                CoilZoomAsyncImage(
-                    model = remember(url) { loadableImageUrl(url) },
-                    imageLoader = imageLoader,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .sharedElement(
-                            rememberSharedContentState(url),
-                            animatedVisibilityScope = animatedContentScope,
-                        ),
-                    contentScale = ContentScale.Fit,
-                    onLoading = { state = LoadableStatus.Loading },
-                    onError = { state = LoadableStatus.Error },
-                    onSuccess = { state = LoadableStatus.Actual },
-                    scrollBar = null,
-                    onTap = { controlsVisible = !controlsVisible },
-                )
+                key(retryHash) {
+                    CoilZoomAsyncImage(
+                        model = remember(url) { loadableImageUrl(url) },
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .sharedElement(
+                                rememberSharedContentState(url),
+                                animatedVisibilityScope = animatedContentScope,
+                            ),
+                        contentScale = ContentScale.Fit,
+                        onLoading = { state = LoadableStatus.Loading },
+                        onError = { state = LoadableStatus.Error },
+                        onSuccess = { state = LoadableStatus.Actual },
+                        scrollBar = null,
+                        onTap = { controlsVisible = !controlsVisible },
+                    )
+                }
             }
 
             if (state == LoadableStatus.Loading) CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))

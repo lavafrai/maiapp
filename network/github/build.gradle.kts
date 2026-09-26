@@ -1,17 +1,23 @@
 @file:OptIn(ExperimentalWasmDsl::class)
 
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.multiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.kotlinx.serialization)
 }
 
 
 kotlin {
-    androidTarget {
-
+    android {
+        namespace = "ru.lavafrai.maiapp.network.github"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
 
     wasmJs {
@@ -21,7 +27,6 @@ kotlin {
 
     jvm()
 
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
@@ -40,10 +45,3 @@ kotlin {
     }
 }
 
-android {
-    namespace = "ru.lavafrai.maiapp.network.github"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-}

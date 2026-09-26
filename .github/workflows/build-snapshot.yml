@@ -6,6 +6,7 @@ on:
         paths:
             - '.github/workflows/build-snapshot.yml'
             - '.github/actions/common-build-setup/**'
+            - 'androidApp/**'
             - 'composeApp/**'
             - 'models/**'
             - 'shared/**'
@@ -23,7 +24,7 @@ jobs:
         name: Build Android
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/common-build-setup
               id: init
               with:
@@ -37,16 +38,16 @@ jobs:
                   output-path: '/home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/android.keystore'
 
             - name: Build with Gradle
-              run: ./gradlew :composeApp:assemble
+              run: ./gradlew :androidApp:assemble
 
             - name: Rename APK
-              run: mv composeApp/build/outputs/apk/release/*.apk "composeApp/build/outputs/apk/release/maiapp-${{ steps.init.outputs.current-time }}.apk"
+              run: mv androidApp/build/outputs/apk/release/*.apk "androidApp/build/outputs/apk/release/maiapp-${{ steps.init.outputs.current-time }}.apk"
 
             - name: Upload Android artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: android-artifact
-                  path: composeApp/build/outputs/apk/release/*.apk
+                  path: androidApp/build/outputs/apk/release/*.apk
 
     build_ios:
         name: Build iOS
@@ -61,7 +62,7 @@ jobs:
             PRODUCT_NAME: maiapp
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/common-build-setup
               id: init
               with:
@@ -69,7 +70,7 @@ jobs:
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
             -   name: Import Apple Certificate
-                uses: apple-actions/import-codesign-certs@v2
+                uses: apple-actions/import-codesign-certs@v7
                 with:
                     p12-file-base64: ${{ secrets.APPLE_P12_KEYSTORE_B64 }}
                     p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -138,7 +139,7 @@ jobs:
               run: mv ${{ env.OUTPUT_DIR_IOS }}/*.ipa "${{ env.OUTPUT_DIR_IOS }}/maiapp-${{ steps.init.outputs.current-time }}.ipa"
 
             -   name: Upload IPA Artifact
-                uses: actions/upload-artifact@v4
+                uses: actions/upload-artifact@v7
                 with:
                     name: ios-artifact
                     path: ${{ env.OUTPUT_DIR_IOS }}/*.ipa
@@ -147,7 +148,7 @@ jobs:
 #        name: Build Windows
 #        runs-on: windows-latest
 #        steps:
-#            - uses: actions/checkout@v4
+#            - uses: actions/checkout@v7
 #            - uses: ./.github/actions/common-build-setup
 #              id: init
 #              with:
@@ -161,7 +162,7 @@ jobs:
 #              run: mv composeApp\build\compose\binaries\main\msi\*.msi "composeApp\build\compose\binaries\main\msi\maiapp-${{ steps.init.outputs.current-time }}.msi"
 #
 #            - name: Upload MSI artifact
-#              uses: actions/upload-artifact@v4
+#              uses: actions/upload-artifact@v7
 #              with:
 #                  name: windows-artifact
 #                  path: composeApp\build\compose\binaries\main\msi\*
@@ -170,7 +171,7 @@ jobs:
 #        name: Build Debian
 #        runs-on: ubuntu-latest
 #        steps:
-#            - uses: actions/checkout@v4
+#            - uses: actions/checkout@v7
 #            - uses: ./.github/actions/common-build-setup
 #              id: init
 #              with:
@@ -184,7 +185,7 @@ jobs:
 #              run: mv composeApp/build/compose/binaries/main/deb/*.deb "composeApp/build/compose/binaries/main/deb/maiapp-${{ steps.init.outputs.current-time }}.deb"
 #
 #            - name: Upload DEB artifact
-#              uses: actions/upload-artifact@v4
+#              uses: actions/upload-artifact@v7
 #              with:
 #                  name: debian-artifact
 #                  path: composeApp/build/compose/binaries/main/deb/*
@@ -193,7 +194,7 @@ jobs:
         name: Build WEB
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - uses: ./.github/actions/common-build-setup
               with:
                   java-version: '21'
@@ -203,13 +204,13 @@ jobs:
               run: ./gradlew :composeApp:wasmJsBrowserDistribution
 
             - name: Upload WEB artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: web-artifact
                   path: composeApp/build/dist/wasmJs/productionExecutable
 
             - name: Upload pages artifact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v5
               with:
                   name: pages-artifact
                   path: composeApp/build/dist/wasmJs/productionExecutable
@@ -219,9 +220,9 @@ jobs:
         runs-on: ubuntu-latest
         needs: [ build_android, build_ios ]
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
             - name: Download artifacts
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8
               with:
                   path: artifacts
                   merge-multiple: true
@@ -251,6 +252,6 @@ jobs:
         steps:
             - name: Publish WEB artifact
               id: deployment
-              uses: actions/deploy-pages@v4
+              uses: actions/deploy-pages@v5
               with:
                   artifact_name: pages-artifact

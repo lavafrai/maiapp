@@ -1,4 +1,4 @@
-FROM rust:1.95-alpine AS build
+FROM rust:1.98-alpine AS build
 
 RUN apk --no-cache add musl-dev openssl-dev openssl-libs-static pkgconfig
 WORKDIR /opt/app
@@ -8,7 +8,7 @@ COPY server3/src server3/src
 WORKDIR /opt/app/server3
 RUN cargo build --release
 
-FROM alpine:3.22
+FROM alpine:3.24
 
 RUN apk --no-cache add ca-certificates curl
 WORKDIR /opt/app

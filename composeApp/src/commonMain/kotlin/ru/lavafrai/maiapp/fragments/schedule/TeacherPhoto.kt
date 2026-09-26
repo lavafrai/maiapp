@@ -18,11 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.CachePolicy
-import coil3.request.crossfade
 import com.valentinilk.shimmer.Shimmer
 import com.valentinilk.shimmer.ShimmerBounds
 import com.valentinilk.shimmer.rememberShimmer
@@ -42,41 +38,34 @@ fun TeacherPhoto(
     modifier: Modifier = Modifier,
 ) {
         val appContext = LocalApplicationContext.current
-        val context = LocalPlatformContext.current
         var retryHash by remember { mutableStateOf(0) }
-        val imageLoader = remember(retryHash) {
-            ImageLoader.Builder(context)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .crossfade(false)
-                .build()
-        }
 
         var state by remember { mutableStateOf(LoadableStatus.Loading) }
         var width by remember { mutableStateOf(150f) }
 
         Box(modifier = Modifier.fillMaxHeight()) {
-            AsyncImage(
-                model = remember(url) { loadableImageUrl(url) },
-                imageLoader = imageLoader,
-                contentDescription = "photo of teacher",
-                modifier = modifier
-                    .fillMaxHeight()
-                    .clip(MaterialTheme.shapes.medium)
-                    .widthIn(min = width.dp)
-                    .conditional(state == LoadableStatus.Loading) { shimmer(customShimmer = shimmerInstance) }
-                    .conditional(state == LoadableStatus.Actual) { clickable { appContext.openImageView(fullSizeUrl) } }
-                    .conditional(state == LoadableStatus.Error) { clickable { retryHash++ } }
-                    .conditional(state != LoadableStatus.Actual) { background(MaterialTheme.colorScheme.surfaceVariant) },
-                contentScale = ContentScale.Fit,
-                onError = { state = LoadableStatus.Error },
-                onLoading = { state = LoadableStatus.Loading },
-                onSuccess = { painter ->
-                    state = LoadableStatus.Actual
-                    val sizes = painter.painter.intrinsicSize
-                    width = (sizes.width / sizes.height * 300)
-                },
-            )
+            key(retryHash) {
+                AsyncImage(
+                    model = remember(url) { loadableImageUrl(url) },
+                    contentDescription = "photo of teacher",
+                    modifier = modifier
+                        .fillMaxHeight()
+                        .clip(MaterialTheme.shapes.medium)
+                        .widthIn(min = width.dp)
+                        .conditional(state == LoadableStatus.Loading) { shimmer(customShimmer = shimmerInstance) }
+                        .conditional(state == LoadableStatus.Actual) { clickable { appContext.openImageView(fullSizeUrl) } }
+                        .conditional(state == LoadableStatus.Error) { clickable { retryHash++ } }
+                        .conditional(state != LoadableStatus.Actual) { background(MaterialTheme.colorScheme.surfaceVariant) },
+                    contentScale = ContentScale.Fit,
+                    onError = { state = LoadableStatus.Error },
+                    onLoading = { state = LoadableStatus.Loading },
+                    onSuccess = { painter ->
+                        state = LoadableStatus.Actual
+                        val sizes = painter.painter.intrinsicSize
+                        width = (sizes.width / sizes.height * 300)
+                    },
+                )
+            }
 
             if (state == LoadableStatus.Error) IconButton(onClick = { retryHash++ }, modifier = Modifier.align(Alignment.Center)) {
                 Icon(

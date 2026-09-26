@@ -56,7 +56,7 @@ jobs:
             ANDROID_KEYSTORE_PASSWORD: ${{ secrets.android_keystore_password }}
         steps:
             - name: Check out release tag
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   ref: ${{ env.CHECKOUT_REF }}
                   persist-credentials: false
@@ -73,13 +73,13 @@ jobs:
                   output-path: '${{ github.workspace }}/android.keystore'
 
             - name: Build release APK
-              run: ./gradlew :composeApp:assembleRelease
+              run: ./gradlew :androidApp:assembleRelease
 
             - name: Rename APK
-              run: mv composeApp/build/outputs/apk/release/*.apk "maiapp-${MAIAPP_BUILD_VERSION}.apk"
+              run: mv androidApp/build/outputs/apk/release/*.apk "maiapp-${MAIAPP_BUILD_VERSION}.apk"
 
             - name: Upload APK artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: android-release
                   path: maiapp-${{ env.MAIAPP_BUILD_VERSION }}.apk
@@ -102,7 +102,7 @@ jobs:
             OUTPUT_DIR_IOS: iosApp/actions
         steps:
             - name: Check out release tag
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   ref: ${{ env.CHECKOUT_REF }}
                   persist-credentials: false
@@ -148,7 +148,7 @@ jobs:
                   zip -qry "maiapp-${VERSION}-sideload.ipa" Payload
 
             - name: Upload IPA artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: ios-release
                   path: ${{ env.OUTPUT_DIR_IOS }}/maiapp-${{ env.VERSION }}-sideload.ipa

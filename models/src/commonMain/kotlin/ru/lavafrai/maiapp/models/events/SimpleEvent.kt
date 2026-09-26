@@ -2,10 +2,9 @@
 
 package ru.lavafrai.maiapp.models.events
 
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.plus
+import kotlinx.datetime.daysUntil
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ru.lavafrai.maiapp.models.schedule.LessonType
@@ -53,10 +52,9 @@ data class SimpleEvent(
                 endDate!!
                 val _dateRange = dateRange ?: DateRange(date, endDate)
                 val result = mutableListOf<RenderedEvent>()
-                var currentDate = maxOf(date, _dateRange.startDate)
 
-                while (currentDate <= minOf(endDate, _dateRange.endDate)) {
-                    if ((currentDate.toEpochDays() - date.toEpochDays()) % period.datePeriod.days == 0) {
+                for (currentDate in maxOf(date, _dateRange.startDate)..minOf(endDate, _dateRange.endDate)) {
+                    if (date.daysUntil(currentDate) % period.datePeriod.days == 0) {
                         result.add(
                             RenderedEvent(
                                 date = currentDate,
@@ -70,7 +68,6 @@ data class SimpleEvent(
                             )
                         )
                     }
-                    currentDate = currentDate.plus(DatePeriod(days = 1))
                 }
 
                 return result
@@ -80,10 +77,9 @@ data class SimpleEvent(
                 endDate!!
                 val _dateRange = dateRange ?: DateRange(date, endDate)
                 val result = mutableListOf<RenderedEvent>()
-                var currentDate = maxOf(date, _dateRange.startDate)
 
-                while (currentDate <= minOf(endDate, _dateRange.endDate)) {
-                    if (currentDate.dayOfMonth == date.dayOfMonth) {
+                for (currentDate in maxOf(date, _dateRange.startDate)..minOf(endDate, _dateRange.endDate)) {
+                    if (currentDate.day == date.day) {
                         result.add(
                             RenderedEvent(
                                 date = currentDate,
@@ -97,7 +93,6 @@ data class SimpleEvent(
                             )
                         )
                     }
-                    currentDate = currentDate.plus(DatePeriod(days = 1))
                 }
 
                 return result

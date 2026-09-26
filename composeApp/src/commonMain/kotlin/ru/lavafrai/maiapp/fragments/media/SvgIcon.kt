@@ -22,15 +22,13 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import coil3.ImageLoader
 import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.svg.SvgDecoder
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.AlertOctagon
 import io.ktor.utils.io.core.*
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.fragments.LoadableView
+import ru.lavafrai.maiapp.utils.reportError
 
 @Composable
 fun SvgIcon(
@@ -39,20 +37,10 @@ fun SvgIcon(
     modifier: Modifier = Modifier.size(24.dp),
     tint: Color? = null,
 ) {
-    val context = LocalPlatformContext.current
-    val imageLoader = ImageLoader.Builder(context)
-        .components {
-            add(SvgDecoder.Factory())
-        }
-        .build()
-
     AsyncImage(
         model = remember(svg) { svg.toByteArray() },
         contentDescription = contentDescription,
-        imageLoader = imageLoader,
-        onError = { error ->
-            error("Error loading image: $error")
-        },
+        onError = { reportError("SVG icon", it.result.throwable) },
         modifier = modifier,
         colorFilter = ColorFilter.tint(tint ?: LocalContentColor.current),
     )

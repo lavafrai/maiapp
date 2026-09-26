@@ -20,6 +20,9 @@ use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitEx
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_tracing();
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .expect("no other TLS crypto provider is installed yet");
 
     let config = AppConfig::from_env();
     let client = config.http_client()?;

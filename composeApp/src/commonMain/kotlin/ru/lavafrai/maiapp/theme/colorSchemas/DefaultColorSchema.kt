@@ -3,6 +3,7 @@ package ru.lavafrai.maiapp.theme.colorSchemas
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import com.materialkolor.dynamicColorScheme
+import com.materialkolor.dynamiccolor.ColorSpec
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.default_color_scheme
 import org.jetbrains.compose.resources.stringResource
@@ -20,6 +21,7 @@ class DefaultColorSchema: ApplicationColorSchema {
             primary = MaiColor,
             isDark = theme.isDark(),
             isAmoled = theme.isAmoled(),
+            specVersion = ColorSpec.SpecVersion.SPEC_2025,
         )
     }
 }
