@@ -126,3 +126,54 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
                   IPA_PATH: ${{ steps.ipa.outputs.ipa-path }}
               run: gh release upload "$RELEASE_TAG" "$IPA_PATH" --clobber --repo "${{ github.repository }}"
+
+    build_web:
+        name: Build release WEB image
+        runs-on: ubuntu-latest
+        needs: version
+        permissions:
+            contents: read
+            packages: write
+        env:
+            MAIAPP_BUILD_VERSION: ${{ needs.version.outputs.version }}
+        steps:
+            - name: Check out release tag
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ env.CHECKOUT_REF }}
+                  persist-credentials: false
+
+            - uses: ./.github/actions/common-build-setup
+              with:
+                  java-version: '21'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+            - name: Build release web bundle
+              run: ./gradlew :composeApp:wasmJsBrowserDistribution
+
+            - name: Prepare PWA distribution
+              run: python3 scripts/prepare-web-distribution.py composeApp/build/dist/wasmJs/productionExecutable "release-${MAIAPP_BUILD_VERSION}-${GITHUB_SHA}" release
+
+            - name: Upload WEB artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: web-release
+                  path: composeApp/build/dist/wasmJs/productionExecutable
+
+            - uses: docker/login-action@v4
+              if: env.PUBLISH == 'true'
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Publish release web image
+              if: env.PUBLISH == 'true'
+              shell: bash
+              run: |
+                  image="ghcr.io/${GITHUB_REPOSITORY,,}/maiapp-web"
+                  mkdir -p build/web-image/app
+                  cp server-configs/nginx-web/nginx.conf build/web-image/nginx.conf
+                  cp -a composeApp/build/dist/wasmJs/productionExecutable/. build/web-image/app/
+                  docker build -f Dockerfile.web -t "$image:latest" build/web-image
+                  docker push "$image:latest"

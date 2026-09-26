@@ -40,6 +40,18 @@ services:
       timeout: 10s
       retries: 3
 
+  web:
+    image: ghcr.io/lavafrai/maiapp/maiapp-web:latest
+    container_name: mai-web
+    restart: unless-stopped
+    expose:
+      - "80"
+    healthcheck:
+      test: wget -q -O /dev/null http://127.0.0.1/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   nginx-internal:
     image: nginx:alpine
     container_name: mai-nginx-internal
@@ -51,6 +63,7 @@ services:
     depends_on:
       - server3
       - landing
+      - web
     healthcheck:
       test: curl -sS http://127.0.0.1 || exit 1
       interval: 30s
