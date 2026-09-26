@@ -168,6 +168,15 @@
     <string name="december_genitive">Декабря</string>
 
     <string name="open_github">Открыть GitHub</string>
+    <string name="developer_settings">Настройки разработчика</string>
+    <string name="appmetrica_device_id">Идентификатор устройства AppMetrica</string>
+    <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
+    <string name="loading">Загрузка…</string>
+    <string name="unavailable">Недоступен</string>
+    <string name="crash_app">Крашнуть приложение</string>
+    <string name="disable_developer_mode">Отключить режим разработчика</string>
+    <string name="disable_developer_mode_confirmation">Скрыть настройки разработчика? Их можно снова включить семью нажатиями на версию приложения.</string>
+    <string name="disable">Отключить</string>
     <string name="open_telegram">Перейти в Телеграм</string>
     <string name="open_thanks">Благодарности и лицензии</string>
     <string name="support_project">Поддержать проект</string>

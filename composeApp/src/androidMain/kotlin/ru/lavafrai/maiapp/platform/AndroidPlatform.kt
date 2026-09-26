@@ -10,6 +10,10 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import com.russhwolf.settings.Settings
 import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.StartupParamsCallback
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.lavafrai.maiapp.AndroidApplication
@@ -19,12 +23,37 @@ import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.ScheduleWidget
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.ScheduleWidgetReceiver
 import ru.lavafrai.maiapp.theme.ApplicationColorSchema
 import ru.lavafrai.maiapp.theme.colorSchemas.MonetColorSchema
+import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class AndroidPlatform: Platform {
     val context = AndroidApplication.instance()
 
     override fun name() = "Android"
+
+    override suspend fun appMetricaDeviceId(): String? = try {
+        withTimeoutOrNull(5_000.milliseconds) {
+            suspendCancellableCoroutine { continuation ->
+                AppMetrica.requestStartupParams(context, object : StartupParamsCallback {
+                    override fun onReceive(result: StartupParamsCallback.Result?) {
+                        if (continuation.isActive) continuation.resume(result?.deviceId)
+                    }
+
+                    override fun onRequestError(
+                        reason: StartupParamsCallback.Reason,
+                        result: StartupParamsCallback.Result?,
+                    ) {
+                        if (continuation.isActive) continuation.resume(result?.deviceId)
+                    }
+                }, listOf(StartupParamsCallback.APPMETRICA_DEVICE_ID, StartupParamsCallback.APPMETRICA_DEVICE_ID_HASH))
+            }
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        null
+    }
 
     override fun reportError(context: String, error: Throwable, details: String) {
         // Same stack trace, but the message is taken from the cleaned details

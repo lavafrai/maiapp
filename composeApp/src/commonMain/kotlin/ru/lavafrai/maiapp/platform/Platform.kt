@@ -11,6 +11,7 @@ interface Platform {
     fun dispatchers(): Dispatchers
     fun storage(): Settings
     fun openUrl(url: String)
+    suspend fun appMetricaDeviceId(): String? = null
 
     /** Whether the my.mai.ru account can work here; if not, its page is hidden and nothing of it is started */
     fun supportsMyMaiAccount(): Boolean = true

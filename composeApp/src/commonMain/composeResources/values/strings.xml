@@ -167,6 +167,15 @@
     <string name="december_genitive">December</string>
 
     <string name="open_github">Open GitHub</string>
+    <string name="developer_settings">Developer settings</string>
+    <string name="appmetrica_device_id">AppMetrica device ID</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="loading">Loading…</string>
+    <string name="unavailable">Unavailable</string>
+    <string name="crash_app">Crash app</string>
+    <string name="disable_developer_mode">Disable developer mode</string>
+    <string name="disable_developer_mode_confirmation">Hide developer settings? You can enable them again by tapping the app version seven times.</string>
+    <string name="disable">Disable</string>
     <string name="open_telegram">Open Telegram</string>
     <string name="open_thanks">Acknowledgements and licenses</string>
     <string name="support_project">Support the project</string>

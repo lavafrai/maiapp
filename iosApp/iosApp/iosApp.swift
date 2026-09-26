@@ -12,6 +12,10 @@ class PlatformDependencyImplementation: IosPlatformDependency {
         let error = AppMetricaError(identifier: identifier, message: message, parameters: nil)
         AppMetricaCrashes.crashes().report(error: error, onFailure: nil)
     }
+
+    func appMetricaDeviceId() -> String? {
+        AppMetrica.deviceID
+    }
 }
 
 @main

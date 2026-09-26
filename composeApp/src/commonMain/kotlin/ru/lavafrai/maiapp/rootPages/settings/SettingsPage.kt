@@ -10,10 +10,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.dp
@@ -29,6 +36,7 @@ import ru.lavafrai.maiapp.utils.asDp
 import ru.lavafrai.maiapp.localizers.appLanguages
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
+import kotlinx.coroutines.delay
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
@@ -110,6 +118,8 @@ fun SettingsPage(
 
         DataCleanButton()
 
+        if (settings.developerMode) DeveloperSettings()
+
         SettingsCopyright()
     }
 }
@@ -184,12 +194,86 @@ fun OpenSourceInfo() = SettingsSection(stringResource(Res.string.information)) {
 
 @Composable
 fun SettingsCopyright() {
+    var versionTaps by remember { mutableIntStateOf(0) }
     Column(
         Modifier.fillMaxWidth().padding(top = 16.dp).alpha(0.5f),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("MAI app by. lava_frai")
-        Text("Build: ${BuildConfig.VERSION_NAME}@${getPlatform().name()}")
+        Text(
+            "Build: ${BuildConfig.VERSION_NAME}@${getPlatform().name()}",
+            modifier = Modifier.clickable {
+                versionTaps++
+                if (versionTaps >= 7) {
+                    ApplicationSettings.setDeveloperMode(true)
+                    versionTaps = 0
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun DeveloperSettings() {
+    val clipboard = LocalClipboardManager.current
+    var showDisableConfirmation by remember { mutableStateOf(false) }
+    var deviceId by remember { mutableStateOf<String?>(null) }
+    var deviceIdLoaded by remember { mutableStateOf(false) }
+    var copied by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        deviceId = getPlatform().appMetricaDeviceId()
+        deviceIdLoaded = true
+    }
+
+    LaunchedEffect(copied) {
+        if (copied) {
+            delay(2_000)
+            copied = false
+        }
+    }
+
+    SettingsSection(title = stringResource(Res.string.developer_settings)) {
+        Text(stringResource(Res.string.appmetrica_device_id))
+        Text(
+            when {
+                !deviceIdLoaded -> stringResource(Res.string.loading)
+                deviceId == null -> stringResource(Res.string.unavailable)
+                else -> deviceId!!
+            },
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.clickable(enabled = deviceId != null) {
+                clipboard.setText(AnnotatedString(deviceId!!))
+                copied = true
+            },
+        )
+        if (copied) Text(stringResource(Res.string.copied_to_clipboard))
+        Spacer(Modifier.height(12.dp))
+        Button(onClick = { error("Developer test crash") }, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.crash_app))
+        }
+        Button(onClick = { showDisableConfirmation = true }, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.disable_developer_mode))
+        }
+    }
+
+    if (showDisableConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDisableConfirmation = false },
+            title = { Text(stringResource(Res.string.disable_developer_mode)) },
+            text = { Text(stringResource(Res.string.disable_developer_mode_confirmation)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    ApplicationSettings.setDeveloperMode(false)
+                    showDisableConfirmation = false
+                }) { Text(stringResource(Res.string.disable)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDisableConfirmation = false }) {
+                    Text(stringResource(Res.string.cancel))
+                }
+            },
+        )
     }
 }
 
