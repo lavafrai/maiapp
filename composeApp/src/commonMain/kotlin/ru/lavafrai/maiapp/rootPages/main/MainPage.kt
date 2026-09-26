@@ -59,7 +59,7 @@ fun MainPage(
     val accountViewModel: AccountViewModel = viewModel(factory = AccountViewModel.Factory())
 
     LaunchedEffect(settings.selectedSchedule) {
-        viewModel.reloadSchedule(settings.selectedSchedule)
+        viewModel.reloadSchedule(settings.selectedSchedule, restartIfLoading = false)
     }
     val viewState by viewModel.state.collectAsState()
     val requestRefresh = { viewModel.reloadSchedule(settings.selectedSchedule) }

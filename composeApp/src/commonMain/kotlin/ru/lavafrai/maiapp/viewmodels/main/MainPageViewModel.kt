@@ -4,26 +4,31 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import ru.lavafrai.maiapp.BuildConfig.API_BASE_URL
 import ru.lavafrai.maiapp.data.Loadable
-import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.data.repositories.EventRepository
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
 import ru.lavafrai.maiapp.data.repositories.MaiDataRepository
 import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
+import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.events.SimpleEvent
+import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.defaultWeek
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
 import ru.lavafrai.maiapp.utils.LessonSelector
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
+import kotlin.concurrent.Volatile
 import kotlin.reflect.KClass
 import kotlin.uuid.Uuid
 
@@ -41,7 +46,7 @@ class MainPageViewModel(
         maidata = Loadable.loading(),
     )
 ) {
-    private var scheduleName: ScheduleId = ApplicationSettings.getCurrent().selectedSchedule!!
+    @Volatile private var scheduleName: ScheduleId = ApplicationSettings.getCurrent().selectedSchedule!!
     private val scheduleRepository = ScheduleRepository(
         httpClient = httpClient,
         baseUrl = API_BASE_URL
@@ -55,6 +60,7 @@ class MainPageViewModel(
         baseUrl = API_BASE_URL
     )
     private val eventRepository = EventRepository
+    private var scheduleLoading: Job? = null
 
     init {
         _instance = this
@@ -68,64 +74,106 @@ class MainPageViewModel(
         }
     }
 
-    override fun emit(newState: MainPageState) {
-        super.emit(newState.withDefaultWeek())
-    }
-
-    private fun MainPageState.withDefaultWeek(): MainPageState {
-        if (weekChosen) return this
-        val schedule = schedule.data ?: return this
-        // Picking the week without user events could pick the wrong one
-        if (events.status == LoadableStatus.Loading) return this
-
-        val selector = LessonSelector.mainSchedule(ApplicationSettings.getCurrent())
-        val week = schedule.defaultWeek(events.data ?: emptyList()) { selector.test(it.date, it, emptyList()) }
-        return copy(selectedWeek = week, weekChosen = true)
-    }
-
     fun setPage(page: MainNavigationPageId) {
         viewModelScope.launch(dispatchers.IO) {
             emit(stateValue.copy(page = page))
         }
     }
 
-    fun reloadSchedule(scheduleId: ScheduleId? = null, onReloaded: (() -> Unit)? = null) {
-        viewModelScope.launch(dispatchers.IO) {
-            val scheduleChanged = scheduleId != null && scheduleId != scheduleName
-            if (scheduleId != null) {
-                scheduleName = scheduleId
-            }
-            if (scheduleChanged) {
-                // Events belong to the previous schedule; the week is picked again once the new ones are loaded
-                emit(stateValue.copy(events = Loadable.loading(), weekChosen = false))
-            }
+    /**
+     * @param restartIfLoading if false and this schedule is already being loaded, waits for that loading instead of
+     * starting a new one (e.g. to not load the schedule twice on start)
+     */
+    fun reloadSchedule(
+        scheduleId: ScheduleId? = null,
+        restartIfLoading: Boolean = true,
+        onReloaded: (() -> Unit)? = null,
+    ) {
+        val name = scheduleId ?: scheduleName
+        val loading = scheduleLoading
+        if (!restartIfLoading && name == scheduleName && loading != null && loading.isActive) {
+            // That loading may have read events before they were changed (e.g. in the events editor); they're local and cheap
+            viewModelScope.launch { reloadEvents() }
+            onReloaded?.let { loading.invokeOnMainWhenDone(it) }
+            return
+        }
 
-            launchCatching(
-                onError = {
-                    emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it as Exception)))
-                    onReloaded?.invoke()
-                }
-            ) {
-                val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
-                if (cachedSchedule != null) emit(stateValue.copy(schedule = Loadable.updating(cachedSchedule)))
-                else emit(stateValue.copy(schedule = Loadable.loading()))
+        val scheduleChanged = name != scheduleName
+        scheduleName = name
+        launchScheduleLoading(
+            // Data of the previous schedule must be neither shown nor used to pick the week for this one
+            reset = if (scheduleChanged) ({ copy(schedule = Loadable.loading(), events = Loadable.loading(), weekChosen = false) }) else null,
+            onLoaded = onReloaded,
+        )
+    }
 
-                reloadEvents()
+    /**
+     * Loads the schedule [scheduleName] and its events, picking the default week if it isn't chosen yet.
+     * The previous loading is cancelled, so a late response for a previously selected schedule can't overwrite this one.
+     *
+     * @param reset applied to the state right away, so neither a cancelled loading nor a quick next call can skip it
+     */
+    private fun launchScheduleLoading(
+        reset: (MainPageState.() -> MainPageState)? = null,
+        onLoaded: (() -> Unit)? = null,
+    ) {
+        scheduleLoading?.cancel()
+        reset?.let { emit(stateValue.it()) }
+        val name = scheduleName
 
-                val schedule = scheduleRepository.getSchedule(scheduleName)
-                emit(stateValue.copy(schedule = Loadable.actual(schedule)))
-                onReloaded?.invoke()
+        scheduleLoading = viewModelScope.launch(dispatchers.IO) {
+            try {
+                val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(name)
+                // listAllEvents() handles its errors itself
+                val events = eventRepository.listAllEvents(name)
+                val cachedWeek = defaultWeekOrNull(cachedSchedule, events)
+                ensureActive()
+                // Together with the week, so the schedule isn't shown on a wrong week first
+                emit(stateValue.copy(
+                    schedule = if (cachedSchedule != null) Loadable.updating(cachedSchedule) else Loadable.loading(),
+                    events = Loadable.actual(events),
+                ).withDefaultWeek(cachedWeek))
+
+                val schedule = scheduleRepository.getSchedule(name)
+                val week = defaultWeekOrNull(schedule, events)
+                ensureActive()
+                emit(stateValue.copy(schedule = Loadable.actual(schedule)).withDefaultWeek(week))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // A cancelled loading must not put its error into the state of the next one
+                ensureActive()
+                e.printStackTrace()
+                emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e)))
             }
+        }.also { job -> onLoaded?.let { job.invokeOnMainWhenDone(it) } }
+    }
+
+    /** Null if the week is already chosen: it's picked once per loaded schedule, so it doesn't jump on refresh */
+    private fun defaultWeekOrNull(schedule: Schedule?, events: List<Event>): DateRange? {
+        if (schedule == null || stateValue.weekChosen) return null
+        return try {
+            val selector = LessonSelector.mainSchedule(ApplicationSettings.getCurrent())
+            schedule.defaultWeek(events) { selector.test(it.date, it, emptyList()) }
+        } catch (e: Exception) {
+            // Not worth failing the schedule loading over, the current week stays
+            e.printStackTrace()
+            null
         }
     }
 
+    private fun MainPageState.withDefaultWeek(week: DateRange?): MainPageState {
+        if (week == null || weekChosen) return this
+        return copy(selectedWeek = week, weekChosen = true)
+    }
+
+    private fun Job.invokeOnMainWhenDone(block: () -> Unit) {
+        invokeOnCompletion { viewModelScope.launch(dispatchers.Main) { block() } }
+    }
+
     suspend fun reloadEvents() {
-        launchCatching(
-            onError = {
-                it.printStackTrace()
-                emit(stateValue.copy(events = stateValue.events.copy(error = it as Exception)))
-            }
-        ) {
+        withContext(dispatchers.IO) {
+            // listAllEvents() handles its errors itself
             val events = eventRepository.listAllEvents(scheduleName)
             emit(stateValue.copy(events = Loadable.actual(events)))
         }
@@ -133,13 +181,9 @@ class MainPageViewModel(
 
     fun startLoading() {
         scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
-        viewModelScope.launch(dispatchers.IO) {
-            emit(initialState.copy(page = stateValue.page))
+        launchScheduleLoading(reset = { initialState.copy(page = page) })
 
-            val scheduleHandler = CoroutineExceptionHandler { _, e ->
-                e.printStackTrace()
-                emit(stateValue.copy(schedule = stateValue.schedule.copy(error = e as Exception)))
-            }
+        viewModelScope.launch(dispatchers.IO) {
             val exlerHandler = CoroutineExceptionHandler { _, e ->
                 e.printStackTrace()
                 emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = e as Exception)))
@@ -150,20 +194,6 @@ class MainPageViewModel(
             }
 
             supervisorScope {
-                // Download schedule
-                launch(scheduleHandler) {
-                    val cachedSchedule = scheduleRepository.getScheduleFromCacheOrNull(scheduleName)
-                    emit(stateValue.copy(schedule = stateValue.schedule.copy(data = cachedSchedule)))
-                }.invokeOnCompletion { launch(scheduleHandler) {
-                    val schedule = scheduleRepository.getSchedule(scheduleName)
-                    emit(stateValue.copy(schedule = Loadable.actual(schedule)))
-                }}
-
-                launchCatching(onError = { emit(stateValue.copy(events = stateValue.events.copy(error = it))) }) {
-                    val events = eventRepository.listAllEvents(scheduleName)
-                    emit(stateValue.copy(events = Loadable.actual(events)))
-                }
-
                 launch(exlerHandler) {
                     val exlerTeachers = exlerRepository.getTeachers()
                     emit(stateValue.copy(exlerTeachers = Loadable.actual(exlerTeachers)))
