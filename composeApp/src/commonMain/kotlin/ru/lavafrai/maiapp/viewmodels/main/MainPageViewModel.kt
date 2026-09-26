@@ -18,6 +18,7 @@ import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.VersionInfo
 import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
+import ru.lavafrai.maiapp.models.schedule.defaultWeek
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.rootPages.main.MainNavigationPageId
 import ru.lavafrai.maiapp.utils.LessonSelector
@@ -54,6 +55,9 @@ class MainPageViewModel(
     )
     private val eventRepository = EventRepository
 
+    // Until the user picks a week, the selected week follows the loaded schedule and events
+    private var weekSelectedByUser = false
+
     init {
         _instance = this
         startLoading()
@@ -64,6 +68,22 @@ class MainPageViewModel(
 
             onVersionUpdated(lastVersion, currentVersion)
         }
+    }
+
+    override fun emit(newState: MainPageState) {
+        super.emit(newState.withDefaultWeek())
+    }
+
+    private fun MainPageState.withDefaultWeek(): MainPageState {
+        if (weekSelectedByUser) return this
+        val schedule = schedule.data ?: return this
+        val scheduleOrEventsChanged = schedule !== stateValue.schedule.data || events.data !== stateValue.events.data
+        if (!scheduleOrEventsChanged) return this
+
+        val selector = if (ApplicationSettings.getCurrent().hideMilitaryTraining) LessonSelector.militaryHideDefault()
+        else LessonSelector.default()
+        val week = schedule.defaultWeek(events.data ?: emptyList()) { selector.test(it.date, it, emptyList()) }
+        return copy(selectedWeek = week)
     }
 
     fun setPage(page: MainNavigationPageId) {
@@ -111,6 +131,7 @@ class MainPageViewModel(
 
     fun startLoading() {
         scheduleName = ApplicationSettings.getCurrent().selectedSchedule!!
+        weekSelectedByUser = false
         viewModelScope.launch(dispatchers.IO) {
             emit(initialState.copy(page = stateValue.page))
 
@@ -171,6 +192,7 @@ class MainPageViewModel(
     }
 
     fun setWeek(dateRange: DateRange) {
+        weekSelectedByUser = true
         viewModelScope.launch(dispatchers.IO) {
             emit(stateValue.copy(selectedWeek = dateRange))
         }

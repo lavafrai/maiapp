@@ -41,6 +41,10 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.ktor.client.core)
         }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
 }
 
