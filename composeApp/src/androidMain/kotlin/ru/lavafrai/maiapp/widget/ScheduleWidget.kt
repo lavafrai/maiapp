@@ -14,6 +14,7 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
+import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.text.FontFamily
@@ -81,58 +82,52 @@ fun ScheduleWidgetContent(
     else ScheduleWidgetNotLoggedIn()
 }
 
+/**
+ * Every row is a separate list item with a stable id and one of a few fixed layouts.
+ * Glance truncates containers with many children and reuses item views by layout, so a whole day
+ * in one item (with a layout depending on its lessons) got lessons cut off and mixed up.
+ */
+private sealed class ScheduleWidgetRow(val id: Long) {
+    class DayHeader(val date: LocalDate) : ScheduleWidgetRow(date.toEpochDays() * 100L)
+    class Lesson(val lesson: LessonLike, date: LocalDate, index: Int) : ScheduleWidgetRow(date.toEpochDays() * 100L + 1 + index)
+    class NoLessons(date: LocalDate) : ScheduleWidgetRow(date.toEpochDays() * 100L + 99)
+    data object BottomSpacer : ScheduleWidgetRow(0)
+}
+
+private fun scheduleWidgetRows(schedule: SimpleSchedule, today: LocalDate): List<ScheduleWidgetRow> = buildList {
+    for (dayIndex in 0 until 7) {
+        val date = today.plus(DatePeriod(days = dayIndex))
+        val lessons = schedule.days[date].orEmpty().sortedBy { it.startTime }
+
+        add(ScheduleWidgetRow.DayHeader(date))
+        if (lessons.isEmpty()) add(ScheduleWidgetRow.NoLessons(date))
+        lessons.forEachIndexed { index, lesson -> add(ScheduleWidgetRow.Lesson(lesson, date, index)) }
+    }
+    add(ScheduleWidgetRow.BottomSpacer)
+}
+
 @Composable
 fun ScheduleWidgetSchedule(
     schedule: SimpleSchedule,
 ) {
-    val today = LocalDate.now()
-    val filteredDays = schedule.days
-        .filter { it.key >= today }
-        .filter { it.key < today.plus(DatePeriod(days = 7)) }
-        .filter { it.value.isNotEmpty() }
+    val rows = scheduleWidgetRows(schedule, LocalDate.now())
 
     LazyColumn(modifier = GlanceModifier.padding(horizontal = 8.dp)) {
-        items(7) { dayIndex ->
-            val date = today.plus(DatePeriod(days = dayIndex))
-            val lessons = filteredDays[date] ?: emptyList()
-
-            Column {
-                Spacer(modifier = GlanceModifier.height(8.dp))
-                ScheduleWidgetDay(date, lessons)
+        items(rows, itemId = { it.id }) { row ->
+            when (row) {
+                is ScheduleWidgetRow.DayHeader -> ScheduleWidgetDayHeader(row.date)
+                is ScheduleWidgetRow.Lesson -> ScheduleWidgetLesson(row.lesson)
+                is ScheduleWidgetRow.NoLessons -> ScheduleWidgetNoLessons()
+                ScheduleWidgetRow.BottomSpacer -> Spacer(modifier = GlanceModifier.height(16.dp))
             }
-        }
-        item {
-            Spacer(modifier = GlanceModifier.height(16.dp))
         }
     }
 }
 
 @Composable
-fun ScheduleWidgetDay(
-    date: LocalDate,
-    lessons: List<LessonLike>,
-) {
-    Column {
-        Column {
-            ScheduleWidgetDayHeader(date)
-            Spacer(modifier = GlanceModifier.height(6.dp))
-        }
-
-
-        if (lessons.isNotEmpty())
-            Column {
-                lessons.sortedBy { it.startTime }.forEach {
-                    Column {
-                        ScheduleWidgetLesson(it)
-                        Spacer(modifier = GlanceModifier.height(4.dp))
-                    }
-                }
-            } else {
-            Row {
-                Spacer(modifier = GlanceModifier.width(8.dp))
-                GlanceText("В этот день нет занятий")
-            }
-        }
+fun ScheduleWidgetNoLessons() {
+    Row(modifier = GlanceModifier.padding(start = 8.dp)) {
+        GlanceText("В этот день нет занятий")
     }
 }
 
@@ -140,7 +135,7 @@ fun ScheduleWidgetDay(
 fun ScheduleWidgetLesson(
     lesson: LessonLike,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = GlanceModifier.padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(horizontalAlignment = Alignment.End) {
             GlanceText(lesson.startTimePaddedString, fontFamily = FontFamily.Monospace)
             GlanceText(lesson.endTimePaddedString, fontFamily = FontFamily.Monospace)
@@ -156,8 +151,12 @@ fun ScheduleWidgetLesson(
                 GlanceText(lesson.type.localizedShortNonContext(), maxLines = 1, fontFamily = FontFamily.Monospace)
 
                 Spacer(GlanceModifier.width(4.dp))
-                if (lesson.classrooms.isNotEmpty()) Box(
-                    modifier = GlanceModifier.width(1.dp).background(Color.White.copy(alpha = 0.3f)).fillMaxHeight()
+                // Always present, so that the layout is the same for lessons with and without classrooms
+                Box(
+                    modifier = GlanceModifier
+                        .width(1.dp)
+                        .background(if (lesson.classrooms.isNotEmpty()) Color.White.copy(alpha = 0.3f) else Color.Transparent)
+                        .fillMaxHeight()
                 ) {}
                 Spacer(GlanceModifier.width(4.dp))
 
@@ -171,7 +170,7 @@ fun ScheduleWidgetLesson(
 fun ScheduleWidgetDayHeader(
     date: LocalDate,
 ) {
-    Row {
+    Row(modifier = GlanceModifier.padding(top = 8.dp, bottom = 6.dp)) {
         GlanceText(
             "${date.dayOfWeek.localizedNonContext()}, ${date.dayOfMonth} ${date.month.localizedGenitiveNonContext()}",
             fontSize = 17.sp
