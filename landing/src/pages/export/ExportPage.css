@@ -1,0 +1,58 @@
+.export-page { width: min(100% - 40px, 920px); margin: 24px auto 64px; }
+.export-page *, .export-entry * { box-sizing: border-box; }
+.export-back { display: inline-block; margin-bottom: 38px; font-size: .95rem; }
+.export-eyebrow { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); }
+.export-intro { max-width: 720px; margin-bottom: 36px; }
+.export-intro h1 { margin: 12px 0 20px; font-size: clamp(2.2rem, 5vw, 3.5rem); line-height: 1.12; letter-spacing: -.04em; }
+.export-intro p { font-size: 1.12rem; max-width: 560px; }
+.export-layout { display: grid; grid-template-columns: 1.1fr .9fr; align-items: start; gap: 32px; }
+.export-panel { border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent); background: color-mix(in srgb, var(--background) 94%, var(--foreground)); border-radius: 24px; padding: 28px; }
+.export-panel h2 { margin: 0 0 24px; font-size: 1.35rem; }
+.export-panel form { display: grid; gap: 16px; }
+.export-kind { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 20px; }
+.export-kind legend { padding: 0 0 10px; font-weight: 600; font-size: .9rem; }
+.export-kind label { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; cursor: pointer; }
+.export-kind input { accent-color: var(--primary); width: 18px; height: 18px; }
+.export-field { display: grid; gap: 9px; font-size: .9rem; font-weight: 600; min-width: 0; }
+.export-field input, .export-field select { width: 100%; min-width: 0; min-height: 48px; border: 1px solid color-mix(in srgb, var(--foreground) 26%, transparent); border-radius: 12px; padding: 12px; background: var(--background); color: var(--foreground); font: inherit; font-size: 1rem; }
+.export-field select { cursor: pointer; }
+.export-field input[readonly] { font-size: .85rem; }
+.export-page .export-hint, .export-entry p { font-size: .9rem; color: var(--foreground-superinaccent); }
+.export-button { min-height: 48px; padding: 12px 18px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent); border-radius: 12px; background: transparent; color: var(--foreground); font: inherit; font-size: .95rem; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; }
+.export-button:hover:not(:disabled) { background: color-mix(in srgb, var(--foreground) 9%, transparent); }
+.export-button.export-primary { border-color: transparent; background: var(--primary); color: #081923; }
+.export-button.export-primary:hover:not(:disabled) { filter: brightness(.93); background: var(--primary); }
+.export-button:disabled { opacity: .5; cursor: not-allowed; }
+.export-page :focus-visible, .export-entry :focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }
+.export-explainer { padding: 24px 4px; display: grid; gap: 18px; }
+.export-explainer h2 { margin: 0; font-size: 1.6rem; letter-spacing: -.02em; }
+.export-note { border-left: 3px solid var(--primary); padding-left: 18px; margin: 8px 0; }
+.export-note strong { display: block; line-height: 1.5; margin-bottom: 8px; }
+.export-notice, .export-error { border-radius: 10px; padding: 12px !important; background: color-mix(in srgb, var(--primary) 12%, var(--background)); font-size: .9rem; line-height: 1.5; }
+.export-error { border-left: 3px solid var(--primary); }
+.export-text-button { border: 0; padding: 8px 0; background: transparent; color: var(--primary); display: block; font: inherit; font-weight: 600; cursor: pointer; }
+.export-result { margin-top: 28px; display: grid; gap: 18px; }
+.export-result h2 { margin: 0; overflow-wrap: anywhere; }
+.export-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.export-instructions { border-top: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent); padding-top: 18px; }
+.export-instructions summary { padding: 10px 0; cursor: pointer; font-weight: 600; }
+.export-instructions p { padding: 10px 0 !important; }
+.export-download { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.export-download p { flex: 1; min-width: 200px; }
+.export-scope { margin-top: 28px !important; font-size: .85rem; max-width: 720px; }
+.export-entry { width: min(100% - 32px, 876px); margin: 18px auto 28px; display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 22px 24px; border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent); border-radius: 20px; background: color-mix(in srgb, var(--primary) 7%, var(--background)); }
+.export-entry strong { display: block; margin-bottom: 6px; font-size: 1.12rem; }
+.export-entry .export-button { flex-shrink: 0; }
+@media (max-width: 680px) {
+    .export-page { width: calc(100% - 28px); margin-top: 16px; }
+    .export-back { margin-bottom: 28px; }
+    .export-layout { grid-template-columns: 1fr; gap: 12px; }
+    .export-panel { padding: 22px 18px; border-radius: 18px; }
+    .export-explainer { padding: 20px 6px; }
+    .export-actions, .export-download, .export-entry { flex-direction: column; align-items: stretch; }
+    .export-download p { min-width: 0; }
+    .export-entry { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .export-page *, .export-entry * { scroll-behavior: auto; transition: none; }
+}

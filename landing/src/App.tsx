@@ -1,6 +1,7 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import HomePage from "./pages/home/HomePage.tsx";
 import DownloadPage from "./pages/download/DownloadPage.tsx";
+import ExportPage from "./pages/export/ExportPage.tsx";
 import NotFound from "./pages/notfound/NotFound.tsx";
 import {YMInitializer} from "react-yandex-metrika";
 
@@ -14,6 +15,7 @@ function App() {
                 <Routes>
                     <Route path='*' element={<NotFound/>}/>
                     <Route path="/" element={<HomePage/>}></Route>
+                    <Route path="/export" element={<ExportPage/>}/>
                     <Route path="/download" element={<DownloadPage/>}></Route>
                 </Routes>
             </BrowserRouter>

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
+    publication::service::PublicationService,
     services::{data::MaiDataService, exler::ExlerService, schedule::ScheduleService},
     telemetry::Telemetry,
 };
@@ -11,6 +12,7 @@ pub struct AppState {
     pub exler: Arc<ExlerService>,
     pub data: Arc<MaiDataService>,
     pub telemetry: Arc<Telemetry>,
+    pub publications: Arc<PublicationService>,
 }
 
 impl AppState {
@@ -19,12 +21,14 @@ impl AppState {
         exler: Arc<ExlerService>,
         data: Arc<MaiDataService>,
         telemetry: Arc<Telemetry>,
+        publications: Arc<PublicationService>,
     ) -> Self {
         Self {
             schedule,
             exler,
             data,
             telemetry,
+            publications,
         }
     }
 }

@@ -3,6 +3,7 @@ mod config;
 mod errors;
 mod http;
 mod models;
+mod publication;
 mod repositories;
 mod services;
 mod state;
@@ -31,11 +32,16 @@ async fn main() -> anyhow::Result<()> {
     ));
     let exler_repository = Arc::new(ExlerRepository::new(client, &config, telemetry.clone()));
 
+    let publications = Arc::new(publication::service::PublicationService::new(
+        mai_repository.clone(),
+        publication::service::PublicationConfig::from_env(),
+    ));
     let state = AppState::new(
         Arc::new(ScheduleService::new(mai_repository)),
         Arc::new(ExlerService::new(exler_repository)),
         Arc::new(MaiDataService::new()),
         telemetry.clone(),
+        publications,
     );
 
     telemetry.clone().spawn_upstream_monitor(config.clone());
