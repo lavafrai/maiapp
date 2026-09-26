@@ -1,10 +1,16 @@
 import UIKit
 import AppMetricaCore
+import AppMetricaCrashes
 import ComposeApp
 
 class PlatformDependencyImplementation: IosPlatformDependency {
     func openUrl(url: URL) {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
+
+    func reportError(identifier: String, message: String) {
+        let error = AppMetricaError(identifier: identifier, message: message, parameters: nil)
+        AppMetricaCrashes.crashes().report(error: error, onFailure: nil)
     }
 }
 

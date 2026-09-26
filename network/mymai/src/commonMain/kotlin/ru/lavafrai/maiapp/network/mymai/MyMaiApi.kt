@@ -51,7 +51,8 @@ class MyMaiApi(
             }
         }
 
-
+        // Without it an error page would fail to parse as T with a confusing message
+        if (!response.status.isSuccess()) throw AuthenticationServerException("$methodName: HTTP ${response.status.value}")
         return response.body()
     }
 
@@ -99,10 +100,13 @@ class MyMaiApi(
                 .map { it.split(", ") }
                 .flatten()
 
-            val authSessionId = cookies.first { it.startsWith("AUTH_SESSION_ID") }.split(";")[0]
-            val authSessionIdLegacy = cookies.first { it.startsWith("AUTH_SESSION_ID_LEGACY") }.split(";")[0]
-            val kcRestart = cookies.first { it.startsWith("KC_RESTART") }.split(";")[0]
-            val authCookies = listOf(authSessionId, authSessionIdLegacy, kcRestart)
+            fun cookie(name: String) = cookies.firstOrNull { it.startsWith("$name=") }?.split(";")?.get(0)
+            fun requiredCookie(name: String) = cookie(name) ?: throw AuthenticationServerException("No $name cookie")
+            val authCookies = listOfNotNull(
+                requiredCookie("AUTH_SESSION_ID"),
+                cookie("AUTH_SESSION_ID_LEGACY"), // Newer Keycloak versions don't set it
+                requiredCookie("KC_RESTART"),
+            )
 
             val doAuthResponse: suspend (String) -> HttpResponse = { url: String ->
                 client.submitForm(
@@ -115,15 +119,16 @@ class MyMaiApi(
             }
 
             val tabIdUrlResponse = doAuthResponse("https://esia.mai.ru/auth/realms/lk_mai/login-actions/authenticate?client_id=proxy")
-            val tabIdUrl = tabIdUrlResponse.headers["Location"] ?: throw AuthenticationServerException()
+            val tabIdUrl = tabIdUrlResponse.headers["Location"] ?: throw AuthenticationServerException("No redirect after the first form submit")
 
             val firstRepeatResponse = doAuthResponse(tabIdUrl)
 
             val authUrl = Ksoup.parse(firstRepeatResponse.bodyAsText()).select("#kc-form-login").attr("action")
+            if (authUrl.isBlank()) throw AuthenticationServerException("No login form")
             val authResponse = doAuthResponse(authUrl)
-            val code =
-                authResponse.headers["Location"]?.split("code=")?.get(1) ?: throw InvalidLoginOrPasswordException()
-            // println(code)
+            // Keycloak shows the form again instead of redirecting when the password is wrong
+            val location = authResponse.headers["Location"] ?: throw InvalidLoginOrPasswordException()
+            val code = location.split("code=").getOrNull(1) ?: throw AuthenticationServerException("No code in the redirect")
 
             val tokenResponse = client.post("https://esia.mai.ru/auth/realms/lk_mai/protocol/openid-connect/token") {
                 body = FormDataContent(Parameters.build {
@@ -133,7 +138,12 @@ class MyMaiApi(
                     append("redirect_uri", "https://my.mai.ru/")
                 })
             }
-            val credentials: MyMaiCredentials = json.decodeFromString(tokenResponse.bodyAsText())
+            val credentials: MyMaiCredentials = try {
+                json.decodeFromString(tokenResponse.bodyAsText())
+            } catch (e: SerializationException) {
+                // Not passed as the cause: its message contains the response, which may contain tokens
+                throw AuthenticationServerException("Unexpected token response: HTTP ${tokenResponse.status.value}")
+            }
 
             return MyMaiApi(credentials)
         }

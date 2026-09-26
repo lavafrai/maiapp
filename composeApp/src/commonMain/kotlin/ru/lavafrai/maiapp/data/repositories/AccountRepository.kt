@@ -1,8 +1,10 @@
 package ru.lavafrai.maiapp.data.repositories
 
 import com.russhwolf.settings.set
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import ru.lavafrai.maiapp.models.account.Credentials
+import ru.lavafrai.maiapp.utils.reportError
 
 class AccountRepository: BaseRepository() {
     private val credentialsKey = "mymai:auth:credentials"
@@ -17,7 +19,14 @@ class AccountRepository: BaseRepository() {
     }
 
     fun getCredentials(): Credentials? {
-        return storage.getStringOrNull(credentialsKey)?.let { json.decodeFromString(it) }
+        val stored = storage.getStringOrNull(credentialsKey) ?: return null
+        return try {
+            json.decodeFromString<Credentials>(stored)
+        } catch (e: SerializationException) {
+            reportError("Stored MyMai credentials", IllegalStateException("Unreadable stored credentials"))
+            clearCredentials()
+            null
+        }
     }
 
     fun clearCredentials() {

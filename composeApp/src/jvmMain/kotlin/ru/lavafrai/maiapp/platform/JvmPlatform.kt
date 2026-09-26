@@ -13,6 +13,9 @@ class JvmPlatform: Platform {
         Default = kotlinx.coroutines.Dispatchers.Default,
     )
     override fun storage(): Settings = DesktopSettings()
+
+    // The My MAI client uses HttpsURLConnection, which can't resolve the host when offline
+    override fun isNoConnectionError(error: Throwable) = error is java.net.UnknownHostException
     override fun openUrl(url: String) {
         if (!Desktop.isDesktopSupported()) {
             error("Desktop is not supported")

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import com.materialkolor.dynamicColorScheme
 import com.russhwolf.settings.Settings
+import io.appmetrica.analytics.AppMetrica
 import ru.lavafrai.maiapp.platformHttpClientProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
@@ -24,6 +25,14 @@ class AndroidPlatform: Platform {
     val context = AndroidApplication.instance()
 
     override fun name() = "Android"
+
+    override fun reportError(context: String, error: Throwable, details: String) {
+        // Same stack trace, but the message is taken from the cleaned details
+        val reported = Exception(details.lineSequence().first()).apply { stackTrace = error.stackTrace }
+        AppMetrica.reportError(context, reported)
+    }
+
+    override fun isNoConnectionError(error: Throwable) = error is java.net.UnknownHostException
     override fun ktorEngine() = platformHttpClientProvider()
     override fun dispatchers() = Dispatchers(
         IO = kotlinx.coroutines.Dispatchers.IO,

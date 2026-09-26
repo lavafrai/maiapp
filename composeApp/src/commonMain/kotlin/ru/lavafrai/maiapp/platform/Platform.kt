@@ -21,6 +21,15 @@ interface Platform {
     fun doesPlatformSupportsMonet(): Boolean = false
     fun getMonet(): ApplicationColorSchema = error("Monet theme isn't supported on this platform")
 
+    /**
+     * Sends a handled error to analytics.
+     * @param details stack trace without personal data; use it instead of the [error] message, which may contain it
+     */
+    fun reportError(context: String, error: Throwable, details: String) {}
+
+    /** Whether this exception of the platform HTTP engine means there's no connection; see Throwable.isNoConnectionError */
+    fun isNoConnectionError(error: Throwable): Boolean = false
+
     fun openGitHub() = openUrl(BuildConfig.GITHUB_URL)
     fun openThanks() = openUrl(BuildConfig.THANKS_URL)
 }

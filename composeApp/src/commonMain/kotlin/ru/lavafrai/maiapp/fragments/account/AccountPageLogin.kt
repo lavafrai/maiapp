@@ -39,7 +39,8 @@ fun AccountPageLogin(
     horizontalAlignment = Alignment.CenterHorizontally,
     paddings = true,
 ) {
-    var loading by rememberSaveable { mutableStateOf(false) }
+    // Not saveable: the sign in itself doesn't survive process death, so a restored true would block the form forever
+    var loading by remember { mutableStateOf(false) }
     var error: String? by remember { mutableStateOf(null) }
     val focusManager = LocalFocusManager.current
     var login by remember { mutableStateOf("") }
@@ -123,14 +124,17 @@ fun AccountPageLogin(
     }
 
     Spacer(Modifier.height(24.dp))
+    val loginInfo = stringResource(Res.string.account_login_info).lines()
     Text(
-        stringResource(Res.string.account_login_info).split("\n")[0],
+        loginInfo.first(),
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
     )
-    Text(
-        stringResource(Res.string.account_login_info).split("\n")[1],
-        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
-    )
+    loginInfo.getOrNull(1)?.let {
+        Text(
+            it,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
+        )
+    }
 
     Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
 }

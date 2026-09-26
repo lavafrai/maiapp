@@ -42,7 +42,19 @@ fun AccountPageView(
     Spacer(Modifier.height(8.dp))
     val selectedStudent = viewState.student.data
 
-    LoadableView(viewState.studentInfo, retry = viewModel::refresh) { studentInfo ->
+    LoadableView(
+        viewState.studentInfo,
+        retry = viewModel::refresh,
+        // Otherwise there's no way out if the saved password stopped working
+        error = { e, retry ->
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                ErrorView(e, retry)
+                TextButton(onClick = viewModel::signOut) {
+                    Text(stringResource(Res.string.sign_out))
+                }
+            }
+        },
+    ) { studentInfo ->
         AppCard(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (studentInfo.students.isEmpty()) {
                 UnsupportedAccountView()

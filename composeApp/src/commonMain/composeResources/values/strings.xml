@@ -6,6 +6,7 @@
     <string name="start_typing">Начните вводить…</string>
     <string name="wait_a_minute">Подождите минутку…</string>
     <string name="network_error">Сетевая ошибка</string>
+    <string name="no_internet_connection">Нет подключения к интернету</string>
     <string name="sign_in">Войти</string>
     <string name="sign_out">Выйти</string>
     <string name="no_data">Нет данных</string>

@@ -1,19 +1,19 @@
 package ru.lavafrai.maiapp.utils
 
+import kotlin.math.abs
 import kotlin.math.pow
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
+/** Formats with exactly [numOfDec] digits after the point, rounding the rest (4.5 -> "4.50") */
 fun Double.toString(numOfDec: Int): String {
-    val integerPart = this.toInt()
+    if (numOfDec <= 0) return toInt().toString()
 
-    if (numOfDec > 0) {
-        val num = this.toString()
-        val res = "${num.split(".")[0]}.${num.split(".")[1].substring(0, 2)}"
-
-        return res
-    } else {
-        return integerPart.toString()
-    }
+    val factor = 10.0.pow(numOfDec).toLong()
+    val rounded = (this * factor).roundToLong()
+    val sign = if (rounded < 0) "-" else ""
+    val integerPart = abs(rounded) / factor
+    val fractionPart = (abs(rounded) % factor).toString().padStart(numOfDec, '0')
+    return "$sign$integerPart.$fractionPart"
 }
 
 fun Float.toHex(length: Int): String {

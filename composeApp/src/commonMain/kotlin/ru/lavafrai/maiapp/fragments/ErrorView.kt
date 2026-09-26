@@ -22,6 +22,7 @@ import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.models.exceptions.MaiAppException
+import ru.lavafrai.maiapp.utils.isNoConnectionError
 
 @Composable
 fun ErrorView(
@@ -35,6 +36,9 @@ fun ErrorView(
 
         if (error is MaiAppException) {
             Text(error.getReadableDescription(), modifier = Modifier.alpha(0.7f))
+            Spacer(Modifier.height(4.dp))
+        } else if (error?.isNoConnectionError() == true) {
+            Text(stringResource(Res.string.no_internet_connection), modifier = Modifier.alpha(0.7f))
             Spacer(Modifier.height(4.dp))
         }
 

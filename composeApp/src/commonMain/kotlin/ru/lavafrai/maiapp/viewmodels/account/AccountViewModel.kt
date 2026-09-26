@@ -4,19 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import io.ktor.util.network.*
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.AccountRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
-import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.models.account.Student
 import ru.lavafrai.maiapp.network.mymai.MyMaiApi
 import ru.lavafrai.maiapp.network.mymai.exceptions.AuthenticationServerException
 import ru.lavafrai.maiapp.network.mymai.exceptions.InvalidLoginOrPasswordException
 import ru.lavafrai.maiapp.utils.contextual
+import ru.lavafrai.maiapp.utils.isNoConnectionError
+import ru.lavafrai.maiapp.utils.reportError
 import ru.lavafrai.maiapp.viewmodels.MaiAppViewModel
 import kotlin.reflect.KClass
 
@@ -30,42 +34,77 @@ class AccountViewModel(
         marks = Loadable.loading(),
     )
 ) {
+    private var accountLoading: Job? = null
+    private var marksReloading: Job? = null
+
     init {
         refresh()
     }
 
     fun refresh() {
+        accountLoading?.cancel()
+        marksReloading?.cancel()
         emit(initialState.copy(loggedIn = accountRepository.hasCredentials()))
 
         val credentials = accountRepository.getCredentials() ?: return
 
-        launchCatching(onError = { emit(stateValue.copy(studentInfo = Loadable.error(it as Exception))) }) {
-            val session = MyMaiApi.authorize(credentials.login, credentials.password)
-
-            val studentInfo = session.studentInfo()
+        accountLoading = viewModelScope.launch {
+            val (session, studentInfo) = try {
+                val session = MyMaiApi.authorize(credentials.login, credentials.password)
+                session to session.studentInfo()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                reportLoadingError("MyMai account loading", e)
+                emit(stateValue.copy(studentInfo = Loadable.error(e)))
+                return@launch
+            }
             emit(stateValue.copy(studentInfo = Loadable.actual(studentInfo)))
 
-            ApplicationSettings.state.collect { settings ->
-                val selectedStudent = studentInfo.students.firstOrNull { settings.selectedStudentId == it.id }
-                    ?: studentInfo.students.firstOrNull()
-                emit(stateValue.copy(student = Loadable.actual(selectedStudent)))
-                selectedStudent ?: throw IllegalArgumentException("No one student found")
+            ApplicationSettings.state.map { it.selectedStudentId }.distinctUntilChanged().collectLatest { selectedId ->
+                val student = studentInfo.students.firstOrNull { it.id == selectedId } ?: studentInfo.students.firstOrNull()
+                emit(stateValue.copy(student = Loadable.actual(student), marks = Loadable.loading()))
+                // No students means an unsupported account, the page shows it by itself
+                if (student == null) return@collectLatest
 
-                launchCatching(onError = {emit(stateValue.copy(marks = Loadable.error(it as Exception)))}) {
-                    val marks = session.studentMarks(selectedStudent.studentCode)
-                    emit(stateValue.copy(marks = Loadable.actual(marks), student = Loadable.actual(selectedStudent)))
+                try {
+                    val marks = session.studentMarks(student.studentCode)
+                    emit(stateValue.copy(marks = Loadable.actual(marks)))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    reportLoadingError("MyMai marks loading", e)
+                    emit(stateValue.copy(marks = Loadable.error(e)))
                 }
             }
         }
     }
 
     fun reloadMarks(student: Student) {
-        launchCatching(onError = { emit(stateValue.copy(marks = Loadable.error(it as Exception))) }) {
+        val credentials = accountRepository.getCredentials() ?: return
+        marksReloading?.cancel()
+        marksReloading = viewModelScope.launch {
             emit(stateValue.copy(marks = Loadable.loading()))
-            val session = MyMaiApi.authorize(accountRepository.getCredentials()!!.login, accountRepository.getCredentials()!!.password)
-            val marks = session.studentMarks(student.studentCode)
-            emit(stateValue.copy(marks = Loadable.actual(marks)))
+            try {
+                val session = MyMaiApi.authorize(credentials.login, credentials.password)
+                val marks = session.studentMarks(student.studentCode)
+                emit(stateValue.copy(marks = Loadable.actual(marks)))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                reportLoadingError("MyMai marks loading", e)
+                emit(stateValue.copy(marks = Loadable.error(e)))
+            }
         }
+    }
+
+    /**
+     * Unlike sign in, loading runs by itself (e.g. on every start), so network problems are expected there
+     * and would flood the reports; a wrong password isn't an app error either
+     */
+    private fun reportLoadingError(context: String, e: Exception) {
+        if (e is IOException || e.isNoConnectionError() || e is InvalidLoginOrPasswordException) return
+        reportError(context, e)
     }
 
     fun signIn(login: String, password: String, onFail: (String) -> Unit) {
@@ -83,30 +122,35 @@ class AccountViewModel(
         viewModelScope.launch {
             try {
                 MyMaiApi.authorize(normalizedLogin, normalizedPassword)
-                accountRepository.updateCredentials(normalizedLogin, password)
+                // The same password that has just worked, otherwise the next refresh fails with trailing spaces
+                accountRepository.updateCredentials(normalizedLogin, normalizedPassword)
                 refresh()
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: InvalidLoginOrPasswordException) {
                 onFail("Неверный логин или пароль")
-            } catch (e: UnresolvedAddressException) {
-                onFail("Нет подключения к интернету")
-            } catch (e: IOException) {
+            } catch (e: Exception) {
+                if (e.isNoConnectionError()) {
+                    onFail("Нет подключения к интернету")
+                    return@launch
+                }
+
+                reportError("MyMai sign in", e)
                 onFail(
-                    when (e.message) {
-                        "Connection reset by peer" -> "Соединение сброшено (Попробуйте отключить VPN)"
-                        else -> e.toString()
+                    when {
+                        e is AuthenticationServerException -> "Ошибка сервера (Попробуйте отключить VPN)"
+                        e is IOException && e.message == "Connection reset by peer" -> "Соединение сброшено (Попробуйте отключить VPN)"
+                        e is IOException -> e.toString()
+                        else -> "Неизвестная ошибка: ${e.message}"
                     }
                 )
-                return@launch
-            } catch (e: AuthenticationServerException) {
-                onFail("Ошибка сервера (Попробуйте отключить VPN)")
-            } catch (e: Exception) {
-                onFail("Неизвестная ошибка: ${e.message}")
-                e.printStackTrace()
             }
         }
     }
 
     fun signOut() {
+        accountLoading?.cancel()
+        marksReloading?.cancel()
         accountRepository.clearCredentials()
         emit(initialState.copy(loggedIn = accountRepository.hasCredentials()))
     }
