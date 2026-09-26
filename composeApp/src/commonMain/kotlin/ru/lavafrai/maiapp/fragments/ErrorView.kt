@@ -21,7 +21,11 @@ import compose.icons.feathericons.Trash2
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
+import ru.lavafrai.maiapp.models.exceptions.AssetLoadingException
 import ru.lavafrai.maiapp.models.exceptions.MaiAppException
+import ru.lavafrai.maiapp.network.MaiApiException
+import ru.lavafrai.maiapp.network.mymai.exceptions.AuthenticationServerException
+import ru.lavafrai.maiapp.network.mymai.exceptions.InvalidLoginOrPasswordException
 import ru.lavafrai.maiapp.utils.isNoConnectionError
 
 @Composable
@@ -34,11 +38,8 @@ fun ErrorView(
         Text(stringResource(Res.string.something_went_wrong))
         Spacer(Modifier.height(4.dp))
 
-        if (error is MaiAppException) {
-            Text(error.getReadableDescription(), modifier = Modifier.alpha(0.7f))
-            Spacer(Modifier.height(4.dp))
-        } else if (error?.isNoConnectionError() == true) {
-            Text(stringResource(Res.string.no_internet_connection), modifier = Modifier.alpha(0.7f))
+        error?.readableDescription()?.let { description ->
+            Text(description, modifier = Modifier.alpha(0.7f))
             Spacer(Modifier.height(4.dp))
         }
 
@@ -66,4 +67,22 @@ fun ErrorView(
             Text(stringResource(Res.string.clear_data_and_restart))
         }
     }
+}
+/** What went wrong, in the app language; null if there's nothing to say beyond "something went wrong" */
+@Composable
+fun Throwable.readableDescription(): String? {
+    // First: our exceptions often wrap it, e.g. asset loading ones
+    if (isNoConnectionError()) return stringResource(Res.string.no_internet_connection)
+    return readableDescriptionOfType()
+}
+
+@Composable
+private fun Throwable.readableDescriptionOfType(): String? = when (this) {
+    is InvalidLoginOrPasswordException -> stringResource(Res.string.mymai_invalid_credentials)
+    is AuthenticationServerException -> stringResource(Res.string.mymai_server_error)
+    // The message comes from our server
+    is MaiApiException -> message ?: stringResource(Res.string.api_error, statusCode)
+    is AssetLoadingException -> stringResource(Res.string.asset_loading_error, message ?: cause?.message.orEmpty())
+    is MaiAppException -> getReadableDescription()
+    else -> null
 }

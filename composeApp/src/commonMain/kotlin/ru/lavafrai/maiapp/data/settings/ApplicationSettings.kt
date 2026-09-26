@@ -27,6 +27,8 @@ data class ApplicationSettingsData(
     val colorSchema: String = DefaultColorSchema().id,
     val hideMilitaryTraining: Boolean = false,
     val localMode: Boolean = false,
+    // BCP 47 tag, null for the system language
+    val language: String? = null,
 
     // official account
     val selectedStudentId: Int? = null,
@@ -126,6 +128,11 @@ object ApplicationSettings {
     fun setSelectedStudentId(student: Int) {
         val current = getCurrent()
         update(current.copy(selectedStudentId = student))
+    }
+
+    fun setLanguage(language: String?) {
+        val current = getCurrent()
+        update(current.copy(language = language))
     }
 
     fun setLocalMode(localMode: Boolean) {

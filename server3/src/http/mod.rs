@@ -1,4 +1,7 @@
 mod admin;
+// Not used by any handler until some data is translated
+#[allow(dead_code)]
+pub mod locale;
 mod response;
 mod routes;
 

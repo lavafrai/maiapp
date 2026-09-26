@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp
 
+import ru.lavafrai.maiapp.localizers.AppEnvironment
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,10 +25,13 @@ internal fun App() = AppTheme {
     )}
 
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
-        AppNavigation(
-            navController = navController,
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
+        // Inside the navController, so that changing the language keeps the navigation (see navTypeOf too)
+        AppEnvironment {
+            AppNavigation(
+                navController = navController,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            )
+        }
     }
 }

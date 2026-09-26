@@ -69,5 +69,5 @@ class MaiApiException(
     message: String,
     val statusCode: Int,
 ): MaiAppException(message) {
-    override fun getReadableDescription(): String = message ?: "Ошибка API ($statusCode)"
+    override fun getReadableDescription(): String = message ?: "API error ($statusCode)"
 }

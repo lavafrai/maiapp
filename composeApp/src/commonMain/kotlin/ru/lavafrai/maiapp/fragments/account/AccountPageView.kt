@@ -16,6 +16,7 @@ import compose.icons.feathericons.AlertOctagon
 import compose.icons.feathericons.ChevronDown
 import compose.icons.feathericons.ChevronUp
 import maiapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.fragments.*
@@ -117,7 +118,7 @@ fun StudentSelector(
         onExpandedChange = {},
     ) {
         OutlinedTextField(
-            value = "Student code ${selected.studentCode}",
+            value = stringResource(Res.string.student_code, selected.studentCode),
             onValueChange = {},
             enabled = false,
             modifier = Modifier.fillMaxWidth(),
@@ -129,7 +130,7 @@ fun StudentSelector(
         ) {
             students.forEach { student ->
                 DropdownMenuItem(
-                    text = { Text(text = "Student code ${student.studentCode}") },
+                    text = { Text(text = stringResource(Res.string.student_code, student.studentCode)) },
                     onClick = { onSelectedChange(student) },
                 )
             }
@@ -266,7 +267,7 @@ fun MarkInfoView(mark: Mark) = Column(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
             Text(
-                text = "${mark.hours} ${stringResource(Res.string.hours_genitive).lowercase()}",
+                text = pluralStringResource(Res.plurals.hours_count, mark.hours, mark.hours),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
             )
         }
@@ -284,7 +285,7 @@ fun MarkInfoView(mark: Mark) = Column(
         AssistChip(onClick = { }, label = { Text(mark.typeControlName.localizeTypeControlName()) }, border = chipBorder)
         if (mark.attempts > 1) AssistChip(
             onClick = { },
-            label = { Text("${mark.attempts} ${stringResource(Res.string.attempts).lowercase()}") })
+            label = { Text(pluralStringResource(Res.plurals.attempts_count, mark.attempts, mark.attempts)) })
         if (mark.isDebt) AssistChip(onClick = { }, label = { Text(stringResource(Res.string.academic_debt)) }, border = chipBorder)
     }
 }

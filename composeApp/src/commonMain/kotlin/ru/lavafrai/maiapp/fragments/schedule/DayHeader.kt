@@ -14,11 +14,13 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.in_days
 import maiapp.composeapp.generated.resources.today
 import maiapp.composeapp.generated.resources.tomorrow
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.localizers.localized
-import ru.lavafrai.maiapp.localizers.localizedGenitive
+import ru.lavafrai.maiapp.localizers.localizedDayMonth
 import ru.lavafrai.maiapp.models.time.now
 
 @Composable
@@ -27,9 +29,22 @@ fun DayHeader(
     modifier: Modifier = Modifier,
     showEventAddingButton: Boolean = false,
     onAddEventClick: (() -> Unit) = {},
+    nearest: Boolean = false,
+    showCountdown: Boolean = false,
 ) {
     val today = date == LocalDate.now()
     val tomorrow = date == LocalDate.now().plus(1, DateTimeUnit.DAY)
+    val dateText = date.localizedDayMonth()
+    val daysUntil = date.toEpochDays() - LocalDate.now().toEpochDays()
+
+    // Shown in a frame instead of the plain date
+    val highlightedText = when {
+        today -> stringResource(Res.string.today)
+        tomorrow -> stringResource(Res.string.tomorrow)
+        nearest -> dateText
+        showCountdown && daysUntil > 1 -> pluralStringResource(Res.plurals.in_days, daysUntil, daysUntil)
+        else -> null
+    }
 
     Column(
         modifier = modifier
@@ -48,38 +63,22 @@ fun DayHeader(
                 )
                 Spacer(Modifier.width(8.dp))
 
-                when {
-                    today -> Surface(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically),
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.small,
-                    ) {
-                        Text(
-                            stringResource(Res.string.today),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                        )
-                    }
-
-                    tomorrow -> Surface(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically),
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = MaterialTheme.shapes.small,
-                    ) {
-                        Text(
-                            stringResource(Res.string.tomorrow),
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                        )
-                    }
-
-                    else -> Text(
-                        "${date.dayOfMonth} ${date.month.localizedGenitive()}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Light,
-                        modifier = Modifier.alpha(0.5f),
+                if (highlightedText != null) Surface(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically),
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = MaterialTheme.shapes.small,
+                ) {
+                    Text(
+                        highlightedText,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                     )
-                }
+                } else Text(
+                    dateText,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Light,
+                    modifier = Modifier.alpha(0.5f),
+                )
             }
             // TODO: add event adding button
             /* if (showEventAddingButton) IconButton(onAddEventClick, modifier = Modifier.then(Modifier.size(24.dp))) {

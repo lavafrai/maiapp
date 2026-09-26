@@ -7,6 +7,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import ru.lavafrai.maiapp.JsonProvider
+import ru.lavafrai.maiapp.network.ApiLocale
 import ru.lavafrai.maiapp.platform.getPlatform
 
 open class BaseRepository {
@@ -18,6 +19,7 @@ open class BaseRepository {
     companion object {
         val baseHttpClient = HttpClient(getPlatform().ktorEngine()) {
             followRedirects = true
+            install(ApiLocale)
 
             install(ContentNegotiation) {
                 json(

@@ -10,5 +10,6 @@ import ru.lavafrai.maiapp.platform.getPlatform
  */
 fun loadableImageUrl(url: String): String {
     if (getPlatform().canLoadCrossOriginImages() || url.startsWith(BuildConfig.API_BASE_URL)) return url
+    // Without the locale unlike other requests to our server: photos don't depend on it, and it would split their cache
     return "${BuildConfig.API_BASE_URL}/exler-photo?url=${UrlEncoderUtil.encode(url)}"
 }

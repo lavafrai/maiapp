@@ -23,7 +23,10 @@ import compose.icons.LineAwesomeIcons
 import compose.icons.feathericons.DollarSign
 import compose.icons.feathericons.Edit3
 import compose.icons.feathericons.Github
+import compose.icons.lineawesomeicons.HeartSolid
 import compose.icons.lineawesomeicons.Telegram
+import ru.lavafrai.maiapp.utils.asDp
+import ru.lavafrai.maiapp.localizers.appLanguages
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.BuildConfig
@@ -86,6 +89,17 @@ fun SettingsPage(
                     Text(it.readableName(), fontSize = 18.sp)
                 }
             )
+
+            SettingsDropdownItem(
+                title = stringResource(Res.string.language),
+                items = listOf(null) + appLanguages,
+                selected = settings.language,
+                onItemSelected = {
+                    ApplicationSettings.setLanguage(it)
+                    getPlatform().onLanguageChanged()
+                },
+                itemContent = { Text(languageName(it), fontSize = 18.sp) },
+            )
         }
 
         WidgetSettings()
@@ -98,6 +112,15 @@ fun SettingsPage(
 
         SettingsCopyright()
     }
+}
+
+/** Languages are named in themselves, as users look for their own */
+@Composable
+private fun languageName(language: String?): String = when (language) {
+    null -> stringResource(Res.string.language_system)
+    "ru" -> "Русский"
+    "en" -> "English"
+    else -> language
 }
 
 @Composable
@@ -144,13 +167,18 @@ fun OpenSourceInfo() = SettingsSection(stringResource(Res.string.information)) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Text(
-            "With ♥\uFE0E by. lava_frai",
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(horizontal = 2.dp)
                 .clip(MaterialTheme.shapes.small)
                 .clickable { appContext.openUrl("https://lavafrai.ru/") }
-        )
+        ) {
+            // An icon, not "♥": fonts of the web version have no such glyph and draw a box instead
+            Text("With ")
+            Icon(LineAwesomeIcons.HeartSolid, contentDescription = "love", modifier = Modifier.size(LocalTextStyle.current.fontSize.asDp))
+            Text(" by. lava_frai")
+        }
     }
 }
 

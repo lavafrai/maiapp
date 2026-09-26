@@ -156,14 +156,14 @@ fun SimpleEventEditorCardExpanded(
         }
 
         if (rooms.isNotEmpty()) {
-            LabeledSection(title = "Аудитории") {
+            LabeledSection(title = stringResource(Res.string.classrooms)) {
                 Text(rooms.joinToString(", "), style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(Modifier.height(16.dp))
         }
 
         if (teachers.isNotEmpty()) {
-            LabeledSection(title = "Преподаватели") {
+            LabeledSection(title = stringResource(Res.string.teachers)) {
                 Column { teachers.forEach { teacher -> Text(teacher, style = MaterialTheme.typography.bodyLarge) } }
             }
         }

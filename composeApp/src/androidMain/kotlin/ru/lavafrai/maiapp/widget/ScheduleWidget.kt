@@ -3,10 +3,14 @@ package ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.*
+import androidx.glance.GlanceId
+import androidx.glance.GlanceModifier
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -16,7 +20,19 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
-import androidx.glance.layout.*
+import androidx.glance.background
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
+import androidx.glance.layout.padding
+import androidx.glance.layout.size
+import androidx.glance.layout.width
 import androidx.glance.text.FontFamily
 import androidx.glance.text.TextDefaults
 import androidx.glance.unit.ColorProvider
@@ -24,16 +40,24 @@ import co.touchlab.kermit.Logger
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.widget_no_lessons
+import maiapp.composeapp.generated.resources.widget_schedule_not_loaded
+import maiapp.composeapp.generated.resources.widget_sign_in_required
+import maiapp.composeapp.generated.resources.widget_today_title
+import org.jetbrains.compose.resources.getString
 import ru.lavafrai.maiapp.MainActivity
 import ru.lavafrai.maiapp.R
 import ru.lavafrai.maiapp.data.repositories.AbstractLessonRepository
 import ru.lavafrai.maiapp.data.repositories.SimpleSchedule
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
-import ru.lavafrai.maiapp.localizers.localizedGenitiveNonContext
-import ru.lavafrai.maiapp.localizers.localizedNonContext
-import ru.lavafrai.maiapp.localizers.localizedShortNonContext
+import ru.lavafrai.maiapp.localizers.LocalAppLocale
+import ru.lavafrai.maiapp.localizers.loadDayMonth
+import ru.lavafrai.maiapp.localizers.nameResource
+import ru.lavafrai.maiapp.localizers.shortNameResource
 import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.models.schedule.LessonLike
+import ru.lavafrai.maiapp.models.schedule.LessonType
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceText
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceTitle
@@ -49,6 +73,9 @@ class ScheduleWidget : GlanceAppWidget() {
         Logger.i("Loading schedule for widget $id")
 
         val schedule = if (group != null) AbstractLessonRepository().loadLessonsFromCacheOrNull(group) else null
+        // The app language, even if its UI hasn't been started in this process yet
+        LocalAppLocale.apply(settings.language)
+        val strings = WidgetStrings.load(today = LocalDate.now())
 
         provideContent {
             Column(
@@ -62,7 +89,8 @@ class ScheduleWidget : GlanceAppWidget() {
                     LocalGlanceTextStyle provides TextDefaults.defaultTextStyle.copy(
                         color = ColorProvider(Color.White),
                         fontSize = 14.sp,
-                    )
+                    ),
+                    LocalWidgetStrings provides strings,
                 ) {
                     ScheduleWidgetContent(group, schedule)
                 }
@@ -70,6 +98,40 @@ class ScheduleWidget : GlanceAppWidget() {
         }
     }
 }
+
+/**
+ * Texts of the widget. Compose resources need Compose UI locals to be used in composition, which Glance doesn't
+ * have, so the texts are loaded beforehand. The same moment's [today] is used for all of them
+ */
+class WidgetStrings(
+    val today: LocalDate,
+    val todayTitle: String,
+    val dayTitles: Map<LocalDate, String>,
+    val lessonTypes: Map<LessonType, String>,
+    val noLessons: String,
+    val notLoaded: String,
+    val signInRequired: String,
+) {
+    companion object {
+        suspend fun load(today: LocalDate): WidgetStrings {
+            val weekday = getString(today.dayOfWeek.nameResource)
+            return WidgetStrings(
+                today = today,
+                todayTitle = getString(Res.string.widget_today_title, today.loadDayMonth(), weekday, weekday.lowercase()),
+                dayTitles = (0 until 7).associate { dayIndex ->
+                    val date = today.plus(DatePeriod(days = dayIndex))
+                    date to "${getString(date.dayOfWeek.nameResource)}, ${date.loadDayMonth()}"
+                },
+                lessonTypes = LessonType.entries.associateWith { getString(it.shortNameResource) },
+                noLessons = getString(Res.string.widget_no_lessons),
+                notLoaded = getString(Res.string.widget_schedule_not_loaded),
+                signInRequired = getString(Res.string.widget_sign_in_required),
+            )
+        }
+    }
+}
+
+val LocalWidgetStrings = staticCompositionLocalOf<WidgetStrings> { error("No widget strings provided") }
 
 @Composable
 fun ScheduleWidgetContent(
@@ -110,7 +172,7 @@ private fun scheduleWidgetRows(schedule: SimpleSchedule, today: LocalDate): List
 fun ScheduleWidgetSchedule(
     schedule: SimpleSchedule,
 ) {
-    val rows = scheduleWidgetRows(schedule, LocalDate.now())
+    val rows = scheduleWidgetRows(schedule, LocalWidgetStrings.current.today)
 
     LazyColumn(modifier = GlanceModifier.padding(horizontal = 8.dp)) {
         items(rows, itemId = { it.id }) { row ->
@@ -127,7 +189,7 @@ fun ScheduleWidgetSchedule(
 @Composable
 fun ScheduleWidgetNoLessons() {
     Row(modifier = GlanceModifier.padding(start = 8.dp)) {
-        GlanceText("В этот день нет занятий")
+        GlanceText(LocalWidgetStrings.current.noLessons)
     }
 }
 
@@ -148,7 +210,7 @@ fun ScheduleWidgetLesson(
         Column {
             GlanceText(lesson.name, maxLines = 1)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                GlanceText(lesson.type.localizedShortNonContext(), maxLines = 1, fontFamily = FontFamily.Monospace)
+                GlanceText(LocalWidgetStrings.current.lessonTypes.getValue(lesson.type), maxLines = 1, fontFamily = FontFamily.Monospace)
 
                 Spacer(GlanceModifier.width(4.dp))
                 // Always present, so that the layout is the same for lessons with and without classrooms
@@ -172,7 +234,7 @@ fun ScheduleWidgetDayHeader(
 ) {
     Row(modifier = GlanceModifier.padding(top = 8.dp, bottom = 6.dp)) {
         GlanceText(
-            "${date.dayOfWeek.localizedNonContext()}, ${date.dayOfMonth} ${date.month.localizedGenitiveNonContext()}",
+            LocalWidgetStrings.current.dayTitles.getValue(date),
             fontSize = 17.sp
         )
     }
@@ -186,7 +248,7 @@ fun ScheduleWidgetNotLoaded() {
             .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        GlanceTitle("Расписание не загружено")
+        GlanceTitle(LocalWidgetStrings.current.notLoaded)
     }
 }
 
@@ -198,7 +260,7 @@ fun ScheduleWidgetNotLoggedIn() {
             .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
-        GlanceTitle("Необходимо войти в приложение")
+        GlanceTitle(LocalWidgetStrings.current.signInRequired)
     }
 }
 
@@ -206,7 +268,6 @@ fun ScheduleWidgetNotLoggedIn() {
 fun ScheduleWidgetHeader(
     modifier: GlanceModifier,
 ) {
-    val today = LocalDate.now()
     Column(modifier = modifier) {
         Box(modifier = GlanceModifier.padding(8.dp), contentAlignment = Alignment.Center) {
             Row(
@@ -215,11 +276,7 @@ fun ScheduleWidgetHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.Start,
             ) {
-                GlanceTitle(
-                    "${today.dayOfMonth} ${today.month.localizedGenitiveNonContext()}, ${
-                        today.dayOfWeek.localizedNonContext().lowercase()
-                    }"
-                )
+                GlanceTitle(LocalWidgetStrings.current.todayTitle)
             }
 
             Row(

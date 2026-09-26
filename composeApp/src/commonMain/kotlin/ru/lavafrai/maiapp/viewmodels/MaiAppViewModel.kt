@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
+import ru.lavafrai.maiapp.network.ApiLocale
 import ru.lavafrai.maiapp.platform.getPlatform
 
 open class MaiAppViewModel<T>(
@@ -31,6 +32,7 @@ open class MaiAppViewModel<T>(
 
     protected val httpClient = HttpClient(getPlatform().ktorEngine()) {
         followRedirects = true
+        install(ApiLocale)
 
         install(ContentNegotiation) {
             json(

@@ -18,6 +18,9 @@ interface Platform {
     /** Whether images of sites without CORS headers can be loaded directly; see loadableImageUrl */
     fun canLoadCrossOriginImages(): Boolean = true
 
+    /** The widget shows texts in the app language, so it's redrawn when that changes */
+    fun onLanguageChanged() {}
+
     fun supportsWidget(): Boolean = false
     fun requestWidgetCreation(): Unit = error("Widget isn't supported on this platform")
 

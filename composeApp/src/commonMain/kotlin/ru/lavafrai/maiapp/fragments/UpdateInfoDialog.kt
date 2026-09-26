@@ -55,7 +55,7 @@ fun UpdateInfoDialog(
                     }
                     Icon(
                         imageVector = FeatherIcons.ArrowRight,
-                        contentDescription = "Информация о версии",
+                        contentDescription = "Version info",
                     )
                     Row(
                         modifier = Modifier

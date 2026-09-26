@@ -3,22 +3,24 @@ package ru.lavafrai.maiapp.localizers
 import androidx.compose.runtime.Composable
 import maiapp.composeapp.generated.resources.Res
 import maiapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.models.time.DayOfWeek
 
-@Composable
-fun DayOfWeek.localized(): String {
-    return when (this) {
-        DayOfWeek.MONDAY -> stringResource(Res.string.monday)
-        DayOfWeek.TUESDAY -> stringResource(Res.string.tuesday)
-        DayOfWeek.WEDNESDAY -> stringResource(Res.string.wednesday)
-        DayOfWeek.THURSDAY -> stringResource(Res.string.thursday)
-        DayOfWeek.FRIDAY -> stringResource(Res.string.friday)
-        DayOfWeek.SATURDAY -> stringResource(Res.string.saturday)
-        DayOfWeek.SUNDAY -> stringResource(Res.string.sunday)
-        else -> throw IllegalArgumentException("Unknown day of week: $this")
+/** Also for loading without composition, e.g. with getString */
+val DayOfWeek.nameResource: StringResource
+    get() = when (this) {
+        DayOfWeek.MONDAY -> Res.string.monday
+        DayOfWeek.TUESDAY -> Res.string.tuesday
+        DayOfWeek.WEDNESDAY -> Res.string.wednesday
+        DayOfWeek.THURSDAY -> Res.string.thursday
+        DayOfWeek.FRIDAY -> Res.string.friday
+        DayOfWeek.SATURDAY -> Res.string.saturday
+        DayOfWeek.SUNDAY -> Res.string.sunday
     }
-}
+
+@Composable
+fun DayOfWeek.localized(): String = stringResource(nameResource)
 
 @Composable
 fun DayOfWeek.localizedShort(): String {
@@ -30,15 +32,13 @@ fun DayOfWeek.localizedShort(): String {
         DayOfWeek.FRIDAY -> stringResource(Res.string.friday_short)
         DayOfWeek.SATURDAY -> stringResource(Res.string.saturday_short)
         DayOfWeek.SUNDAY -> stringResource(Res.string.sunday_short)
-        else -> throw IllegalArgumentException("Unknown day of week: $this")
     }
 }
 
 @Composable
 fun kotlinx.datetime.DayOfWeek.localized(): String = this.toApplication().localized()
 
-@Composable
-fun kotlinx.datetime.DayOfWeek.localizedNonContext(): String = this.toApplication().localizedNonContext()
+val kotlinx.datetime.DayOfWeek.nameResource: StringResource get() = toApplication().nameResource
 
 @Composable
 fun kotlinx.datetime.DayOfWeek.localizedShort(): String = this.toApplication().localizedShort()
@@ -62,20 +62,4 @@ fun kotlinx.datetime.DayOfWeek.toApplication(): DayOfWeek = when(this) {
     kotlinx.datetime.DayOfWeek.SATURDAY -> DayOfWeek.SATURDAY
     kotlinx.datetime.DayOfWeek.SUNDAY -> DayOfWeek.SUNDAY
     else -> throw IllegalArgumentException("Unknown day of week: $this")
-}
-
-
-
-@Composable
-fun DayOfWeek.localizedNonContext(): String {
-    return when (this) {
-        DayOfWeek.MONDAY -> "Понедельник"
-        DayOfWeek.TUESDAY -> "Вторник"
-        DayOfWeek.WEDNESDAY -> "Среда"
-        DayOfWeek.THURSDAY -> "Четверг"
-        DayOfWeek.FRIDAY -> "Пятница"
-        DayOfWeek.SATURDAY -> "Суббота"
-        DayOfWeek.SUNDAY -> "Воскресенье"
-        else -> throw IllegalArgumentException("Unknown day of week: $this")
-    }
 }

@@ -50,7 +50,7 @@ import ru.lavafrai.maiapp.fragments.shaker.rememberShakeController
 import ru.lavafrai.maiapp.fragments.shaker.shake
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.localizers.localizedBeforeTime
-import ru.lavafrai.maiapp.localizers.localizedGenitive
+import ru.lavafrai.maiapp.localizers.localizedDayMonth
 import ru.lavafrai.maiapp.models.events.SimpleEvent
 import ru.lavafrai.maiapp.models.events.SimpleEventPeriod
 import ru.lavafrai.maiapp.models.schedule.GroupName
@@ -369,11 +369,8 @@ fun EventCreateDialogDateTime(
     var endDateExpanded by remember { mutableStateOf(false) }
     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-    val dateText = if (now.year == date.year) "${date.dayOfMonth} ${date.month.localizedGenitive()}"
-    else "${date.dayOfMonth} ${date.month.localizedGenitive()} ${date.year}"
-
-    val endDateText = if (now.year == date.year) "${endDate.dayOfMonth} ${endDate.month.localizedGenitive()}"
-    else "${endDate.dayOfMonth} ${endDate.month.localizedGenitive()} ${endDate.year}"
+    val dateText = date.localizedDayMonth(withYear = date.year != now.year)
+    val endDateText = endDate.localizedDayMonth(withYear = endDate.year != now.year)
 
     val startTimeText = "${startTime.hour}:${startTime.minute.toString().padStart(2, '0')}"
     val endTimeText = "${endTime.hour}:${endTime.minute.toString().padStart(2, '0')}"
@@ -411,7 +408,7 @@ fun EventCreateDialogDateTime(
                 )
                 if (period != SimpleEventPeriod.Single) {
                     Text(
-                        "по",
+                        stringResource(Res.string.date_range_to),
                         style = MaterialTheme.typography.displaySmall.copy(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,

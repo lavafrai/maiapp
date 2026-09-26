@@ -7,6 +7,62 @@
         <title>maiapp</title>
 
         <script>
+            // The app language: Compose resources take it from navigator.languages, so a language chosen in the app
+            // is returned from there (see LocalAppLocale). The saved one is set right away to start in it
+            const currentLanguagesImplementation = Object.getOwnPropertyDescriptor(Navigator.prototype, "languages");
+            Object.defineProperty(Navigator.prototype, "languages", Object.assign({}, currentLanguagesImplementation, {
+                get: function () {
+                    return window.__customLocale ? [window.__customLocale] : currentLanguagesImplementation.get.apply(this);
+                }
+            }));
+            try {
+                window.__customLocale = JSON.parse(localStorage.getItem("settings") || "null")?.language ?? null;
+            } catch (e) {
+                // Unreadable settings, the app will deal with them
+            }
+            document.documentElement.lang = (navigator.languages?.[0] || "en").toLowerCase().startsWith("ru") ? "ru" : "en";
+        </script>
+
+        <script>
+            const crashTexts = {
+                ru: {
+                    unsupportedTitle: "Браузер не поддерживается",
+                    unsupportedText: "Для веб-версии нужен свежий браузер: Chrome или Edge 119+, Firefox 120+ или Safari 18.2+. Обновите браузер или установите приложение на телефон.",
+                    crashTitle: "Произошла ошибка",
+                    crashText: "Приложение столкнулось с ошибкой и может работать неправильно. Перезагрузите страницу. Если ошибка повторяется, пришлите её текст в поддержку.",
+                    loadingTitle: "Не удалось загрузить приложение",
+                    loadingText: "Проверьте подключение к интернету и перезагрузите страницу.",
+                    details: "Подробности",
+                    reload: "Перезагрузить",
+                    copy: "Скопировать ошибку",
+                    copied: "Скопировано",
+                    close: "Закрыть",
+                    support: "Написать в поддержку",
+                },
+                en: {
+                    unsupportedTitle: "Browser is not supported",
+                    unsupportedText: "The web version needs an up-to-date browser: Chrome or Edge 119+, Firefox 120+ or Safari 18.2+. Update your browser or install the app on your phone.",
+                    crashTitle: "Something went wrong",
+                    crashText: "The app ran into an error and may not work correctly. Reload the page. If the error repeats, send its text to support.",
+                    loadingTitle: "Failed to load the app",
+                    loadingText: "Check your internet connection and reload the page.",
+                    details: "Details",
+                    reload: "Reload",
+                    copy: "Copy error",
+                    copied: "Copied",
+                    close: "Close",
+                    support: "Contact support",
+                },
+            };
+
+            // The same language the app is in: English unless it's Russian, as in the app resources
+            function crashText(key) {
+                const language = (navigator.languages?.[0] || navigator.language || "").toLowerCase();
+                return (language.startsWith("ru") ? crashTexts.ru : crashTexts.en)[key];
+            }
+        </script>
+
+        <script>
             // Registered before the app is loaded, so that failures of loading and compiling the wasm are shown too
             let crashShown = false;
 
@@ -30,7 +86,7 @@
                     // textContent, not innerHTML: the error text must not be able to inject markup
                     const detailsElement = document.createElement("details");
                     const summary = document.createElement("summary");
-                    summary.textContent = "Подробности";
+                    summary.textContent = crashText("details");
                     const pre = document.createElement("pre");
                     pre.textContent = details;
                     detailsElement.append(summary, pre);
@@ -46,18 +102,18 @@
                     buttons.appendChild(button);
                     return button;
                 };
-                addButton("Перезагрузить", () => location.reload());
+                addButton(crashText("reload"), () => location.reload());
                 if (details) {
-                    const copyButton = addButton("Скопировать ошибку", () => {
-                        navigator.clipboard?.writeText(details).then(() => copyButton.textContent = "Скопировано");
+                    const copyButton = addButton(crashText("copy"), () => {
+                        navigator.clipboard?.writeText(details).then(() => copyButton.textContent = crashText("copied"));
                     });
                 }
-                addButton("Закрыть", () => overlay.remove());
+                addButton(crashText("close"), () => overlay.remove());
 
                 const support = document.createElement("a");
                 support.href = "https://t.me/maiapp3";
                 support.target = "_blank";
-                support.textContent = "Написать в поддержку";
+                support.textContent = crashText("support");
                 dialog.append(buttons, support);
 
                 (document.body ?? document.documentElement).appendChild(overlay);
@@ -80,17 +136,9 @@
 
             function showErrorCrash(error) {
                 if (isUnsupportedBrowserError(error)) {
-                    showCrash(
-                        "Браузер не поддерживается",
-                        "Для веб-версии нужен свежий браузер: Chrome или Edge 119+, Firefox 120+ или Safari 18.2+. Обновите браузер или установите приложение на телефон.",
-                        describeError(error),
-                    );
+                    showCrash(crashText("unsupportedTitle"), crashText("unsupportedText"), describeError(error));
                 } else {
-                    showCrash(
-                        "Произошла ошибка",
-                        "Приложение столкнулось с ошибкой и может работать неправильно. Перезагрузите страницу. Если ошибка повторяется, пришлите её текст в поддержку.",
-                        describeError(error),
-                    );
+                    showCrash(crashText("crashTitle"), crashText("crashText"), describeError(error));
                 }
             }
 
@@ -110,11 +158,7 @@
 
             // The app script itself failed to load
             function onPanicError() {
-                showCrash(
-                    "Не удалось загрузить приложение",
-                    "Проверьте подключение к интернету и перезагрузите страницу.",
-                    null,
-                );
+                showCrash(crashText("loadingTitle"), crashText("loadingText"), null);
             }
         </script>
         <style>

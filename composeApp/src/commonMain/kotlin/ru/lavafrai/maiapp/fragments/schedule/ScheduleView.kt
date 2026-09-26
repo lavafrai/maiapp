@@ -27,6 +27,8 @@ import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.time.DateRange
+import ru.lavafrai.maiapp.models.time.now
+import ru.lavafrai.maiapp.models.time.week
 import ru.lavafrai.maiapp.utils.LessonSelector
 
 
@@ -38,6 +40,7 @@ fun ScheduleView(
     exlerTeachers: List<ExlerTeacher>? = null,
     modifier: Modifier = Modifier,
     selector: LessonSelector = LessonSelector.default(),
+    highlightNearest: Boolean = false,
     onRefresh: (() -> Unit)? = null,
     refreshing: Boolean = false,
     state: ScheduleViewState = rememberScheduleViewState(),
@@ -83,6 +86,15 @@ fun ScheduleView(
         (filteredLessons.flatMap { it.lessons } + filteredEvents).sortedBy { it.date }
     }
 
+    // The first day with something not finished yet; today and tomorrow are marked anyway
+    val nearestDate = remember(filteredLessonLikes, highlightNearest) {
+        if (highlightNearest) filteredLessonLikes.filter { !it.isFinished() }.minOfOrNull { it.date } else null
+    }
+    // When the next week is shown (e.g. opened by default as this one is over), its first day tells how soon it is
+    val countdownDate = remember(filteredLessonLikes, dateRange) {
+        if (dateRange == LocalDate.now().week().plusDays(7)) filteredLessonLikes.minOfOrNull { it.date } else null
+    }
+
     LaunchedEffect(dateRange, selector, schedule.id, filteredLessons) {
         state.updateScrollIfRequired(schedule, dateRange, selector, filteredLessonLikes)
     }
@@ -100,7 +112,8 @@ fun ScheduleView(
                     state = state.lazyScrollState,
                 ) {
                     for (dayEntry in filteredLessonLikes.groupBy { it.date }) {
-                        stickyHeader {
+                        // Keys and content types, so that a header isn't composed out of a reused day and vice versa
+                        stickyHeader(key = "header ${dayEntry.key}", contentType = "day header") {
                             DayHeader(
                                 date = dayEntry.key,
                                 modifier = Modifier
@@ -108,10 +121,12 @@ fun ScheduleView(
                                     .padding(vertical = 8.dp),
                                 showEventAddingButton = showEventAddingButton,
                                 onAddEventClick = { onAddEventClick(dayEntry.key) },
+                                nearest = dayEntry.key == nearestDate,
+                                showCountdown = dayEntry.key == countdownDate,
                             )
                         }
 
-                        item {
+                        item(key = "day ${dayEntry.key}", contentType = "day") {
                             DayView(
                                 date = dayEntry.key,
                                 lessons = dayEntry.value,

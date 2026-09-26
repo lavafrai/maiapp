@@ -141,7 +141,8 @@ fun MainPage(
                                 exlerTeachers = viewState.exlerTeachers.data,
                                 dateRange = null,
                                 modifier = Modifier.fillMaxSize(),
-                                selector = remember(viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() }
+                                selector = remember(viewState.workLessonSelectors) { viewState.workLessonSelectors.anySelector() },
+                                highlightNearest = true,
                             )
                         }
                     }

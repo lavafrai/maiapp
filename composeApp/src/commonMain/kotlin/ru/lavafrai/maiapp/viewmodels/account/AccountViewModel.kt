@@ -11,6 +11,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.io.IOException
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.connection_reset_try_without_vpn
+import maiapp.composeapp.generated.resources.enter_login_and_password
+import maiapp.composeapp.generated.resources.invalid_login_or_password
+import maiapp.composeapp.generated.resources.no_internet_connection
+import maiapp.composeapp.generated.resources.server_error_try_without_vpn
+import maiapp.composeapp.generated.resources.unknown_error
+import org.jetbrains.compose.resources.getString
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.repositories.AccountRepository
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
@@ -108,18 +116,19 @@ class AccountViewModel(
     }
 
     fun signIn(login: String, password: String, onFail: (String) -> Unit) {
-        val normalizedLogin = login
-            .trim()
+        val trimmedLogin = login.trim()
+        val normalizedLogin = trimmedLogin
             .contextual(case = { !it.endsWith("@mai.education") }) { "$this@mai.education" }
         val normalizedPassword = password
             .trim()
 
-        if (normalizedLogin.isEmpty() || normalizedPassword.isEmpty()) {
-            onFail("Введите логин и пароль")
-            return
-        }
-
         viewModelScope.launch {
+            // Not normalizedLogin: an empty login becomes "@mai.education" there
+            if (trimmedLogin.isEmpty() || normalizedPassword.isEmpty()) {
+                onFail(getString(Res.string.enter_login_and_password))
+                return@launch
+            }
+
             try {
                 MyMaiApi.authorize(normalizedLogin, normalizedPassword)
                 // The same password that has just worked, otherwise the next refresh fails with trailing spaces
@@ -128,20 +137,20 @@ class AccountViewModel(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: InvalidLoginOrPasswordException) {
-                onFail("Неверный логин или пароль")
+                onFail(getString(Res.string.invalid_login_or_password))
             } catch (e: Exception) {
                 if (e.isNoConnectionError()) {
-                    onFail("Нет подключения к интернету")
+                    onFail(getString(Res.string.no_internet_connection))
                     return@launch
                 }
 
                 reportError("MyMai sign in", e)
                 onFail(
                     when {
-                        e is AuthenticationServerException -> "Ошибка сервера (Попробуйте отключить VPN)"
-                        e is IOException && e.message == "Connection reset by peer" -> "Соединение сброшено (Попробуйте отключить VPN)"
+                        e is AuthenticationServerException -> getString(Res.string.server_error_try_without_vpn)
+                        e is IOException && e.message == "Connection reset by peer" -> getString(Res.string.connection_reset_try_without_vpn)
                         e is IOException -> e.toString()
-                        else -> "Неизвестная ошибка: ${e.message}"
+                        else -> getString(Res.string.unknown_error, e.message.orEmpty())
                     }
                 )
             }

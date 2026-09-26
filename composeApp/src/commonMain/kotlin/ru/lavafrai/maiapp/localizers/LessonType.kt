@@ -2,6 +2,7 @@ package ru.lavafrai.maiapp.localizers
 
 import androidx.compose.runtime.Composable
 import maiapp.composeapp.generated.resources.*
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.models.schedule.LessonType
 
@@ -15,15 +16,16 @@ fun LessonType.localized() = when (this) {
     LessonType.OTHER -> stringResource(Res.string.other)
 }
 
-@Composable
-fun LessonType.localizedShortNonContext() = when (this) {
-    LessonType.LECTURE -> "ЛК"
-    LessonType.LABORATORY -> "ЛР"
-    LessonType.SEMINAR -> "ПЗ"
-    LessonType.EXAM -> "ЭК"
-    LessonType.MEETING -> "ВСТ"
-    LessonType.OTHER -> "ХЗ"
-}
+/** Also for loading without composition, e.g. with getString */
+val LessonType.shortNameResource: StringResource
+    get() = when (this) {
+        LessonType.LECTURE -> Res.string.lecture_short
+        LessonType.LABORATORY -> Res.string.laboratory_short
+        LessonType.SEMINAR -> Res.string.seminar_short
+        LessonType.EXAM -> Res.string.exam_short
+        LessonType.MEETING -> Res.string.meeting_short
+        LessonType.OTHER -> Res.string.other_short
+    }
 
 @Composable
 fun String.localizeTypeControlName(): String {

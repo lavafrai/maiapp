@@ -6,6 +6,12 @@
 	<true/>
 	<key>CFBundleIconName</key>
     <string>AppIcon</string>
+    <!-- Languages of the app resources, so that iOS offers choosing the app language in its settings -->
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>ru</string>
+    </array>
     <!-- Required for the custom CA in createMyMaiHttpClient; HTTPS and certificate
          validation are still enforced by that client. Keep domains in sync with MyMaiTls.kt. -->
     <key>NSAppTransportSecurity</key>

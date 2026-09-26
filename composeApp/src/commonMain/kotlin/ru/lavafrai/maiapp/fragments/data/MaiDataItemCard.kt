@@ -1,17 +1,27 @@
 package ru.lavafrai.maiapp.fragments.data
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.touchlab.kermit.Logger
 import ru.lavafrai.maiapp.BuildConfig
 import ru.lavafrai.maiapp.data.Loadable
+import ru.lavafrai.maiapp.data.repositories.BaseRepository
 import ru.lavafrai.maiapp.fragments.AppCard
 import ru.lavafrai.maiapp.fragments.AppCardShape
 import ru.lavafrai.maiapp.fragments.AppCardShapes
@@ -20,7 +30,6 @@ import ru.lavafrai.maiapp.fragments.media.LoadableSvgIcon
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.asset.AssetLoader
 import ru.lavafrai.maiapp.models.maidata.asset.RelativeAsset
-import ru.lavafrai.maiapp.models.maidata.asset.UrlAsset
 import ru.lavafrai.maiapp.viewmodels.launchCatching
 
 
@@ -41,7 +50,8 @@ fun MaiDataItemCard(
 ) {
     var loadingHash by remember { mutableStateOf(0) }
     var svgIcon by remember { mutableStateOf(Loadable.loading<String>()) }
-    val assetLoader = remember { AssetLoader.forApi(BuildConfig.API_BASE_URL) }
+    // The shared client with ApiLocale rather than a new one per card, which was never closed
+    val assetLoader = remember { AssetLoader(apiUrl = BuildConfig.API_BASE_URL, httpClient = BaseRepository.baseHttpClient) }
 
     LaunchedEffect(item.icon, loadingHash) {
         item.icon ?: return@LaunchedEffect

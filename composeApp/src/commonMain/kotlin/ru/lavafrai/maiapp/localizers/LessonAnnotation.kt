@@ -16,17 +16,18 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
 
-fun LessonAnnotation.letter(): String {
-    return when(type) {
-        LessonAnnotation.FinalTest -> "З"
-        LessonAnnotation.ControlWork -> "К"
-        LessonAnnotation.HomeWork -> "Д"
-        LessonAnnotation.Skipped -> "П"
-        LessonAnnotation.Colloquium -> "Q"
-        LessonAnnotation.Comment -> "i"
-        else -> "Х"
+@Composable
+fun LessonAnnotation.letter(): String = stringResource(
+    when (type) {
+        LessonAnnotation.FinalTest -> Res.string.annotation_letter_final_test
+        LessonAnnotation.ControlWork -> Res.string.annotation_letter_control_work
+        LessonAnnotation.HomeWork -> Res.string.annotation_letter_home_work
+        LessonAnnotation.Skipped -> Res.string.annotation_letter_skipped
+        LessonAnnotation.Colloquium -> Res.string.annotation_letter_colloquium
+        LessonAnnotation.Comment -> Res.string.annotation_letter_comment
+        else -> Res.string.annotation_letter_unknown
     }
-}
+)
 
 fun LessonAnnotation.color(): Color {
     return when(type) {
