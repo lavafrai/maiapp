@@ -1,0 +1,80 @@
+name: 'Build iOS sideload IPA'
+description: 'Builds an unsigned iPhoneOS app and packs it into an IPA for AltStore/Sideloadly'
+inputs:
+    ipa-name:
+        description: 'File name of the resulting IPA'
+        required: true
+    marketing-version:
+        description: 'CFBundleShortVersionString; the Xcode project value if empty'
+        required: false
+        default: ''
+
+outputs:
+    ipa-path:
+        description: 'Absolute path to the IPA'
+        value: ${{ steps.pack.outputs.ipa-path }}
+
+runs:
+    using: "composite"
+    steps:
+        - name: Build iPhoneOS app without Apple signing
+          shell: bash
+          env:
+              MARKETING_VERSION: ${{ inputs.marketing-version }}
+          run: |
+              args=()
+              if [ -n "$MARKETING_VERSION" ]; then
+                args+=("MARKETING_VERSION=$MARKETING_VERSION")
+              fi
+
+              xcodebuild clean build \
+                -project iosApp/iosApp.xcodeproj \
+                -scheme iosApp \
+                -configuration Release \
+                -sdk iphoneos \
+                -destination 'generic/platform=iOS' \
+                -derivedDataPath "$RUNNER_TEMP/ios-sideload/derived-data" \
+                CODE_SIGNING_ALLOWED=NO \
+                CODE_SIGNING_REQUIRED=NO \
+                CODE_SIGN_IDENTITY="" \
+                DEVELOPMENT_TEAM="" \
+                "${args[@]}"
+
+        - name: Pack and validate IPA
+          id: pack
+          shell: bash
+          env:
+              IPA_NAME: ${{ inputs.ipa-name }}
+          run: |
+              products="$RUNNER_TEMP/ios-sideload/derived-data/Build/Products/Release-iphoneos"
+              app="$(find "$products" -maxdepth 1 -type d -name "*.app" | head -n 1)"
+              if [ -z "$app" ]; then
+                echo "No .app in $products"
+                exit 1
+              fi
+
+              out="$RUNNER_TEMP/ios-sideload/out"
+              rm -rf "$out"
+              mkdir -p "$out/Payload"
+              cp -R "$app" "$out/Payload/"
+              bundle="$out/Payload/$(basename "$app")"
+
+              # AltStore/Sideloadly re-sign with the user's Apple ID; this only gives the bundle a valid structure
+              codesign --force --deep --sign - "$bundle" || true
+
+              plist="$bundle/Info.plist"
+              executable="$bundle/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$plist")"
+              echo "Bundle ID: $(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist")"
+              echo "Version: $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")"
+              file "$executable"
+              if ! file "$executable" | grep -q arm64; then
+                echo "Expected an arm64 iPhoneOS binary"
+                exit 1
+              fi
+              if ! /usr/libexec/PlistBuddy -c 'Print :CFBundleSupportedPlatforms:0' "$plist" | grep -q iPhoneOS; then
+                echo "Expected the iPhoneOS platform"
+                exit 1
+              fi
+
+              (cd "$out" && zip -qry "$IPA_NAME" Payload)
+              echo "ipa-path=$out/$IPA_NAME" >> "$GITHUB_OUTPUT"

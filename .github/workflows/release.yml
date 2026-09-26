@@ -96,10 +96,6 @@ jobs:
         needs: version
         env:
             VERSION: ${{ needs.version.outputs.version }}
-            SCHEME_NAME: iosApp
-            PROJECT_PATH: iosApp/iosApp.xcodeproj
-            DERIVED_DATA_PATH: build-ios-sideload
-            OUTPUT_DIR_IOS: iosApp/actions
         steps:
             - name: Check out release tag
               uses: actions/checkout@v7
@@ -112,49 +108,21 @@ jobs:
                   java-version: '17'
                   secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
 
-            - name: Build iPhoneOS app without Apple signing
-              run: |
-                  xcodebuild clean build \
-                    -project "${PROJECT_PATH}" \
-                    -scheme "${SCHEME_NAME}" \
-                    -configuration Release \
-                    -sdk iphoneos \
-                    -destination 'generic/platform=iOS' \
-                    -derivedDataPath "${DERIVED_DATA_PATH}" \
-                    MARKETING_VERSION="${VERSION}" \
-                    CODE_SIGNING_ALLOWED=NO \
-                    CODE_SIGNING_REQUIRED=NO \
-                    CODE_SIGN_IDENTITY="" \
-                    DEVELOPMENT_TEAM=""
-
-            - name: Pack app as sideload IPA
-              run: |
-                  APP_PATH="$(find "${DERIVED_DATA_PATH}/Build/Products/Release-iphoneos" -maxdepth 1 -type d -name "*.app" | head -n 1)"
-                  if [ -z "$APP_PATH" ]; then
-                    echo "No .app found in ${DERIVED_DATA_PATH}/Build/Products/Release-iphoneos"
-                    exit 1
-                  fi
-
-                  mkdir -p "${OUTPUT_DIR_IOS}/Payload"
-                  cp -R "$APP_PATH" "${OUTPUT_DIR_IOS}/Payload/"
-                  APP_BUNDLE="$(find "${OUTPUT_DIR_IOS}/Payload" -maxdepth 1 -type d -name "*.app" | head -n 1)"
-
-                  # Structural ad-hoc signature; AltStore/Sideloadly re-sign with the user's Apple ID anyway.
-                  codesign --force --deep --sign - "$APP_BUNDLE" || true
-
-                  file "$APP_BUNDLE/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP_BUNDLE/Info.plist")" | grep -q arm64
-
-                  cd "${OUTPUT_DIR_IOS}"
-                  zip -qry "maiapp-${VERSION}-sideload.ipa" Payload
+            - uses: ./.github/actions/build-ios-sideload
+              id: ipa
+              with:
+                  ipa-name: maiapp-${{ env.VERSION }}-sideload.ipa
+                  marketing-version: ${{ env.VERSION }}
 
             - name: Upload IPA artifact
               uses: actions/upload-artifact@v7
               with:
                   name: ios-release
-                  path: ${{ env.OUTPUT_DIR_IOS }}/maiapp-${{ env.VERSION }}-sideload.ipa
+                  path: ${{ steps.ipa.outputs.ipa-path }}
 
             - name: Upload IPA to release
               if: env.PUBLISH == 'true'
               env:
                   GH_TOKEN: ${{ github.token }}
-              run: gh release upload "$RELEASE_TAG" "${OUTPUT_DIR_IOS}/maiapp-${VERSION}-sideload.ipa" --clobber --repo "${{ github.repository }}"
+                  IPA_PATH: ${{ steps.ipa.outputs.ipa-path }}
+              run: gh release upload "$RELEASE_TAG" "$IPA_PATH" --clobber --repo "${{ github.repository }}"
