@@ -84,6 +84,9 @@ fun WebViewPage(
             desktopWebSettings.apply {
                 transparent = false
             }
+            // In the browser it's an iframe placed before the Compose canvas in the DOM, so the canvas,
+            // painted with the page background, covered it
+            wasmJSWebSettings.customContainerStyle = "z-index: 1"
         }
 
         val appContext = LocalApplicationContext.current

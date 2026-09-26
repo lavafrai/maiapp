@@ -1,9 +1,11 @@
 use axum::{
     Json, Router,
-    extract::{Path, State},
+    extract::{Path, Query, State},
+    http::header,
     response::IntoResponse,
     routing::get,
 };
+use serde::Deserialize;
 
 use crate::{errors::AppResult, state::AppState};
 
@@ -18,7 +20,28 @@ pub fn router() -> Router<AppState> {
         .route("/schedule/{id}", get(schedule))
         .route("/exler-teachers", get(exler_teachers))
         .route("/exler-teacher/{id}", get(exler_teacher))
+        .route("/exler-photo", get(exler_photo))
         .route("/data", get(data))
+}
+
+#[derive(Deserialize)]
+struct PhotoQuery {
+    url: String,
+}
+
+/// Teacher photo for the web version, which can't load it from the exler sites directly because of CORS
+async fn exler_photo(
+    State(state): State<AppState>,
+    Query(query): Query<PhotoQuery>,
+) -> AppResult<impl IntoResponse> {
+    let photo = state.exler.photo(&query.url).await?;
+    Ok((
+        [
+            (header::CONTENT_TYPE, photo.content_type),
+            (header::CACHE_CONTROL, "public, max-age=604800".to_owned()),
+        ],
+        photo.bytes,
+    ))
 }
 
 async fn root() -> &'static str {

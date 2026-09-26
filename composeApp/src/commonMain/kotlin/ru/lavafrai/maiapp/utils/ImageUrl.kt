@@ -1,0 +1,14 @@
+package ru.lavafrai.maiapp.utils
+
+import net.thauvin.erik.urlencoder.UrlEncoderUtil
+import ru.lavafrai.maiapp.BuildConfig
+import ru.lavafrai.maiapp.platform.getPlatform
+
+/**
+ * URL to load an image of another site from. Browsers can't draw such images without CORS headers,
+ * which the exler sites with teacher photos don't send, so there they go through our server
+ */
+fun loadableImageUrl(url: String): String {
+    if (getPlatform().canLoadCrossOriginImages() || url.startsWith(BuildConfig.API_BASE_URL)) return url
+    return "${BuildConfig.API_BASE_URL}/exler-photo?url=${UrlEncoderUtil.encode(url)}"
+}

@@ -189,30 +189,30 @@ jobs:
 #                  name: debian-artifact
 #                  path: composeApp/build/compose/binaries/main/deb/*
 
-#    build_web:
-#        name: Build WEB
-#        runs-on: ubuntu-latest
-#        steps:
-#            - uses: actions/checkout@v4
-#            - uses: ./.github/actions/common-build-setup
-#              with:
-#                  java-version: '21'
-#                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
-#
-#            - name: Build with Gradle
-#              run: ./gradlew :composeApp:wasmJsBrowserDistribution
-#
-#            - name: Upload WEB artifact
-#              uses: actions/upload-artifact@v4
-#              with:
-#                  name: web-artifact
-#                  path: composeApp/build/dist/wasmJs/productionExecutable
-#
-#            - name: Upload pages artifact
-#              uses: actions/upload-pages-artifact@v3
-#              with:
-#                  name: pages-artifact
-#                  path: composeApp/build/dist/wasmJs/productionExecutable
+    build_web:
+        name: Build WEB
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: ./.github/actions/common-build-setup
+              with:
+                  java-version: '21'
+                  secrets-properties: ${{ secrets.SECRETS_PROPERTIES }}
+
+            - name: Build with Gradle
+              run: ./gradlew :composeApp:wasmJsBrowserDistribution
+
+            - name: Upload WEB artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: web-artifact
+                  path: composeApp/build/dist/wasmJs/productionExecutable
+
+            - name: Upload pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  name: pages-artifact
+                  path: composeApp/build/dist/wasmJs/productionExecutable
 
     publish_rolling:
         name: Publish Rolling Release
@@ -233,19 +233,24 @@ jobs:
 
 
 
-#    publish_pages:
-#      needs:
-#          - build_web
-#      runs-on: ubuntu-latest
-#      permissions:
-#          contents: read
-#          pages: write
-#          id-token: write
-#      steps:
-#          -   uses: actions/checkout@v4
-#
-#          -   name: Publish WEB artifact
-#              uses: actions/deploy-pages@v4
-#              with:
-#                  artifact_name: pages-artifact
-#                  preview: 'true'
+    publish_pages:
+        name: Publish WEB to GitHub Pages
+        needs: [ build_web ]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pages: write
+            id-token: write
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        # Deployments of consecutive pushes must not overlap
+        concurrency:
+            group: pages
+            cancel-in-progress: false
+        steps:
+            - name: Publish WEB artifact
+              id: deployment
+              uses: actions/deploy-pages@v4
+              with:
+                  artifact_name: pages-artifact

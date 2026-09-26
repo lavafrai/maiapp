@@ -1,10 +1,122 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" href="favicon.ico" sizes="any">
         <title>maiapp</title>
+
+        <script>
+            // Registered before the app is loaded, so that failures of loading and compiling the wasm are shown too
+            let crashShown = false;
+
+            function showCrash(title, text, details) {
+                if (crashShown) return;
+                crashShown = true;
+
+                const overlay = document.createElement("div");
+                overlay.id = "crash";
+                const dialog = document.createElement("div");
+                dialog.id = "crash-dialog";
+                overlay.appendChild(dialog);
+
+                const titleElement = document.createElement("h2");
+                titleElement.textContent = title;
+                const textElement = document.createElement("p");
+                textElement.textContent = text;
+                dialog.append(titleElement, textElement);
+
+                if (details) {
+                    // textContent, not innerHTML: the error text must not be able to inject markup
+                    const detailsElement = document.createElement("details");
+                    const summary = document.createElement("summary");
+                    summary.textContent = "Подробности";
+                    const pre = document.createElement("pre");
+                    pre.textContent = details;
+                    detailsElement.append(summary, pre);
+                    dialog.appendChild(detailsElement);
+                }
+
+                const buttons = document.createElement("div");
+                buttons.id = "crash-buttons";
+                const addButton = (label, onClick) => {
+                    const button = document.createElement("button");
+                    button.textContent = label;
+                    button.onclick = onClick;
+                    buttons.appendChild(button);
+                    return button;
+                };
+                addButton("Перезагрузить", () => location.reload());
+                if (details) {
+                    const copyButton = addButton("Скопировать ошибку", () => {
+                        navigator.clipboard?.writeText(details).then(() => copyButton.textContent = "Скопировано");
+                    });
+                }
+                addButton("Закрыть", () => overlay.remove());
+
+                const support = document.createElement("a");
+                support.href = "https://t.me/maiapp3";
+                support.target = "_blank";
+                support.textContent = "Написать в поддержку";
+                dialog.append(buttons, support);
+
+                (document.body ?? document.documentElement).appendChild(overlay);
+            }
+
+            function describeError(error) {
+                if (!(error instanceof Error)) return String(error);
+                // Kotlin exceptions come as Error with the Kotlin type name and stack trace.
+                // Chrome's stacks start with "Name: message", other browsers' don't
+                const header = `${error.name}: ${error.message}`;
+                if (!error.stack) return header;
+                return error.stack.startsWith(header) ? error.stack : `${header}\n\n${error.stack}`;
+            }
+
+            function isUnsupportedBrowserError(error) {
+                if (typeof WebAssembly !== "object") return true;
+                // Thrown while compiling the app when the browser lacks WasmGC or other required features
+                return error instanceof WebAssembly.CompileError || error instanceof WebAssembly.LinkError;
+            }
+
+            function showErrorCrash(error) {
+                if (isUnsupportedBrowserError(error)) {
+                    showCrash(
+                        "Браузер не поддерживается",
+                        "Для веб-версии нужен свежий браузер: Chrome или Edge 119+, Firefox 120+ или Safari 18.2+. Обновите браузер или установите приложение на телефон.",
+                        describeError(error),
+                    );
+                } else {
+                    showCrash(
+                        "Произошла ошибка",
+                        "Приложение столкнулось с ошибкой и может работать неправильно. Перезагрузите страницу. Если ошибка повторяется, пришлите её текст в поддержку.",
+                        describeError(error),
+                    );
+                }
+            }
+
+            window.addEventListener("error", (event) => {
+                // Not ours: browser extensions and cross-origin scripts without any details
+                if (/^(chrome|moz|safari|safari-web)-extension:/.test(event.filename || "")) return;
+                if (!event.error && event.message === "Script error.") return;
+                // Harmless and common, not a crash
+                if ((event.message || "").includes("ResizeObserver loop")) return;
+
+                showErrorCrash(event.error ?? event.message);
+            });
+
+            window.addEventListener("unhandledrejection", (event) => {
+                showErrorCrash(event.reason);
+            });
+
+            // The app script itself failed to load
+            function onPanicError() {
+                showCrash(
+                    "Не удалось загрузить приложение",
+                    "Проверьте подключение к интернету и перезагрузите страницу.",
+                    null,
+                );
+            }
+        </script>
         <style>
             html, body {
                 width: 100%;
@@ -108,6 +220,79 @@
                 font-style: normal;
             }
 
+            #crash {
+                position: fixed;
+                inset: 0;
+                z-index: 1000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 16px;
+                box-sizing: border-box;
+                background: rgba(0, 0, 0, 0.7);
+                font-family: system-ui, sans-serif;
+            }
+
+            #crash-dialog {
+                max-width: 560px;
+                width: 100%;
+                max-height: 100%;
+                overflow: auto;
+                box-sizing: border-box;
+                padding: 24px;
+                border-radius: 24px;
+                background: #1c1c1c;
+                color: white;
+            }
+
+            #crash-dialog h2 {
+                margin: 0 0 12px;
+            }
+
+            #crash-dialog p {
+                margin: 0 0 16px;
+                opacity: 0.85;
+                line-height: 1.4;
+            }
+
+            #crash-dialog summary {
+                cursor: pointer;
+                color: var(--primary);
+            }
+
+            #crash-dialog pre {
+                max-height: 40vh;
+                overflow: auto;
+                padding: 12px;
+                border-radius: 12px;
+                background: var(--background);
+                font-family: "JetBrains Mono", monospace;
+                font-size: 12px;
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+
+            #crash-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin: 16px 0 12px;
+            }
+
+            #crash-buttons button {
+                padding: 10px 16px;
+                border: none;
+                border-radius: 20px;
+                background: var(--primary);
+                color: #0f0f0f;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            #crash-dialog a {
+                color: var(--primary);
+            }
+
             #copyright-label {
                 position: absolute;
                 bottom: 10px;
@@ -142,15 +327,6 @@
             }, 300);
         }
 
-        function onPanicError() {
-            alert("An error occurred while loading the application. Please try again later.");
-        }
-
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            // ... обработка ошибки ...
-            onPanicError();
-            return false;
-        }
     </script>
 
     <script src="composeApp.js" onerror="onPanicError()"></script>

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import ru.lavafrai.maiapp.platform.getPlatform
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,12 @@ fun MainPageNavigation(
     header: @Composable (MainNavigationPageId) -> Unit,
     content: @Composable (MainNavigationPageId) -> Unit,
 ) {
-    val items = remember(localMode) {if (localMode) { mainNavigationItems.filter { it.id !in nonLocalMenuItems } } else { mainNavigationItems }}
+    val accountSupported = remember { getPlatform().supportsMyMaiAccount() }
+    val items = remember(localMode) {
+        mainNavigationItems
+            .filter { !localMode || it.id !in nonLocalMenuItems }
+            .filter { accountSupported || it.id != MainNavigationPageId.ACCOUNT }
+    }
     val selectedItem by remember(page) { mutableStateOf(mainNavigationItems.find { it.id == page }!!) }
 
     val navRail = @Composable {

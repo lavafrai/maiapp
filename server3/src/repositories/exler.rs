@@ -20,6 +20,28 @@ use crate::{
 // #1: Kotlin использует mai-exler.ru, Rust ранее ошибочно использовал mai-sten.online
 const EXLER_BASE: &str = "https://mai-sten.online";
 
+/// Hosts of teacher photos. Browsers can't load them in the web version directly
+/// (these sites don't send CORS headers), so they are proxied from here
+const PHOTO_HOSTS: [&str; 3] = ["mai-sten.online", "mai-exler.ru", "www.mai-exler.ru"];
+const MAX_PHOTO_BYTES: usize = 10 * 1024 * 1024;
+
+pub struct ExlerPhoto {
+    pub content_type: String,
+    pub bytes: Vec<u8>,
+}
+
+/// Only https teacher photos of the known hosts, so that the proxy can't be used for anything else
+pub fn allowed_photo_url(url: &str) -> Option<reqwest::Url> {
+    let url = reqwest::Url::parse(url).ok()?;
+    let allowed = url.scheme() == "https"
+        && url.port().is_none()
+        && url.username().is_empty()
+        && url.password().is_none()
+        && url.host_str().is_some_and(|host| PHOTO_HOSTS.contains(&host))
+        && url.path().starts_with("/prepods/");
+    allowed.then_some(url)
+}
+
 pub struct ExlerRepository {
     client: reqwest::Client,
     teachers: AsyncCache<Vec<ExlerTeacher>>,
@@ -33,6 +55,35 @@ impl ExlerRepository {
             teachers: AsyncCache::new("exler-teachers", config, telemetry.clone()),
             teacher_info: AsyncCache::new("exler-teacher", config, telemetry),
         }
+    }
+
+    pub async fn photo(&self, url: reqwest::Url) -> anyhow::Result<ExlerPhoto> {
+        let response = self
+            .client
+            .get(url)
+            .timeout(Duration::from_secs(20))
+            .send()
+            .await?
+            .error_for_status()?;
+
+        let content_type = response
+            .headers()
+            .get(reqwest::header::CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .unwrap_or_default()
+            .to_owned();
+        if !content_type.starts_with("image/") {
+            return Err(anyhow!("Not an image: {content_type}"));
+        }
+        if response.content_length().is_some_and(|length| length > MAX_PHOTO_BYTES as u64) {
+            return Err(anyhow!("Photo is too large"));
+        }
+
+        let bytes = response.bytes().await?;
+        if bytes.len() > MAX_PHOTO_BYTES {
+            return Err(anyhow!("Photo is too large"));
+        }
+        Ok(ExlerPhoto { content_type, bytes: bytes.to_vec() })
     }
 
     pub async fn teachers(&self) -> anyhow::Result<Cached<Vec<ExlerTeacher>>> {
@@ -492,4 +543,31 @@ fn java_hash_code(value: &str) -> i32 {
     value.encode_utf16().fold(0i32, |hash, unit| {
         hash.wrapping_mul(31).wrapping_add(unit as i32)
     })
+}
+
+#[cfg(test)]
+mod photo_url_tests {
+    use super::allowed_photo_url;
+
+    #[test]
+    fn allows_teacher_photos_of_exler_hosts() {
+        assert!(allowed_photo_url("https://mai-sten.online/prepods/06/sergeev/prepods_603_sergeev_small.jpg").is_some());
+        assert!(allowed_photo_url("https://mai-exler.ru/prepods/02/uskova/photo.jpg").is_some());
+        assert!(allowed_photo_url("https://www.mai-exler.ru/prepods/02/uskova/photo.jpg").is_some());
+    }
+
+    #[test]
+    fn rejects_everything_else() {
+        for url in [
+            "http://mai-sten.online/prepods/06/sergeev/photo.jpg",
+            "https://example.com/prepods/photo.jpg",
+            "https://mai-sten.online.example.com/prepods/photo.jpg",
+            "https://mai-sten.online/admin/photo.jpg",
+            "https://mai-sten.online:8443/prepods/photo.jpg",
+            "https://user:pass@mai-sten.online/prepods/photo.jpg",
+            "not a url",
+        ] {
+            assert!(allowed_photo_url(url).is_none(), "{url}");
+        }
+    }
 }

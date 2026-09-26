@@ -12,6 +12,12 @@ interface Platform {
     fun storage(): Settings
     fun openUrl(url: String)
 
+    /** Whether the my.mai.ru account can work here; if not, its page is hidden and nothing of it is started */
+    fun supportsMyMaiAccount(): Boolean = true
+
+    /** Whether images of sites without CORS headers can be loaded directly; see loadableImageUrl */
+    fun canLoadCrossOriginImages(): Boolean = true
+
     fun supportsWidget(): Boolean = false
     fun requestWidgetCreation(): Unit = error("Widget isn't supported on this platform")
 

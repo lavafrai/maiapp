@@ -31,6 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.platform.getPlatform
+import ru.lavafrai.maiapp.utils.loadableImageUrl
 
 @Composable
 fun ImageViewPage(
@@ -62,7 +63,7 @@ fun ImageViewPage(
         ) {
             with(sharedTransitionScope) {
                 CoilZoomAsyncImage(
-                    model = url,
+                    model = remember(url) { loadableImageUrl(url) },
                     imageLoader = imageLoader,
                     contentDescription = null,
                     modifier = Modifier

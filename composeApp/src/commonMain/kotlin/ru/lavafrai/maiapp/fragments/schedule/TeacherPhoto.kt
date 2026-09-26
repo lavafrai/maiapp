@@ -32,6 +32,7 @@ import compose.icons.feathericons.Repeat
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.LoadableStatus
 import ru.lavafrai.maiapp.utils.conditional
+import ru.lavafrai.maiapp.utils.loadableImageUrl
 
 @Composable
 fun TeacherPhoto(
@@ -56,7 +57,7 @@ fun TeacherPhoto(
 
         Box(modifier = Modifier.fillMaxHeight()) {
             AsyncImage(
-                model = url,
+                model = remember(url) { loadableImageUrl(url) },
                 imageLoader = imageLoader,
                 contentDescription = "photo of teacher",
                 modifier = modifier

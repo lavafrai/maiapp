@@ -30,6 +30,7 @@ import ru.lavafrai.maiapp.rootPages.maidata.MaiDataView
 import ru.lavafrai.maiapp.rootPages.settings.SettingsPage
 import ru.lavafrai.maiapp.utils.LessonSelector
 import ru.lavafrai.maiapp.utils.anySelector
+import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.viewmodels.account.AccountViewModel
 import ru.lavafrai.maiapp.viewmodels.main.MainPageViewModel
 
@@ -56,7 +57,10 @@ fun MainPage(
             },
         )
     )
-    val accountViewModel: AccountViewModel = viewModel(factory = AccountViewModel.Factory())
+    // Not even created where the account isn't supported: it starts loading the account right away
+    val accountSupported = remember { getPlatform().supportsMyMaiAccount() }
+    val accountViewModel: AccountViewModel? =
+        if (accountSupported) viewModel(factory = AccountViewModel.Factory()) else null
 
     LaunchedEffect(settings.selectedSchedule) {
         viewModel.reloadSchedule(settings.selectedSchedule, restartIfLoading = false)
@@ -165,7 +169,7 @@ fun MainPage(
                     }
 
                     MainNavigationPageId.ACCOUNT -> Column(Modifier.fillMaxSize()) {
-                        AccountPage(
+                        if (accountViewModel != null) AccountPage(
                             viewModel = accountViewModel,
                             modifier = Modifier.fillMaxSize(),
                         )
