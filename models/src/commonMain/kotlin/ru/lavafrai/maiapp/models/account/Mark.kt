@@ -15,8 +15,13 @@ data class Mark(
     @SerialName("lecturer") val lecturer: String,
 ) {
     val isDebt
-        get() = value in listOf("Нзч", "Ня", "2")
+        get() = value.trim().lowercase() in debtMarks
 
     val isSuccess
         get() = value in listOf("Зч", "3", "4", "5")
+
+    private companion object {
+        // Незачёт, неявка, двойка, недопуск кафедрой, недопуск деканатом
+        val debtMarks = setOf("нзч", "ня", "2", "нк", "нд")
+    }
 }
