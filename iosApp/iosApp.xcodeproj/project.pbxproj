@@ -323,7 +323,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.lavafrai.maiapp;
 				PRODUCT_NAME = maiapp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -360,7 +360,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.lavafrai.maiapp;
 				PRODUCT_NAME = maiapp;
 				PROVISIONING_PROFILE_SPECIFIER = "";

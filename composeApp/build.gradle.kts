@@ -16,7 +16,7 @@ plugins {
     alias(libs.plugins.buildconfig)
 }
 
-val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.4"
+val version = System.getenv("MAIAPP_BUILD_VERSION") ?: "1.0.5"
 val versionPlain = System.getenv("MAIAPP_BUILD_VERSION") ?: version
 val calculatedVersionCode = versionPlain.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
 
