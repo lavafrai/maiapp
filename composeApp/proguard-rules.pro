@@ -14,6 +14,9 @@
 -keep class ru.lavafrai.maiapp.models.** { *; }
 -keepclasseswithmembers class ru.lavafrai.maiapp.navigation.pages.** { *; }
 
+# Room creates this WorkManager database implementation by class name at startup.
+-keep class androidx.work.impl.WorkDatabase_Impl { *; }
+
 -dontwarn com.google.api.client.http.GenericUrl
 -dontwarn com.google.api.client.http.HttpHeaders
 -dontwarn com.google.api.client.http.HttpRequest
