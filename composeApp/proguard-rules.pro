@@ -14,8 +14,14 @@
 -keep class ru.lavafrai.maiapp.models.** { *; }
 -keepclasseswithmembers class ru.lavafrai.maiapp.navigation.pages.** { *; }
 
-# Room creates this WorkManager database implementation by class name at startup.
+# Classes created by name through the no-arg constructor. Their libraries keep them with member-less -keep rules
+# (Room 2.2 and WorkManager 2.7 come with Glance), which don't keep the constructor since AGP 9 (strict R8 full mode)
+# Room creates this WorkManager database implementation at startup
 -keep class androidx.work.impl.WorkDatabase_Impl { *; }
+# WorkManager creates it for every one-time work, e.g. the widget's Glance session; without it the widget never renders
+-keepclassmembers class * extends androidx.work.InputMerger { public <init>(); }
+# Glance creates actionRunCallback targets, e.g. the widget's refresh button
+-keepclassmembers class * implements androidx.glance.appwidget.action.ActionCallback { public <init>(); }
 
 -dontwarn com.google.api.client.http.GenericUrl
 -dontwarn com.google.api.client.http.HttpHeaders
