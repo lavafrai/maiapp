@@ -303,7 +303,7 @@ fn capitalize_words(text: &str) -> String {
 }
 
 fn is_group_name(value: &str) -> bool {
-    Regex::new(r"^(([МТ])([\dИУ]+?)([ОВЗ]))-((\d+?)(Б|С|А|СВ|БВ|М)к?и?)-(\d+?)$")
+    Regex::new(r"^[МТ][\dА-ЯЁ]+?[ОВЗ]-\d+[А-ЯЁа-яё]+-\d+$")
         .unwrap()
         .is_match(value)
 }
@@ -318,4 +318,33 @@ fn is_teacher_name(value: &str) -> bool {
     Regex::new(r"^([\SА-Яа-яЁё-]+?( |$)){3,5}$")
         .unwrap()
         .is_match(value)
+}
+
+#[cfg(test)]
+mod group_name_tests {
+    use super::{is_group_name, is_teacher_name};
+
+    #[test]
+    fn accepts_mai_group_names() {
+        for name in [
+            "М4О-103БВ-24",
+            "М8О-401СВ-21",
+            "М4О-103Ап-26",
+            "М4О-103Аап-26",
+            "М4О-103Ааф-26",
+            "М6О-214Ааи-25",
+            "МИО-103БВК-26",
+            "МЛВ-601Ск-21",
+            "Т1О-203Аа-25",
+        ] {
+            assert!(is_group_name(name), "{name}");
+        }
+    }
+
+    #[test]
+    fn does_not_take_teacher_names_for_groups() {
+        let name = "Петров-Водкин Кузьма Сергеевич";
+        assert!(!is_group_name(name));
+        assert!(is_teacher_name(name));
+    }
 }
