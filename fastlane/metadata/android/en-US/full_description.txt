@@ -1,4 +1,12 @@
-An app with information about MAI for students and faculty.
-Get quick access to university data. You can view your group's schedule.
-All information is downloaded on first launch and is available offline, so you always have your class timetable at hand.
+An app for quick access to information about your studies. You can view your group's schedule. All information is downloaded on first launch and is available offline, so you always have your class timetable at hand.
 
+Available features:
+• Showing the schedule and saving it on the device
+• A handy widget showing your schedule
+• Downloading several schedules and switching between them
+• Campus information and map
+• The schedule is updated automatically every time the app starts
+• Teacher reviews, in cooperation with MAI.Exler.ru
+• You can mark works so you don't forget about upcoming tests and quizzes
+• Even teachers can use the app
+• my.mai.ru personal account: grades and debts

@@ -1,0 +1,7 @@
+[+] If there are no more lessons this week, the next week opens right away
+[+] Fixed signing in to the personal account: added the Russian Ministry of Digital Development certificate, used only for the personal account
+[+] Fixed personal account crashes; "НК" and "НД" grades now count as debts
+[+] Fixed the Android widget: lessons no longer disappear or get mixed up
+[+] Added English and a language choice in the settings
+[+] Updated the MAI campus map
+[!] Requires Android 7.0 or newer
