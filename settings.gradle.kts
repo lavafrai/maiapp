@@ -3,7 +3,6 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
-        maven("https://jitpack.io")
         google {
             content { 
               	includeGroupByRegex("com\\.android.*")
@@ -29,11 +28,6 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
-        maven("https://jitpack.io")
-        maven("https://oss.sonatype.org/content/repositories/snapshots") {
-            name = "SonatypeSnapshots"
-            mavenContent { snapshotsOnly() }
-        }
     }
 }
 include(":models")
