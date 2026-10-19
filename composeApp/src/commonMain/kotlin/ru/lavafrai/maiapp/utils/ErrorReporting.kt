@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 import ru.lavafrai.maiapp.platform.getPlatform
 
 /**
- * Logs a handled error and sends it to AppMetrica. Never throws.
+ * Logs a handled error and sends it to the platform analytics. Never throws.
  *
  * `JSON input` lines are cut out: kotlinx.serialization puts a piece of the response there,
  * and responses of my.mai.ru contain personal data and tokens.

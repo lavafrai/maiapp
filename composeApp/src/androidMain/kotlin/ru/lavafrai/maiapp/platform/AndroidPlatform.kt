@@ -9,8 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import com.russhwolf.settings.Settings
-import io.appmetrica.analytics.AppMetrica
-import io.appmetrica.analytics.StartupParamsCallback
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
@@ -32,34 +30,32 @@ class AndroidPlatform: Platform {
 
     override fun name() = "Android"
 
-    override suspend fun appMetricaDeviceId(): String? = try {
-        withTimeoutOrNull(5_000.milliseconds) {
-            suspendCancellableCoroutine { continuation ->
-                AppMetrica.requestStartupParams(context, object : StartupParamsCallback {
-                    override fun onReceive(result: StartupParamsCallback.Result?) {
-                        if (continuation.isActive) continuation.resume(result?.deviceId)
-                    }
-
-                    override fun onRequestError(
-                        reason: StartupParamsCallback.Reason,
-                        result: StartupParamsCallback.Result?,
-                    ) {
-                        if (continuation.isActive) continuation.resume(result?.deviceId)
-                    }
-                }, listOf(StartupParamsCallback.APPMETRICA_DEVICE_ID, StartupParamsCallback.APPMETRICA_DEVICE_ID_HASH))
+    override suspend fun appMetricaDeviceId(): String? {
+        val analytics = context.analytics ?: return null
+        return try {
+            withTimeoutOrNull(5_000.milliseconds) {
+                suspendCancellableCoroutine { continuation ->
+                    analytics.requestDeviceId { if (continuation.isActive) continuation.resume(it) }
+                }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            null
         }
-    } catch (e: CancellationException) {
-        throw e
-    } catch (_: Exception) {
-        null
     }
 
     override fun reportError(context: String, error: Throwable, details: String) {
         // Same stack trace, but the message is taken from the cleaned details
         val reported = Exception(details.lineSequence().first()).apply { stackTrace = error.stackTrace }
-        AppMetrica.reportError(context, reported)
+        this.context.analytics?.reportError(context, reported)
     }
+
+    override fun trackScreen(screen: String) {
+        context.analytics?.trackScreen(screen)
+    }
+
+    override fun isAnalyticsEnabled() = context.analytics != null
 
     override fun isNoConnectionError(error: Throwable) = error is java.net.UnknownHostException
 

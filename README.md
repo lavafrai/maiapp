@@ -34,7 +34,7 @@
    - `ANDROID_KEYSTORE_PASSWORD` - пароль к keystore
    - `ANDROID_KEYSTORE_KEY_PASSWORD` - пароль к ключу в keystore
 4. Запустите сборку с помощью Gradle:
-   - Для Android: `./gradlew :composeApp:assemble`
+   - Для Android: `./gradlew :androidApp:assembleFullRelease`, или `:androidApp:assembleFossRelease` для сборки без AppMetrica (как в F-Droid). Без keystore APK соберётся неподписанным
    - Для Windows: `./gradlew :composeApp:packageMsi`
    - Для Debian: `./gradlew :composeApp:packageDeb`
    - Сборка для iOS осуществляется через Xcode.

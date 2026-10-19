@@ -1,0 +1,55 @@
+name: F-Droid check
+
+# Builds every commit the way F-Droid does and runs its checks, see scripts/fdroid-check.sh
+on:
+    push:
+        branches: [ '**' ]
+        paths:
+            - '.github/workflows/fdroid-check.yml'
+            - 'scripts/fdroid-check.sh'
+            - 'fdroid/**'
+            - 'fastlane/**'
+            - 'androidApp/**'
+            - 'composeApp/**'
+            - 'models/**'
+            - 'network/**'
+            - 'shared/**'
+            - 'gradle/**'
+            - 'build.gradle.kts'
+            - 'settings.gradle.kts'
+            - 'gradle.properties'
+    pull_request:
+        paths:
+            - '.github/workflows/fdroid-check.yml'
+            - 'scripts/fdroid-check.sh'
+            - 'fdroid/**'
+            - 'fastlane/**'
+            - 'androidApp/**'
+            - 'composeApp/**'
+            - 'models/**'
+            - 'network/**'
+            - 'shared/**'
+            - 'gradle/**'
+            - 'build.gradle.kts'
+            - 'settings.gradle.kts'
+            - 'gradle.properties'
+    workflow_dispatch:
+
+concurrency:
+    group: fdroid-check-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    fdroid:
+        name: Build like F-Droid
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        container: registry.gitlab.com/fdroid/fdroidserver:buildserver-trixie
+        steps:
+            - uses: actions/checkout@v7
+              with:
+                  persist-credentials: false
+                  fetch-depth: 0
+
+            - name: Build and check like F-Droid
+              run: bash scripts/fdroid-check.sh .

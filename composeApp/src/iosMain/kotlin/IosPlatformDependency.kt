@@ -7,6 +7,8 @@ interface IosPlatformDependency {
     /** Reports a handled error to AppMetrica, which is only available from Swift */
     fun reportError(identifier: String, message: String)
     fun appMetricaDeviceId(): String?
+    fun trackScreen(screen: String)
+    fun isAnalyticsEnabled(): Boolean
 
     companion object {
         var instance: IosPlatformDependency? = null

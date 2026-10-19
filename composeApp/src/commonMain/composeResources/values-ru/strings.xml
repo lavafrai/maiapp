@@ -170,6 +170,7 @@
     <string name="open_github">Открыть GitHub</string>
     <string name="developer_settings">Настройки разработчика</string>
     <string name="appmetrica_device_id">Идентификатор устройства AppMetrica</string>
+    <string name="analytics_disabled">Аналитика отключена</string>
     <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
     <string name="loading">Загрузка…</string>
     <string name="unavailable">Недоступен</string>

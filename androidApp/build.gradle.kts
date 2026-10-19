@@ -3,8 +3,25 @@ plugins {
 }
 
 // The app code is in composeApp: AGP 9 doesn't allow the Android application plugin in a KMP module
-val version = System.getenv("MAIAPP_BUILD_VERSION") ?: providers.gradleProperty("maiapp.version").get()
-val calculatedVersionCode = version.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
+val propertiesVersion = providers.gradleProperty("maiapp.version").get()
+val version = System.getenv("MAIAPP_BUILD_VERSION") ?: propertiesVersion
+fun versionCodeOf(version: String) = version.split(".").fold(0) { acc, s -> acc * 1000 + s.toInt() }
+val calculatedVersionCode = versionCodeOf(version)
+
+// F-Droid can't calculate the code from the version to detect updates, so it reads this copy from gradle.properties
+val checkVersionCode = tasks.register("checkVersionCode") {
+    val versionName = propertiesVersion
+    val expected = versionCodeOf(versionName).toString()
+    val actual = providers.gradleProperty("maiapp.versionCode").orNull
+    doLast {
+        check(actual == expected) { "Set maiapp.versionCode=$expected in gradle.properties for maiapp.version=$versionName" }
+    }
+}
+tasks.named("preBuild") { dependsOn(checkVersionCode) }
+
+// F-Droid builds without a key and signs the APK itself
+val releaseKeystore = System.getenv("ANDROID_KEYSTORE")?.let { file(it) }
+    ?: file("maiapp.keystore").takeIf { it.exists() }
 
 android {
     lint {
@@ -24,12 +41,34 @@ android {
         versionName = version
     }
 
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("full") {
+            dimension = "distribution"
+            isDefault = true
+            manifestPlaceholders["applicationClass"] = "ru.lavafrai.maiapp.AppMetricaApplication"
+        }
+        // For F-Droid: AppMetrica brings proprietary Google Play services
+        create("foss") {
+            dimension = "distribution"
+            manifestPlaceholders["applicationClass"] = "ru.lavafrai.maiapp.AndroidApplication"
+        }
+    }
+
+    // F-Droid asks to drop this blob encrypted with a Google key from the APK signature
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     signingConfigs {
-        create("release") {
-            storeFile = file(System.getenv("ANDROID_KEYSTORE") ?: "maiapp.keystore")
-            keyAlias = System.getenv("ANDROID_KEYSTORE_KEY") ?: "maiapp"
-            keyPassword = System.getenv("ANDROID_KEYSTORE_KEY_PASSWORD") ?: "password"
-            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = releaseKeystore
+                keyAlias = System.getenv("ANDROID_KEYSTORE_KEY") ?: "maiapp"
+                keyPassword = System.getenv("ANDROID_KEYSTORE_KEY_PASSWORD") ?: "password"
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "password"
+            }
         }
     }
 
@@ -50,7 +89,7 @@ android {
                 rootProject.file("composeApp/proguard-rules.pro"),
             )
 
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 
@@ -68,4 +107,5 @@ android {
 
 dependencies {
     implementation(projects.composeApp)
+    "fullImplementation"(libs.analytics)
 }

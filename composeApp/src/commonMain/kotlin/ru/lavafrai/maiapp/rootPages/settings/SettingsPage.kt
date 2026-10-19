@@ -220,9 +220,10 @@ private fun DeveloperSettings() {
     var deviceId by remember { mutableStateOf<String?>(null) }
     var deviceIdLoaded by remember { mutableStateOf(false) }
     var copied by remember { mutableStateOf(false) }
+    val analyticsEnabled = remember { getPlatform().isAnalyticsEnabled() }
 
     LaunchedEffect(Unit) {
-        deviceId = getPlatform().appMetricaDeviceId()
+        if (analyticsEnabled) deviceId = getPlatform().appMetricaDeviceId()
         deviceIdLoaded = true
     }
 
@@ -234,20 +235,24 @@ private fun DeveloperSettings() {
     }
 
     SettingsSection(title = stringResource(Res.string.developer_settings)) {
-        Text(stringResource(Res.string.appmetrica_device_id))
-        Text(
-            when {
-                !deviceIdLoaded -> stringResource(Res.string.loading)
-                deviceId == null -> stringResource(Res.string.unavailable)
-                else -> deviceId!!
-            },
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.clickable(enabled = deviceId != null) {
-                clipboard.setText(AnnotatedString(deviceId!!))
-                copied = true
-            },
-        )
-        if (copied) Text(stringResource(Res.string.copied_to_clipboard))
+        if (analyticsEnabled) {
+            Text(stringResource(Res.string.appmetrica_device_id))
+            Text(
+                when {
+                    !deviceIdLoaded -> stringResource(Res.string.loading)
+                    deviceId == null -> stringResource(Res.string.unavailable)
+                    else -> deviceId!!
+                },
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.clickable(enabled = deviceId != null) {
+                    clipboard.setText(AnnotatedString(deviceId!!))
+                    copied = true
+                },
+            )
+            if (copied) Text(stringResource(Res.string.copied_to_clipboard))
+        } else {
+            Text(stringResource(Res.string.analytics_disabled))
+        }
         Spacer(Modifier.height(12.dp))
         Button(onClick = { error("Developer test crash") }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(Res.string.crash_app))

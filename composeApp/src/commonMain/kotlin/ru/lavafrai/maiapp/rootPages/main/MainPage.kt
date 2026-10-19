@@ -66,6 +66,9 @@ fun MainPage(
         viewModel.reloadSchedule(settings.selectedSchedule, restartIfLoading = false)
     }
     val viewState by viewModel.state.collectAsState()
+    LaunchedEffect(viewState.page) {
+        getPlatform().trackScreen("main.${viewState.page.name.lowercase()}")
+    }
     val requestRefresh = { viewModel.reloadSchedule(settings.selectedSchedule) }
     val onAddEventClick: (LocalDate) -> Unit = { eventCreateExpanded = true }
 

@@ -44,6 +44,31 @@ jobs:
                   fi
                   echo "version=$version" >> "$GITHUB_OUTPUT"
 
+            - name: Check out gradle.properties
+              if: github.event_name == 'release'
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ env.CHECKOUT_REF }}
+                  persist-credentials: false
+                  sparse-checkout: gradle.properties
+                  sparse-checkout-cone-mode: false
+
+            # F-Droid builds the tag without MAIAPP_BUILD_VERSION, so it takes the version from gradle.properties
+            - name: Check the version in sources
+              if: github.event_name == 'release'
+              shell: bash
+              env:
+                  VERSION: ${{ steps.version.outputs.version }}
+              run: |
+                  source_version="$(sed -n 's/^maiapp\.version=//p' gradle.properties)"
+                  source_code="$(sed -n 's/^maiapp\.versionCode=//p' gradle.properties)"
+                  IFS=. read -r major minor patch <<< "$VERSION"
+                  expected_code=$((10#$major * 1000000 + 10#$minor * 1000 + 10#$patch))
+                  if [[ "$source_version" != "$VERSION" || "$source_code" != "$expected_code" ]]; then
+                    echo "::error::gradle.properties must have maiapp.version=$VERSION and maiapp.versionCode=$expected_code, but has $source_version and $source_code. Bump them before tagging: F-Droid builds the tag sources"
+                    exit 1
+                  fi
+
     build_android:
         name: Build Android
         runs-on: ubuntu-latest
@@ -72,23 +97,29 @@ jobs:
                   base64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
                   output-path: '${{ github.workspace }}/android.keystore'
 
-            - name: Build release APK
-              run: ./gradlew :androidApp:assembleRelease
+            - name: Build release APKs
+              run: ./gradlew :androidApp:assembleFullRelease :androidApp:assembleFossRelease
 
-            - name: Rename APK
-              run: mv androidApp/build/outputs/apk/release/*.apk "maiapp-${MAIAPP_BUILD_VERSION}.apk"
+            # foss is the F-Droid variant without AppMetrica, but signed with our key.
+            # Exact names: without a keystore the build makes *-unsigned.apk, which must not be published
+            - name: Rename APKs
+              run: |
+                  mv androidApp/build/outputs/apk/full/release/androidApp-full-release.apk "maiapp-${MAIAPP_BUILD_VERSION}.apk"
+                  mv androidApp/build/outputs/apk/foss/release/androidApp-foss-release.apk "maiapp-${MAIAPP_BUILD_VERSION}-foss.apk"
 
             - name: Upload APK artifact
               uses: actions/upload-artifact@v7
               with:
                   name: android-release
-                  path: maiapp-${{ env.MAIAPP_BUILD_VERSION }}.apk
+                  path: |
+                      maiapp-${{ env.MAIAPP_BUILD_VERSION }}.apk
+                      maiapp-${{ env.MAIAPP_BUILD_VERSION }}-foss.apk
 
-            - name: Upload APK to release
+            - name: Upload APKs to release
               if: env.PUBLISH == 'true'
               env:
                   GH_TOKEN: ${{ github.token }}
-              run: gh release upload "$RELEASE_TAG" "maiapp-${MAIAPP_BUILD_VERSION}.apk" --clobber --repo "${{ github.repository }}"
+              run: gh release upload "$RELEASE_TAG" "maiapp-${MAIAPP_BUILD_VERSION}.apk" "maiapp-${MAIAPP_BUILD_VERSION}-foss.apk" --clobber --repo "${{ github.repository }}"
 
     build_ios:
         name: Build iOS (sideload IPA)

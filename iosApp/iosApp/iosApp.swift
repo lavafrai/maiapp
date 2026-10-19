@@ -16,6 +16,14 @@ class PlatformDependencyImplementation: IosPlatformDependency {
     func appMetricaDeviceId() -> String? {
         AppMetrica.deviceID
     }
+
+    func trackScreen(screen: String) {
+        AppMetrica.reportEvent(name: "screen_view", parameters: ["screen": screen], onFailure: nil)
+    }
+
+    func isAnalyticsEnabled() -> Bool {
+        AppMetrica.isActivated
+    }
 }
 
 @main
@@ -31,18 +39,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        // Before the UI: AppMetrica drops events, e.g. the first screen view, until it's activated
+        let appmetricaApiKey = IosPlatformDependencyKt.getAppmetricaKey()
+        if let configuration = AppMetricaConfiguration(apiKey: appmetricaApiKey) {
+            // configuration.areLogsEnabled = true
+            AppMetrica.activate(with: configuration)
+        }
+
         window = UIWindow(frame: UIScreen.main.bounds)
         if let window = window {
             window.rootViewController = MainKt.MainViewController()
             window.makeKeyAndVisible()
         }
 
-        let appmetricaApiKey = IosPlatformDependencyKt.getAppmetricaKey()
-        if let configuration = AppMetricaConfiguration(apiKey: appmetricaApiKey) {
-            // configuration.areLogsEnabled = true
-            AppMetrica.activate(with: configuration)
-        }
-        
         return true
     }
 }

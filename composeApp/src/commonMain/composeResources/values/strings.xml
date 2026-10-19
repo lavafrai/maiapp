@@ -169,6 +169,7 @@
     <string name="open_github">Open GitHub</string>
     <string name="developer_settings">Developer settings</string>
     <string name="appmetrica_device_id">AppMetrica device ID</string>
+    <string name="analytics_disabled">Analytics is disabled</string>
     <string name="copied_to_clipboard">Copied to clipboard</string>
     <string name="loading">Loading…</string>
     <string name="unavailable">Unavailable</string>

@@ -1,0 +1,32 @@
+AntiFeatures:
+  NonFreeNet:
+    en-US: Depends on the MAI websites and the personal account at my.mai.ru.
+Categories:
+  - Schedule
+  - Science & Education
+License: GPL-3.0-only
+AuthorName: lavafrai
+WebSite: https://maiapp.lavafrai.ru/
+SourceCode: https://github.com/lavafrai/maiapp
+IssueTracker: https://github.com/lavafrai/maiapp/issues
+Changelog: https://github.com/lavafrai/maiapp/releases
+Donate: https://pay.cloudtips.ru/p/e930707c
+
+AutoName: MAI
+
+RepoType: git
+Repo: https://github.com/lavafrai/maiapp.git
+
+Builds:
+  - versionName: 1.0.7
+    versionCode: 1000007
+    commit: 1.0.7
+    subdir: androidApp
+    gradle:
+      - foss
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^\d+\.\d+\.\d+$
+UpdateCheckData: gradle.properties|maiapp\.versionCode=(\d+)|.|maiapp\.version=([\d.]+)
+CurrentVersion: 1.0.7
+CurrentVersionCode: 1000007

@@ -12,6 +12,10 @@ interface Platform {
     fun storage(): Settings
     fun openUrl(url: String)
     suspend fun appMetricaDeviceId(): String? = null
+    fun trackScreen(screen: String) {}
+
+    /** False in builds without AppMetrica (F-Droid, web, desktop) and if it didn't start, e.g. without the API key */
+    fun isAnalyticsEnabled(): Boolean = false
 
     /** Whether the my.mai.ru account can work here; if not, its page is hidden and nothing of it is started */
     fun supportsMyMaiAccount(): Boolean = true

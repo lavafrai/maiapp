@@ -149,7 +149,6 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
-            implementation(libs.analytics)
 
             // Widget
             implementation(libs.androidx.glance.appwidget)

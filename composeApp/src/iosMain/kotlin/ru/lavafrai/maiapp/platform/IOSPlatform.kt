@@ -14,6 +14,8 @@ import platform.Foundation.NSURLErrorNotConnectedToInternet
 class IOSPlatform: Platform {
     override fun name() = "iOS"
     override suspend fun appMetricaDeviceId() = IosPlatformDependency.getInstance().appMetricaDeviceId()
+    override fun trackScreen(screen: String) = IosPlatformDependency.getInstance().trackScreen(screen)
+    override fun isAnalyticsEnabled() = IosPlatformDependency.getInstance().isAnalyticsEnabled()
     override fun ktorEngine() = Darwin
     override fun dispatchers() = Dispatchers(
         IO = kotlinx.coroutines.Dispatchers.IO,
