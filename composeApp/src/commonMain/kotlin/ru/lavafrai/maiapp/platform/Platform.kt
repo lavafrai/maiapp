@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.platform
 
+import androidx.navigation.NavController
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.HttpClientEngineFactory
 import ru.lavafrai.maiapp.BuildConfig
@@ -25,6 +26,13 @@ interface Platform {
 
     /** The widget shows texts in the app language, so it's redrawn when that changes */
     fun onLanguageChanged() {}
+
+    /** Connects the back navigation of the platform to the app one where the platform doesn't do it itself */
+    suspend fun bindBackNavigation(navController: NavController) {}
+
+    /** Whether the pages of the information section open in the built-in WebView; if not, see [openHtmlInBrowser] */
+    fun supportsWebView(): Boolean = true
+    fun openHtmlInBrowser(html: String): Unit = error("Opening HTML in the browser isn't supported on this platform")
 
     fun supportsWidget(): Boolean = false
     fun requestWidgetCreation(): Unit = error("Widget isn't supported on this platform")

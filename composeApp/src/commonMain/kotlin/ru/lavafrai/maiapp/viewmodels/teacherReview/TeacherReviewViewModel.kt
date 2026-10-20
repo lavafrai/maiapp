@@ -37,7 +37,7 @@ class TeacherReviewViewModel(
 
             val teacherReviewsHandler = CoroutineExceptionHandler { _, e ->
                 e.printStackTrace()
-                emit(stateValue.copy(teacherInfo = stateValue.teacherInfo.copy(error = e as Exception)))
+                emit(stateValue.copy(teacherInfo = stateValue.teacherInfo.copy(error = e)))
             }
 
             supervisorScope {

@@ -7,16 +7,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import ru.lavafrai.maiapp.platform.windowSizeClass
 
 @Composable
 fun Modifier.pageColumnPaddings(
     horizontal: Boolean = false
 ): Modifier {
-    val widthSizeClass = calculateWindowSizeClass().widthSizeClass
+    val widthSizeClass = windowSizeClass().widthSizeClass
     return when (widthSizeClass) {
         WindowWidthSizeClass.Expanded -> this
             .widthIn(max = 800.dp)

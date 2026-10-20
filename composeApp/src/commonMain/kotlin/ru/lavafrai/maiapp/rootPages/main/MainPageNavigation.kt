@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +20,7 @@ import ru.lavafrai.maiapp.fragments.AnimatedIcon
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.materialSharedAxisX
 import soup.compose.material.motion.animation.rememberSlideDistance
+import ru.lavafrai.maiapp.platform.windowSizeClass
 
 val mainNavigationItems = listOf(
     MainNavigationItem(
@@ -128,7 +128,7 @@ fun MainPageNavigation(
         }
     }
 
-    val windowSizeClass = calculateWindowSizeClass()
+    val windowSizeClass = windowSizeClass()
     val wideScreen = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
     val slideDistance = rememberSlideDistance(slideDistance = 30.dp)
 

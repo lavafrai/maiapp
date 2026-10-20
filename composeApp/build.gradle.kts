@@ -171,6 +171,13 @@ kotlin {
     }
 }
 
+// JOGL of the desktop WebView (compose-webview uses KCEF) is only in the jogamp.org repository, which F-Droid
+// doesn't allow. The desktop doesn't use the WebView anyway, see JvmPlatform.supportsWebView
+configurations.matching { it.name.startsWith("jvm") }.configureEach {
+    exclude(group = "org.jogamp.gluegen")
+    exclude(group = "org.jogamp.jogl")
+}
+
 
 compose.desktop {
     application {

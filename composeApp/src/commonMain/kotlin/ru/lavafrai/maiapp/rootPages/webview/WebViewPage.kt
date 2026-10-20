@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
 import com.multiplatform.webview.jsbridge.IJsMessageHandler
@@ -26,6 +29,10 @@ import com.multiplatform.webview.web.WebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewStateWithHTMLData
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.ArrowLeft
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.open_again
+import maiapp.composeapp.generated.resources.opened_in_browser
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.fragments.LoadableView
 import ru.lavafrai.maiapp.platform.getPlatform
@@ -69,6 +76,10 @@ fun WebViewPage(
         alignment = Alignment.Center,
     ) { page ->
         val css = buildCssStyles()
+        if (!getPlatform().supportsWebView()) {
+            OpenedInBrowser(buildBrowserPage(title, page, css))
+            return@LoadableView
+        }
         val js = buildJsScripts()
         val builtPage = "<script>\n$js\n</script>$page\n<style>\n$css\n</style>"
         val webViewState = rememberWebViewStateWithHTMLData(data = builtPage)
@@ -110,6 +121,56 @@ fun WebViewPage(
         )
     }
 }
+
+@Composable
+private fun OpenedInBrowser(html: String) {
+    LaunchedEffect(html) { getPlatform().openHtmlInBrowser(html) }
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(stringResource(Res.string.opened_in_browser), textAlign = TextAlign.Center)
+        Spacer(Modifier.height(12.dp))
+        Button(onClick = { getPlatform().openHtmlInBrowser(html) }) {
+            Text(stringResource(Res.string.open_again))
+        }
+    }
+}
+
+/** A standalone page, where the functions of the app the markup calls are done by the browser */
+private fun buildBrowserPage(title: String, page: String, css: String) = """
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${title.replace("&", "&amp;").replace("<", "&lt;")}</title>
+<style>
+$css
+body { max-width: 720px; margin: 16px auto; }
+</style>
+<script>
+function copy(text) {
+    if (navigator.clipboard) return navigator.clipboard.writeText(text)
+    const area = document.createElement("textarea")
+    area.value = text
+    document.body.appendChild(area)
+    area.select()
+    document.execCommand("copy")
+    area.remove()
+}
+function openMap(text) {
+    const [lat, lon] = text.split(",")
+    window.open("https://yandex.ru/maps/?pt=" + lon + "," + lat + "&z=17")
+}
+function openUrl(text) {
+    window.open(text)
+}
+</script>
+</head>
+<body>$page</body>
+</html>
+"""
 
 class ClipboardJsMessageHandler(
     val copy: (String) -> Unit

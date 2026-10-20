@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.platform
 
+import androidx.navigation.NavController
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.js.*
 import kotlinx.browser.document
@@ -23,4 +24,6 @@ class WebPlatform: Platform {
     override fun openUrl(url: String) {
         document.defaultView?.open(url, "_blank")
     }
+
+    override suspend fun bindBackNavigation(navController: NavController) = navController.bindToBrowserBack()
 }

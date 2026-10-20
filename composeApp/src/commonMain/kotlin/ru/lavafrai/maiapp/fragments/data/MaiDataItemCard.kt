@@ -62,7 +62,7 @@ fun MaiDataItemCard(
             return@LaunchedEffect
         }
 
-        launchCatching(onError = { svgIcon = Loadable.error(it as Exception) }) {
+        launchCatching(onError = { svgIcon = Loadable.error(it) }) {
             if (svgIcon.data != null) return@launchCatching
 
             val svgData = item.icon!!.load(assetLoader)

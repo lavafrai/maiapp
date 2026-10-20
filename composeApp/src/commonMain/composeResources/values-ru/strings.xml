@@ -11,6 +11,8 @@
     <string name="sign_out">Выйти</string>
     <string name="no_data">Нет данных</string>
     <string name="retry">Повторить</string>
+    <string name="opened_in_browser">Страница открыта в браузере</string>
+    <string name="open_again">Открыть ещё раз</string>
     <string name="copy_stacktrace">Скопировать ошибку</string>
     <string name="copy">Скопировать</string>
     <string name="share">Поделиться</string>

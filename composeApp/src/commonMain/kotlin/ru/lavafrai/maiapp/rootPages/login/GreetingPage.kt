@@ -13,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -33,6 +32,7 @@ import ru.lavafrai.maiapp.fragments.fixes.SplitButtonLayoutFixed
 import ru.lavafrai.maiapp.fragments.loginPageButtonColors
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.MaiColor
+import ru.lavafrai.maiapp.platform.windowSizeClass
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
@@ -52,7 +52,7 @@ fun GreetingPage(
                 .padding(contentPadding)
                 .fillMaxSize(),
         ) {
-            val windowSizeClass = calculateWindowSizeClass()
+            val windowSizeClass = windowSizeClass()
             val columnFraction = when (windowSizeClass.widthSizeClass) {
                 WindowWidthSizeClass.Compact -> 1f
                 else -> 0.5f

@@ -4,6 +4,7 @@ import ru.lavafrai.maiapp.localizers.AppEnvironment
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
@@ -26,6 +27,7 @@ internal fun App() = AppTheme {
             platform.storage().clear()
         },
     )}
+    LaunchedEffect(navController) { platform.bindBackNavigation(navController) }
 
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
         // Inside the navController, so that changing the language keeps the navigation (see navTypeOf too)

@@ -140,7 +140,7 @@ class MainPageViewModel(
                 emit(stateValue.copy(schedule = Loadable.actual(schedule)).withDefaultWeek(week))
             } catch (e: CancellationException) {
                 throw e
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 // A cancelled loading must not put its error into the state of the next one
                 ensureActive()
                 e.printStackTrace()
@@ -186,11 +186,11 @@ class MainPageViewModel(
         viewModelScope.launch(dispatchers.IO) {
             val exlerHandler = CoroutineExceptionHandler { _, e ->
                 e.printStackTrace()
-                emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = e as Exception)))
+                emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = e)))
             }
             val maidataHandler = CoroutineExceptionHandler { _, e ->
                 e.printStackTrace()
-                emit(stateValue.copy(maidata = stateValue.maidata.copy(error = e as Exception)))
+                emit(stateValue.copy(maidata = stateValue.maidata.copy(error = e)))
             }
 
             supervisorScope {

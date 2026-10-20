@@ -42,14 +42,14 @@ class DedicatedScheduleViewModel(
         }
 
         launchCatching(onError = {
-            emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it as Exception)))
+            emit(stateValue.copy(schedule = stateValue.schedule.copy(error = it)))
         }) {
             val schedule = scheduleRepository.getSchedule(scheduleName)
             emit(stateValue.copy(schedule = Loadable.actual(schedule)))
         }
 
         launchCatching(onError = {
-            emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = it as Exception)))
+            emit(stateValue.copy(exlerTeachers = stateValue.exlerTeachers.copy(error = it)))
         }) {
             val exlerTeachers = exlerRepository.getTeachers()
             emit(stateValue.copy(exlerTeachers = Loadable.actual(exlerTeachers)))

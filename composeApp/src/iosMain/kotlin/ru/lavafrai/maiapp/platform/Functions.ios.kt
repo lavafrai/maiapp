@@ -1,5 +1,9 @@
 package ru.lavafrai.maiapp.platform
 
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PlatformImeOptions
@@ -25,3 +29,7 @@ actual fun credentialImeOptions(field: CredentialField): PlatformImeOptions? = P
 }
 
 actual fun ImageLoader.Builder.trimMemoryCacheInBackground(): ImageLoader.Builder = this
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
+actual fun windowSizeClass(): WindowSizeClass = calculateWindowSizeClass()

@@ -3,6 +3,7 @@ package ru.lavafrai.maiapp.platform
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.cio.*
 import java.awt.Desktop
+import java.io.File
 
 class JvmPlatform: Platform {
     override fun name() = "JVM"
@@ -21,5 +22,15 @@ class JvmPlatform: Platform {
             error("Desktop is not supported")
         }
         Desktop.getDesktop().browse(java.net.URI(url))
+    }
+
+    // The desktop WebView needs KCEF, which downloads Chromium on the first start
+    override fun supportsWebView() = false
+    override fun openHtmlInBrowser(html: String) {
+        val file = File.createTempFile("maiapp-", ".html").apply {
+            deleteOnExit()
+            writeText(html)
+        }
+        openUrl(file.toURI().toString())
     }
 }

@@ -45,7 +45,6 @@ buildconfig = "6.1.2"
 richeditorCompose = "1.2.0"
 sonner = "0.3.8"
 urlencoderLib = "1.6.0"
-windowSize = "0.5.0"
 material-motion = "2.0.1"
 uiAndroid = "1.12.1"
 androidx-browser = "1.10.0"
@@ -124,7 +123,7 @@ composeIcons-lineAwesomeIcons = { module = "br.com.devsrsouza.compose.icons:line
 richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditorCompose" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 urlencoder-lib = { module = "net.thauvin.erik.urlencoder:urlencoder-lib", version.ref = "urlencoderLib" }
-windowSize = { module = "dev.chrisbanes.material3:material3-window-size-class-multiplatform", version.ref = "windowSize" }
+windowSize = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "material3" }
 material-motion = { module = "io.github.fornewid:material-motion-compose-core", version.ref = "material-motion" }
 androidx-ui-android = { group = "androidx.compose.ui", name = "ui-android", version.ref = "uiAndroid" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "androidx-browser" }

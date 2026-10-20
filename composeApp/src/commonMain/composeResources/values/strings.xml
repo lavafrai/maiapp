@@ -11,6 +11,8 @@
     <string name="sign_out">Sign out</string>
     <string name="no_data">No data</string>
     <string name="retry">Retry</string>
+    <string name="opened_in_browser">The page is opened in your browser</string>
+    <string name="open_again">Open again</string>
     <string name="copy_stacktrace">Copy error</string>
     <string name="copy">Copy</string>
     <string name="share">Share</string>
