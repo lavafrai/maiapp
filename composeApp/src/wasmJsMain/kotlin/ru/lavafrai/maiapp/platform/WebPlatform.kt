@@ -4,6 +4,7 @@ import androidx.navigation.NavController
 import com.russhwolf.settings.Settings
 import io.ktor.client.engine.js.*
 import kotlinx.browser.document
+import kotlinx.browser.window
 
 class WebPlatform: Platform {
     override fun name() = "Web"
@@ -26,4 +27,7 @@ class WebPlatform: Platform {
     }
 
     override suspend fun bindBackNavigation(navController: NavController) = navController.bindToBrowserBack()
+
+    // A browser reports any failed request alike ("Failed to fetch"), so only its offline flag tells there's no connection
+    override fun isNoConnectionError(error: Throwable) = error is JsError && !window.navigator.onLine
 }
