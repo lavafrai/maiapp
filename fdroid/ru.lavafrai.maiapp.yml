@@ -6,6 +6,7 @@ Categories:
   - Science & Education
 License: GPL-3.0-only
 AuthorName: lavafrai
+AuthorWebSite: https://lavafrai.ru/
 WebSite: https://maiapp.lavafrai.ru/
 SourceCode: https://github.com/lavafrai/maiapp
 IssueTracker: https://github.com/lavafrai/maiapp/issues
@@ -16,6 +17,7 @@ AutoName: MAI
 
 RepoType: git
 Repo: https://github.com/lavafrai/maiapp.git
+Binaries: https://github.com/lavafrai/maiapp/releases/download/%v/maiapp-%v-foss.apk
 
 Builds:
   - versionName: 1.0.7
@@ -24,6 +26,8 @@ Builds:
     subdir: androidApp
     gradle:
       - foss
+
+AllowedAPKSigningKeys: aef1db16ec0e0fc16083fd9f404543b20ebb81f4a1a88872d4525e9764d6509e
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^\d+\.\d+\.\d+$

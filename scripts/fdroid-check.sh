@@ -74,9 +74,11 @@ sdkmanager "platform-tools" "build-tools;31.0.0" >/dev/null
 git -C "$home_vagrant/gradlew-fdroid" pull -q
 # F-Droid clones the repository from GitHub; here it's a copy of the checkout, owned by vagrant like a fresh clone
 cp -a "$SRC" /srv/app
-# The recipe has a single build: it's switched to this commit and to the copy
+# The recipe has a single build: it's switched to this commit and to the copy. The release APK of this version,
+# which Binaries points to, may not exist yet or be built from another commit, so it isn't compared
 git_src show "HEAD:fdroid/$APP_ID.yml" | sed \
     -e "s|^Repo: .*|Repo: /srv/app|" \
+    -e "/^Binaries: /d" \
     -e "s|^    versionName: .*|    versionName: $version|" \
     -e "s|^    versionCode: .*|    versionCode: $version_code|" \
     -e "s|^    commit: .*|    commit: $commit|" \
