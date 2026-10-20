@@ -1,5 +1,7 @@
 An app for quick access to information about your studies. You can view your group's schedule. All information is downloaded on first launch and is available offline, so you always have your class timetable at hand.
 
+The interface is in English and Russian. The schedule and the information about the university come from MAI and are in Russian.
+
 Available features:
 • Showing the schedule and saving it on the device
 • A handy widget showing your schedule
