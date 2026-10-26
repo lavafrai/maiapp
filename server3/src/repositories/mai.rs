@@ -14,11 +14,33 @@ use crate::{
     telemetry::Telemetry,
 };
 
-const GROUPS_URL: &str = "https://public.mai.ru/schedule/data/groups.json";
 const SCHEDULE_BASE_URL: &str = "https://public.mai.ru/schedule/data";
 
+pub(super) trait MaiDataSource: Send + Sync {
+    fn read<'a>(&'a self, filename: &'a str) -> BoxFuture<'a, anyhow::Result<Option<String>>>;
+
+    fn cached_at(&self) -> BoxFuture<'_, anyhow::Result<Option<i64>>> {
+        Box::pin(async { Ok(None) })
+    }
+}
+
+impl MaiDataSource for reqwest::Client {
+    fn read<'a>(&'a self, filename: &'a str) -> BoxFuture<'a, anyhow::Result<Option<String>>> {
+        Box::pin(async move {
+            let response = self
+                .get(format!("{SCHEDULE_BASE_URL}/{filename}"))
+                .send()
+                .await?;
+            if response.status() == reqwest::StatusCode::NOT_FOUND {
+                return Ok(None);
+            }
+            Ok(Some(response.error_for_status()?.text().await?))
+        })
+    }
+}
+
 pub struct MaiRepository {
-    client: reqwest::Client,
+    source: Arc<dyn MaiDataSource>,
     groups: AsyncCache<Vec<Group>>,
     schedules: AsyncCache<Schedule>,
     teachers: RwLock<Vec<TeacherId>>,
@@ -26,8 +48,16 @@ pub struct MaiRepository {
 
 impl MaiRepository {
     pub fn new(client: reqwest::Client, config: &AppConfig, telemetry: Arc<Telemetry>) -> Self {
+        Self::with_source(Arc::new(client), config, telemetry)
+    }
+
+    pub(super) fn with_source(
+        source: Arc<dyn MaiDataSource>,
+        config: &AppConfig,
+        telemetry: Arc<Telemetry>,
+    ) -> Self {
         Self {
-            client: client.clone(),
+            source,
             groups: AsyncCache::new("groups", config, telemetry.clone()),
             schedules: AsyncCache::new("schedule", config, telemetry),
             teachers: RwLock::new(Vec::new()),
@@ -35,16 +65,15 @@ impl MaiRepository {
     }
 
     pub async fn groups(&self) -> anyhow::Result<Cached<Vec<Group>>> {
-        let client = self.client.clone();
+        let source = self.source.clone();
+        let key = cache_key("groups", source.cached_at().await?);
         self.groups
-            .get_or_refresh("groups".to_owned(), move || async move {
-                let mut groups = client
-                    .get(GROUPS_URL)
-                    .send()
+            .get_or_refresh(key, move || async move {
+                let text = source
+                    .read("groups.json")
                     .await?
-                    .error_for_status()?
-                    .json::<Vec<Group>>()
-                    .await?;
+                    .context("groups not found")?;
+                let mut groups: Vec<Group> = serde_json::from_str(&text)?;
                 groups.retain(|g| g.name != "Для внеучебных мероприятий (служебная)");
                 Ok(groups)
             })
@@ -77,37 +106,35 @@ impl MaiRepository {
 
     async fn group_schedule(&self, group: &str) -> anyhow::Result<Cached<Schedule>> {
         let key = format!("group:{group}");
-        let url = format!(
-            "{SCHEDULE_BASE_URL}/{:x}.json",
-            md5::compute(group.as_bytes())
-        );
-        let schedule = self.cached_schedule(key, url, false).await?;
+        let filename = format!("{:x}.json", md5::compute(group.as_bytes()));
+        let schedule = self.cached_schedule(key, filename, false).await?;
         self.remember_teachers(&schedule.value).await;
         Ok(schedule)
     }
 
     async fn teacher_schedule(&self, uid: &str) -> anyhow::Result<Cached<Schedule>> {
         let key = format!("teacher:{uid}");
-        let url = format!("{SCHEDULE_BASE_URL}/{uid}.json");
-        self.cached_schedule(key, url, true).await
+        let filename = format!("{uid}.json");
+        self.cached_schedule(key, filename, true).await
     }
 
     async fn cached_schedule(
         &self,
         key: String,
-        url: String,
+        filename: String,
         teacher_mode_hint: bool,
     ) -> anyhow::Result<Cached<Schedule>> {
-        let client = self.client.clone();
+        let source = self.source.clone();
+        let cached_at = source.cached_at().await?;
         self.schedules
-            .get_or_refresh(key.clone(), move || async move {
-                let response = client.get(url).send().await?;
-                if response.status() == reqwest::StatusCode::NOT_FOUND {
-                    anyhow::bail!("{} not found", key.replacen(':', "(", 1) + ")");
-                }
-                let response = response.error_for_status()?;
-                let text = response.text().await?;
-                parse_raw_schedule(&text, teacher_mode_hint)
+            .get_or_refresh(cache_key(&key, cached_at), move || async move {
+                let text = source
+                    .read(&filename)
+                    .await?
+                    .ok_or_else(|| anyhow!("{} not found", key.replacen(':', "(", 1) + ")"))?;
+                let mut schedule = parse_raw_schedule(&text, teacher_mode_hint)?;
+                schedule.cached = cached_at.unwrap_or(0);
+                Ok(schedule)
             })
             .await
     }
@@ -126,6 +153,13 @@ impl MaiRepository {
                 }
             }
         }
+    }
+}
+
+fn cache_key(key: &str, cached_at: Option<i64>) -> String {
+    match cached_at {
+        Some(timestamp) => format!("{key}@{timestamp}"),
+        None => key.to_owned(),
     }
 }
 

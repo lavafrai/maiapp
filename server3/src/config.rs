@@ -1,8 +1,36 @@
 use std::{path::PathBuf, time::Duration};
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ScheduleProvider {
+    Mai,
+    Local(PathBuf),
+}
+
+impl ScheduleProvider {
+    fn from_values(provider: &str, local_dir: Option<&str>) -> anyhow::Result<Self> {
+        match provider {
+            "mai" => Ok(Self::Mai),
+            "local" => {
+                let path = local_dir
+                    .filter(|path| !path.trim().is_empty())
+                    .ok_or_else(|| {
+                        anyhow::anyhow!(
+                            "MAIAPP_SCHEDULE_LOCAL_DIR is required for the local schedule provider"
+                        )
+                    })?;
+                Ok(Self::Local(PathBuf::from(path)))
+            }
+            _ => {
+                anyhow::bail!("unknown MAIAPP_SCHEDULE_PROVIDER: {provider}; expected mai or local")
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct AppConfig {
     pub port: u16,
+    pub schedule_provider: ScheduleProvider,
     pub assets_dir: PathBuf,
     pub telemetry_path: PathBuf,
     pub cache_dir: PathBuf,
@@ -22,9 +50,13 @@ pub struct AppConfig {
 }
 
 impl AppConfig {
-    pub fn from_env() -> Self {
-        Self {
+    pub fn from_env() -> anyhow::Result<Self> {
+        Ok(Self {
             port: env_parse("PORT").unwrap_or(80),
+            schedule_provider: ScheduleProvider::from_values(
+                &std::env::var("MAIAPP_SCHEDULE_PROVIDER").unwrap_or_else(|_| "mai".to_owned()),
+                std::env::var("MAIAPP_SCHEDULE_LOCAL_DIR").ok().as_deref(),
+            )?,
             assets_dir: std::env::var("MAIAPP_ASSETS_DIR")
                 .map(PathBuf::from)
                 .unwrap_or_else(|_| PathBuf::from("server/src/main/resources/data/assets")),
@@ -80,7 +112,7 @@ impl AppConfig {
                 env_parse("MAIAPP_CACHE_WORKER_TIMEOUT_SECONDS").unwrap_or(45),
             ),
             cache_max_workers: env_parse("MAIAPP_CACHE_MAX_WORKERS").unwrap_or(8),
-        }
+        })
     }
 
     pub fn http_client(&self) -> anyhow::Result<reqwest::Client> {
@@ -97,4 +129,30 @@ fn env_parse<T: std::str::FromStr>(name: &str) -> Option<T> {
     std::env::var(name)
         .ok()
         .and_then(|value| value.parse().ok())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ScheduleProvider;
+
+    #[test]
+    fn selects_schedule_provider() {
+        assert_eq!(
+            ScheduleProvider::from_values("mai", None).unwrap(),
+            ScheduleProvider::Mai
+        );
+        assert_eq!(
+            ScheduleProvider::from_values("local", Some("/dump")).unwrap(),
+            ScheduleProvider::Local("/dump".into()),
+        );
+    }
+
+    #[test]
+    fn rejects_invalid_schedule_provider_configuration() {
+        for directory in [None, Some(""), Some("   ")] {
+            let error = ScheduleProvider::from_values("local", directory).unwrap_err();
+            assert!(error.to_string().contains("MAIAPP_SCHEDULE_LOCAL_DIR"));
+        }
+        assert!(ScheduleProvider::from_values("typo", Some("/dump")).is_err());
+    }
 }

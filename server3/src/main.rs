@@ -10,8 +10,11 @@ mod telemetry;
 
 use std::{net::SocketAddr, sync::Arc};
 
-use config::AppConfig;
-use repositories::{exler::ExlerRepository, mai::MaiRepository, schedule::ScheduleRepository};
+use config::{AppConfig, ScheduleProvider};
+use repositories::{
+    exler::ExlerRepository, local::LocalMaiRepository, mai::MaiRepository,
+    schedule::ScheduleRepository,
+};
 use services::{data::MaiDataService, exler::ExlerService, schedule::ScheduleService};
 use state::AppState;
 use telemetry::Telemetry;
@@ -19,19 +22,29 @@ use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitEx
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    match dotenvy::dotenv() {
+        Ok(_) => {}
+        Err(error) if error.not_found() => {}
+        Err(error) => return Err(error.into()),
+    }
     init_tracing();
     rustls::crypto::ring::default_provider()
         .install_default()
         .expect("no other TLS crypto provider is installed yet");
 
-    let config = AppConfig::from_env();
+    let config = AppConfig::from_env()?;
     let client = config.http_client()?;
     let telemetry = Arc::new(Telemetry::load_or_new(&config).await);
-    let schedule_repository: Arc<dyn ScheduleRepository> = Arc::new(MaiRepository::new(
-        client.clone(),
-        &config,
-        telemetry.clone(),
-    ));
+    let schedule_repository: Arc<dyn ScheduleRepository> = match &config.schedule_provider {
+        ScheduleProvider::Mai => Arc::new(MaiRepository::new(
+            client.clone(),
+            &config,
+            telemetry.clone(),
+        )),
+        ScheduleProvider::Local(root) => {
+            Arc::new(LocalMaiRepository::new(root, &config, telemetry.clone()).await?)
+        }
+    };
     let exler_repository = Arc::new(ExlerRepository::new(client, &config, telemetry.clone()));
 
     let state = AppState::new(

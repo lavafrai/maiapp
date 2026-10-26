@@ -9,6 +9,8 @@ services:
     expose:
       - "80"
     environment:
+      - MAIAPP_SCHEDULE_PROVIDER=${MAIAPP_SCHEDULE_PROVIDER:-mai}
+      - MAIAPP_SCHEDULE_LOCAL_DIR=/var/lib/maiapp-schedules
       - MAIAPP_ADMIN_USER=${MAIAPP_ADMIN_USER:-admin}
       - MAIAPP_ADMIN_PASSWORD=${MAIAPP_ADMIN_PASSWORD:-admin}
       - MAIAPP_UPSTREAM_PROBE_INTERVAL_SECONDS=${MAIAPP_UPSTREAM_PROBE_INTERVAL_SECONDS:-60}
@@ -22,6 +24,7 @@ services:
       - MAIAPP_CACHE_MAX_WORKERS=${MAIAPP_CACHE_MAX_WORKERS:-8}
     volumes:
       - server3-telemetry:/var/lib/maiapp-server3
+      - ${MAIAPP_SCHEDULE_LOCAL_DIR:-schedule-data}:/var/lib/maiapp-schedules:ro
     healthcheck:
       test: curl -sS http://127.0.0.1/health || exit 1
       interval: 30s
@@ -117,6 +120,7 @@ services:
 
 volumes:
   server3-telemetry:
+  schedule-data:
   caddy-usage-data:
 
 networks:

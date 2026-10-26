@@ -8,7 +8,7 @@ use chrono::{Duration as ChronoDuration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
-use crate::config::AppConfig;
+use crate::config::{AppConfig, ScheduleProvider};
 
 const MAI_UPSTREAM_URL: &str = "https://public.mai.ru/schedule/data/groups.json";
 const EXLER_UPSTREAM_URL: &str = "https://mai-sten.online/prepods/";
@@ -387,10 +387,18 @@ impl Telemetry {
             loop {
                 interval.tick().await;
                 let (mai, exler) = tokio::join!(
-                    probe_upstream(&client, MAI_UPSTREAM_URL),
+                    async {
+                        if matches!(&config.schedule_provider, ScheduleProvider::Mai) {
+                            Some(probe_upstream(&client, MAI_UPSTREAM_URL).await)
+                        } else {
+                            None
+                        }
+                    },
                     probe_upstream(&client, EXLER_UPSTREAM_URL),
                 );
-                self.record_upstream_probe("mai", mai).await;
+                if let Some(mai) = mai {
+                    self.record_upstream_probe("mai", mai).await;
+                }
                 self.record_upstream_probe("exler", exler).await;
             }
         });

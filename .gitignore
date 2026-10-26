@@ -21,3 +21,4 @@ Pods/
 /kotlin-js-store/
 /build-ios-sideload/
 /dist/
+/.env
