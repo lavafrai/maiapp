@@ -126,16 +126,20 @@ impl MaiRepository {
     ) -> anyhow::Result<Cached<Schedule>> {
         let source = self.source.clone();
         let cached_at = source.cached_at().await?;
+        // The previous parser's persisted schedules may omit subjects sharing a time slot.
         self.schedules
-            .get_or_refresh(cache_key(&key, cached_at), move || async move {
-                let text = source
-                    .read(&filename)
-                    .await?
-                    .ok_or_else(|| anyhow!("{} not found", key.replacen(':', "(", 1) + ")"))?;
-                let mut schedule = parse_raw_schedule(&text, teacher_mode_hint)?;
-                schedule.cached = cached_at.unwrap_or(0);
-                Ok(schedule)
-            })
+            .get_or_refresh(
+                cache_key(&format!("v2:{key}"), cached_at),
+                move || async move {
+                    let text = source
+                        .read(&filename)
+                        .await?
+                        .ok_or_else(|| anyhow!("{} not found", key.replacen(':', "(", 1) + ")"))?;
+                    let mut schedule = parse_raw_schedule(&text, teacher_mode_hint)?;
+                    schedule.cached = cached_at.unwrap_or(0);
+                    Ok(schedule)
+                },
+            )
             .await
     }
 
@@ -168,8 +172,8 @@ impl ScheduleRepository for MaiRepository {
         Box::pin(MaiRepository::groups(self))
     }
 
-    fn teachers(&self) -> BoxFuture<'_, Vec<TeacherId>> {
-        Box::pin(MaiRepository::teachers(self))
+    fn teachers(&self) -> BoxFuture<'_, anyhow::Result<Vec<TeacherId>>> {
+        Box::pin(async { Ok(MaiRepository::teachers(self).await) })
     }
 
     fn schedule_by_id<'a>(
@@ -180,7 +184,7 @@ impl ScheduleRepository for MaiRepository {
     }
 }
 
-fn parse_raw_schedule(text: &str, teacher_mode_hint: bool) -> anyhow::Result<Schedule> {
+pub(super) fn parse_raw_schedule(text: &str, teacher_mode_hint: bool) -> anyhow::Result<Schedule> {
     let root: serde_json::Value = serde_json::from_str(text)?;
     let object = root
         .as_object()
@@ -232,42 +236,44 @@ fn parse_group_lessons(
     let mut lessons = Vec::with_capacity(pairs.len());
     for value in pairs.values() {
         let object = value.as_object().context("group pair is not an object")?;
-        let (name, raw_value) = object.iter().next().context("group pair is empty")?;
-        let raw: RawGroupLesson = serde_json::from_value(raw_value.clone())?;
-        lessons.push(Lesson {
-            name: name.clone(),
-            time_range: time_range(&raw.time_start, &raw.time_end),
-            time_start: Time {
-                time: raw.time_start,
-            },
-            time_end: Time { time: raw.time_end },
-            lectors: raw
-                .lector
-                .into_iter()
-                .map(|(uid, name)| TeacherId {
-                    name: TeacherName {
-                        name: capitalize_words(&name),
-                    },
-                    uid: TeacherUid { uid },
-                })
-                .collect(),
-            lesson_type: lesson_type(
-                raw.lesson_type
-                    .keys()
-                    .next()
-                    .map(String::as_str)
-                    .unwrap_or_default(),
-            ),
-            day: date,
-            rooms: raw
-                .room
-                .into_iter()
-                .map(|(uid, name)| Classroom { name, uid })
-                .collect(),
-            lms: raw.lms.unwrap_or_default(),
-            teams: raw.teams.unwrap_or_default(),
-            other: raw.other.unwrap_or_default(),
-        });
+        anyhow::ensure!(!object.is_empty(), "group pair is empty");
+        for (name, raw_value) in object {
+            let raw: RawGroupLesson = serde_json::from_value(raw_value.clone())?;
+            lessons.push(Lesson {
+                name: name.clone(),
+                time_range: time_range(&raw.time_start, &raw.time_end),
+                time_start: Time {
+                    time: raw.time_start,
+                },
+                time_end: Time { time: raw.time_end },
+                lectors: raw
+                    .lector
+                    .into_iter()
+                    .map(|(uid, name)| TeacherId {
+                        name: TeacherName {
+                            name: capitalize_words(&name),
+                        },
+                        uid: TeacherUid { uid },
+                    })
+                    .collect(),
+                lesson_type: lesson_type(
+                    raw.lesson_type
+                        .keys()
+                        .next()
+                        .map(String::as_str)
+                        .unwrap_or_default(),
+                ),
+                day: date,
+                rooms: raw
+                    .room
+                    .into_iter()
+                    .map(|(uid, name)| Classroom { name, uid })
+                    .collect(),
+                lms: raw.lms.unwrap_or_default(),
+                teams: raw.teams.unwrap_or_default(),
+                other: raw.other.unwrap_or_default(),
+            });
+        }
     }
     Ok(lessons)
 }
@@ -355,19 +361,19 @@ fn capitalize_words(text: &str) -> String {
         .join(" ")
 }
 
-fn is_group_name(value: &str) -> bool {
+pub(super) fn is_group_name(value: &str) -> bool {
     Regex::new(r"^[МТ][\dА-ЯЁ]+?[ОВЗ]-\d+[А-ЯЁа-яё]+-\d+$")
         .unwrap()
         .is_match(value)
 }
 
-fn is_teacher_uid(value: &str) -> bool {
+pub(super) fn is_teacher_uid(value: &str) -> bool {
     Regex::new(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
         .unwrap()
         .is_match(value)
 }
 
-fn is_teacher_name(value: &str) -> bool {
+pub(super) fn is_teacher_name(value: &str) -> bool {
     Regex::new(r"^([\SА-Яа-яЁё-]+?( |$)){3,5}$")
         .unwrap()
         .is_match(value)

@@ -8,7 +8,7 @@ use crate::{
 pub trait ScheduleRepository: Send + Sync {
     fn groups(&self) -> BoxFuture<'_, anyhow::Result<Cached<Vec<Group>>>>;
 
-    fn teachers(&self) -> BoxFuture<'_, Vec<TeacherId>>;
+    fn teachers(&self) -> BoxFuture<'_, anyhow::Result<Vec<TeacherId>>>;
 
     fn schedule_by_id<'a>(&'a self, id: &'a str)
     -> BoxFuture<'a, anyhow::Result<Cached<Schedule>>>;

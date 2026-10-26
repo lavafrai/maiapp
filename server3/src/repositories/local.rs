@@ -6,17 +6,19 @@ use std::{
 use anyhow::Context;
 use chrono::{FixedOffset, NaiveDateTime};
 use futures::future::BoxFuture;
+use tokio::sync::{Mutex, MutexGuard};
 
 use crate::{
-    cache::Cached,
+    cache::{CacheStatus, Cached},
     config::AppConfig,
     models::{Group, Schedule, TeacherId},
     telemetry::Telemetry,
 };
 
 use super::{
-    mai::{MaiDataSource, MaiRepository},
+    mai::{MaiDataSource, MaiRepository, is_group_name, is_teacher_name, is_teacher_uid},
     schedule::ScheduleRepository,
+    teacher_index::TeacherIndex,
 };
 
 struct LocalMaiSource {
@@ -62,6 +64,8 @@ impl MaiDataSource for LocalMaiSource {
 
 pub struct LocalMaiRepository {
     inner: MaiRepository,
+    source: Arc<LocalMaiSource>,
+    teacher_index: Mutex<TeacherIndex>,
 }
 
 impl LocalMaiRepository {
@@ -115,13 +119,13 @@ impl LocalMaiRepository {
                 Err(error) => return Err(error).context("failed to access dump update date"),
             }
         }
-        let source = LocalMaiSource {
+        let source = Arc::new(LocalMaiSource {
             last_update_path: last_update_path.context(
                 "local dump requires last_update.txt in the data directory or dump root",
             )?,
             data_dir: data_dir.clone(),
-        };
-        source.cached_at().await?;
+        });
+        let teacher_index = Mutex::new(TeacherIndex::build(source.as_ref()).await?);
         tracing::info!("using local schedules from {}", data_dir.display());
         let mut config = config.clone();
         config.cache_dir = config.cache_dir.join("local").join(format!(
@@ -129,8 +133,23 @@ impl LocalMaiRepository {
             md5::compute(data_dir.as_os_str().as_encoded_bytes())
         ));
         Ok(Self {
-            inner: MaiRepository::with_source(Arc::new(source), &config, telemetry),
+            inner: MaiRepository::with_source(source.clone(), &config, telemetry),
+            source,
+            teacher_index,
         })
+    }
+
+    async fn current_teacher_index(&self) -> anyhow::Result<MutexGuard<'_, TeacherIndex>> {
+        let cached_at = self
+            .source
+            .cached_at()
+            .await?
+            .context("local dump update date is required")?;
+        let mut index = self.teacher_index.lock().await;
+        if index.cached_at != cached_at {
+            *index = TeacherIndex::build(self.source.as_ref()).await?;
+        }
+        Ok(index)
     }
 }
 
@@ -139,15 +158,39 @@ impl ScheduleRepository for LocalMaiRepository {
         Box::pin(self.inner.groups())
     }
 
-    fn teachers(&self) -> BoxFuture<'_, Vec<TeacherId>> {
-        Box::pin(self.inner.teachers())
+    fn teachers(&self) -> BoxFuture<'_, anyhow::Result<Vec<TeacherId>>> {
+        Box::pin(async { Ok(self.current_teacher_index().await?.teachers()) })
     }
 
     fn schedule_by_id<'a>(
         &'a self,
         id: &'a str,
     ) -> BoxFuture<'a, anyhow::Result<Cached<Schedule>>> {
-        Box::pin(self.inner.schedule_by_id(id))
+        Box::pin(async move {
+            if is_group_name(id) {
+                return self.inner.schedule_by_id(id).await;
+            }
+            let index = self.current_teacher_index().await?;
+            let indexed = index.find(id);
+            if indexed.is_none() && !(is_teacher_uid(id) || is_teacher_name(id)) {
+                drop(index);
+                return self.inner.schedule_by_id(id).await;
+            }
+            let uid = indexed.map(|(uid, _)| uid).unwrap_or(id).to_owned();
+            let schedule = indexed.map(|(_, schedule)| schedule.clone());
+            drop(index);
+            if is_teacher_uid(&uid)
+                && tokio::fs::try_exists(self.source.data_dir.join(format!("{uid}.json"))).await?
+            {
+                return self.inner.schedule_by_id(&uid).await;
+            }
+            let schedule = schedule
+                .with_context(|| format!("schedule({id}) not found in the local teacher index"))?;
+            Ok(Cached {
+                value: schedule,
+                status: CacheStatus::Hit,
+            })
+        })
     }
 }
 
@@ -239,6 +282,7 @@ mod tests {
     async fn reads_group_and_teacher_schedules_from_dump() {
         let fixture = Fixture::new();
         let repository = fixture.repository(&fixture.root).await;
+        assert_eq!(repository.teachers().await.unwrap()[0].uid.uid, TEACHER);
         let groups = repository.groups().await.unwrap();
         assert_eq!(groups.value.len(), 1);
         assert_eq!(groups.value[0].name, GROUP);
@@ -253,7 +297,7 @@ mod tests {
         assert_eq!(lesson.lectors[0].uid.uid, TEACHER);
         assert_eq!(lesson.time_range, "09:00 – 10:30");
         assert_eq!(
-            repository.teachers().await[0].name.name,
+            repository.teachers().await.unwrap()[0].name.name,
             "Иванов Иван Иванович"
         );
 
@@ -273,6 +317,106 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn indexes_teachers_at_startup_without_uuid_files_and_merges_joint_lessons() {
+        let fixture = Fixture::new();
+        let group2 = "М4О-104БВ-24";
+        let group3 = "М4О-105БВ-24";
+        let teacher2 = "87654321-4321-4321-4321-cba987654321";
+        std::fs::remove_file(fixture.root.join("data").join(format!("{TEACHER}.json"))).unwrap();
+        fixture.write(
+            "groups.json",
+            json!([{"name": GROUP}, {"name": group2}, {"name": group3}]),
+        );
+        let filename = format!("{:x}.json", md5::compute(GROUP));
+        let mut raw: serde_json::Value = serde_json::from_str(
+            &std::fs::read_to_string(fixture.root.join("data").join(&filename)).unwrap(),
+        )
+        .unwrap();
+        for (name, room) in [(group2, "ГУК А-101"), (group3, "ГУК А-102")] {
+            let mut copy = raw.clone();
+            copy["group"] = json!(name);
+            copy["01.09.2026"]["pairs"]["09:00:00"]["Математика"]["time_start"] = json!("9:00:00");
+            copy["01.09.2026"]["pairs"]["09:00:00"]["Математика"]["room"]["room-id"] = json!(room);
+            fixture.write(&format!("{:x}.json", md5::compute(name)), copy);
+        }
+        let mut algebra = raw["01.09.2026"]["pairs"]["09:00:00"]["Математика"].clone();
+        algebra["time_start"] = json!("10:45:00");
+        algebra["time_end"] = json!("12:15:00");
+        let mut physics = algebra.clone();
+        physics["lector"] = json!({teacher2: "МАНУН МОХСЕН"});
+        raw["01.09.2026"]["pairs"]["10:45:00"] = json!({"Алгебра": algebra, "Физика": physics});
+        let mut unknown = raw["01.09.2026"]["pairs"]["09:00:00"]["Математика"].clone();
+        unknown["lector"] = json!({"00000000-0000-0000-0000-000000000000": ""});
+        raw["01.09.2026"]["pairs"]["13:00:00"] = json!({"Без преподавателя": unknown});
+        fixture.write(&filename, raw);
+
+        let repository = fixture.repository(&fixture.root).await;
+        let teachers = repository.teachers().await.unwrap();
+        assert_eq!(teachers.len(), 2);
+        assert!(teachers.iter().any(|teacher| teacher.uid.uid == TEACHER));
+        for id in [TEACHER, "Иванов Иван Иванович"] {
+            let schedule = repository.schedule_by_id(id).await.unwrap();
+            assert_eq!(schedule.value.cached, DUMP_CACHED_AT);
+            let lessons = &schedule.value.days[0].lessons;
+            assert_eq!(lessons.len(), 3);
+            assert_eq!(lessons[0].name, "Математика");
+            assert_eq!(
+                lessons[0]
+                    .lectors
+                    .iter()
+                    .map(|group| group.name.name.as_str())
+                    .collect::<Vec<_>>(),
+                [GROUP, group2]
+            );
+            assert_eq!(lessons[1].rooms[0].name, "ГУК А-102");
+            assert_eq!(lessons[1].lectors[0].name.name, group3);
+            assert_eq!(lessons[2].name, "Алгебра");
+        }
+        for id in [teacher2, "Манун Мохсен"] {
+            let schedule = repository.schedule_by_id(id).await.unwrap();
+            assert_eq!(schedule.value.days[0].lessons[0].name, "Физика");
+        }
+        assert_eq!(
+            repository.schedule_by_id(GROUP).await.unwrap().value.days[0]
+                .lessons
+                .len(),
+            4
+        );
+    }
+
+    #[tokio::test]
+    async fn rebuilds_teacher_index_after_dump_update_and_reports_incomplete_dumps() {
+        let fixture = Fixture::new();
+        std::fs::remove_file(fixture.root.join("data").join(format!("{TEACHER}.json"))).unwrap();
+        let repository = fixture.repository(&fixture.root).await;
+        assert_eq!(repository.teachers().await.unwrap().len(), 1);
+        let filename = format!("{:x}.json", md5::compute(GROUP));
+        std::fs::remove_file(fixture.root.join("data").join(&filename)).unwrap();
+        std::fs::write(fixture.root.join("last_update.txt"), "2026-10-25 13:00:00").unwrap();
+        assert!(repository.teachers().await.is_err());
+        assert!(repository.schedule_by_id(TEACHER).await.is_err());
+
+        fixture.write(&filename, json!({"group": GROUP}));
+        assert!(repository.teachers().await.unwrap().is_empty());
+        assert!(
+            repository
+                .schedule_by_id(TEACHER)
+                .await
+                .unwrap_err()
+                .to_string()
+                .contains("not found")
+        );
+
+        std::fs::remove_file(fixture.root.join("data").join(&filename)).unwrap();
+        let telemetry = Arc::new(Telemetry::load_or_new(&fixture.config).await);
+        assert!(
+            LocalMaiRepository::new(&fixture.root, &fixture.config, telemetry)
+                .await
+                .is_err()
+        );
+    }
+
+    #[tokio::test]
     async fn invalidates_cached_data_when_dump_update_date_changes() {
         let fixture = Fixture::new();
         let repository = fixture.repository(&fixture.root).await;
@@ -286,7 +430,10 @@ mod tests {
             CacheStatus::Hit
         );
 
-        fixture.write("groups.json", json!([{"name": "Updated group"}]));
+        fixture.write(
+            "groups.json",
+            json!([{"name": GROUP, "fac": "Updated faculty"}]),
+        );
         fixture.write(
             &format!("{:x}.json", md5::compute(GROUP)),
             json!({"group": GROUP}),
@@ -303,7 +450,7 @@ mod tests {
         assert!(updated.value.days.is_empty());
         let groups = repository.groups().await.unwrap();
         assert_eq!(groups.status, CacheStatus::Miss);
-        assert_eq!(groups.value[0].name, "Updated group");
+        assert_eq!(groups.value[0].faculty.as_deref(), Some("Updated faculty"));
 
         let restarted = fixture.repository(&fixture.root).await;
         let restored = restarted.schedule_by_id(GROUP).await.unwrap();
@@ -375,13 +522,9 @@ mod tests {
             .unwrap_err();
         assert!(invalid.to_string().contains("invalid format"));
         std::fs::remove_file(fixture.root.join("data").join(format!("{TEACHER}.json"))).unwrap();
-        assert!(
-            repository
-                .schedule_by_id(TEACHER)
-                .await
-                .unwrap_err()
-                .to_string()
-                .contains("not found")
+        assert_eq!(
+            repository.schedule_by_id(TEACHER).await.unwrap().value.name,
+            "Иванов Иван Иванович"
         );
 
         std::fs::write(
@@ -413,6 +556,10 @@ mod tests {
             .await
             .unwrap();
         fixture.write("groups.json", json!([{"name": "Local group"}]));
+        fixture.write(
+            &format!("{:x}.json", md5::compute("Local group")),
+            json!({"group": "Local group"}),
+        );
         let repository = fixture.repository(&fixture.root).await;
         assert_eq!(repository.groups().await.unwrap().value.len(), 1);
         assert_eq!(

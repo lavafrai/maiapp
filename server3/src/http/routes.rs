@@ -62,9 +62,9 @@ async fn groups(State(state): State<AppState>) -> AppResult<impl IntoResponse> {
     ))
 }
 
-async fn teachers(State(state): State<AppState>) -> impl IntoResponse {
+async fn teachers(State(state): State<AppState>) -> AppResult<impl IntoResponse> {
     state.telemetry.record_endpoint("/teachers").await;
-    cache(Json(state.schedule.teachers().await), 1800)
+    Ok(cache(Json(state.schedule.teachers().await?), 1800))
 }
 
 async fn schedule(

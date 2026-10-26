@@ -20,8 +20,8 @@ impl ScheduleService {
         Ok(self.repository.groups().await?)
     }
 
-    pub async fn teachers(&self) -> Vec<TeacherId> {
-        self.repository.teachers().await
+    pub async fn teachers(&self) -> AppResult<Vec<TeacherId>> {
+        Ok(self.repository.teachers().await?)
     }
 
     pub async fn schedule(&self, id: &str) -> AppResult<Cached<Schedule>> {
@@ -63,16 +63,16 @@ mod tests {
             })
         }
 
-        fn teachers(&self) -> BoxFuture<'_, Vec<TeacherId>> {
+        fn teachers(&self) -> BoxFuture<'_, anyhow::Result<Vec<TeacherId>>> {
             Box::pin(async {
-                vec![TeacherId {
+                Ok(vec![TeacherId {
                     name: TeacherName {
                         name: "custom teacher".to_owned(),
                     },
                     uid: TeacherUid {
                         uid: "custom uid".to_owned(),
                     },
-                }]
+                }])
             })
         }
 
@@ -108,7 +108,7 @@ mod tests {
         assert_eq!(groups.value[0].name, "custom group");
         assert_eq!(groups.status, CacheStatus::Stale);
 
-        let teachers = service.teachers().await;
+        let teachers = service.teachers().await.unwrap();
         assert_eq!(teachers[0].name.name, "custom teacher");
         assert_eq!(teachers[0].uid.uid, "custom uid");
 
