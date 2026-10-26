@@ -11,7 +11,7 @@ mod telemetry;
 use std::{net::SocketAddr, sync::Arc};
 
 use config::AppConfig;
-use repositories::{exler::ExlerRepository, mai::MaiRepository};
+use repositories::{exler::ExlerRepository, mai::MaiRepository, schedule::ScheduleRepository};
 use services::{data::MaiDataService, exler::ExlerService, schedule::ScheduleService};
 use state::AppState;
 use telemetry::Telemetry;
@@ -27,7 +27,7 @@ async fn main() -> anyhow::Result<()> {
     let config = AppConfig::from_env();
     let client = config.http_client()?;
     let telemetry = Arc::new(Telemetry::load_or_new(&config).await);
-    let mai_repository = Arc::new(MaiRepository::new(
+    let schedule_repository: Arc<dyn ScheduleRepository> = Arc::new(MaiRepository::new(
         client.clone(),
         &config,
         telemetry.clone(),
@@ -35,7 +35,7 @@ async fn main() -> anyhow::Result<()> {
     let exler_repository = Arc::new(ExlerRepository::new(client, &config, telemetry.clone()));
 
     let state = AppState::new(
-        Arc::new(ScheduleService::new(mai_repository)),
+        Arc::new(ScheduleService::new(schedule_repository)),
         Arc::new(ExlerService::new(exler_repository)),
         Arc::new(MaiDataService::new()),
         telemetry.clone(),

@@ -2,6 +2,7 @@ use std::{collections::BTreeMap, sync::Arc};
 
 use anyhow::{Context, anyhow};
 use chrono::{NaiveDate, Utc};
+use futures::future::BoxFuture;
 use regex::Regex;
 use tokio::sync::RwLock;
 
@@ -9,6 +10,7 @@ use crate::{
     cache::{AsyncCache, Cached},
     config::AppConfig,
     models::*,
+    repositories::schedule::ScheduleRepository,
     telemetry::Telemetry,
 };
 
@@ -124,6 +126,23 @@ impl MaiRepository {
                 }
             }
         }
+    }
+}
+
+impl ScheduleRepository for MaiRepository {
+    fn groups(&self) -> BoxFuture<'_, anyhow::Result<Cached<Vec<Group>>>> {
+        Box::pin(MaiRepository::groups(self))
+    }
+
+    fn teachers(&self) -> BoxFuture<'_, Vec<TeacherId>> {
+        Box::pin(MaiRepository::teachers(self))
+    }
+
+    fn schedule_by_id<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> BoxFuture<'a, anyhow::Result<Cached<Schedule>>> {
+        Box::pin(MaiRepository::schedule_by_id(self, id))
     }
 }
 
