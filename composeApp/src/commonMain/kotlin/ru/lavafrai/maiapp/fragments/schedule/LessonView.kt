@@ -26,6 +26,7 @@ import ru.lavafrai.maiapp.fragments.AppCardShapes
 import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
+import ru.lavafrai.maiapp.models.exler.findByTeacherName
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
@@ -85,16 +86,18 @@ fun LessonView(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 lesson.lectors.filter { it.teacherName.name.isNotBlank() }.forEach {
-                    val areOnExler = remember(exlerTeachers) { exlerTeachers?.any { exler -> exler.name == it.name } ?: false }
+                    // ФИО в расписании и в отзывах может отличаться буквой ё, регистром или порядком слов
+                    val exlerTeacher = remember(exlerTeachers, it.name) { exlerTeachers?.findByTeacherName(it.name) }
                     val hasSchedule = remember(it) { it.uid != TeacherUid.Empty }
-                    val clickable = areOnExler || hasSchedule
+                    val clickable = exlerTeacher != null || hasSchedule
 
                     Text(
                         it.name,
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (clickable) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.conditional(clickable) { clickable {
-                            if (areOnExler) appContext.openTeacherReviews(it.name, it.uid)
+                            // Открываем отзывы по имени из списка СтЭна: именно его знает сервер
+                            if (exlerTeacher != null) appContext.openTeacherReviews(exlerTeacher.name, it.uid)
                             else if (hasSchedule) appContext.openSchedule(it.uid, it.name)
                         }}
                     )
