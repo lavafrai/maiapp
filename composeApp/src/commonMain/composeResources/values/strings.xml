@@ -242,6 +242,7 @@
     <string name="widget_no_lessons">No classes on this day</string>
     <string name="widget_schedule_not_loaded">Schedule not loaded</string>
     <string name="widget_sign_in_required">Open the app and choose a schedule</string>
+    <string name="widget_choose_schedule">Which schedule should it show?</string>
     <string name="widget_today_title">%2$s, %1$s</string>
 
     <plurals name="hours_count">
