@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import androidx.glance.appwidget.updateAll
 import co.touchlab.kermit.Logger
 
 class RefreshScheduleWidgetAction: ActionCallback {
@@ -13,7 +12,8 @@ class RefreshScheduleWidgetAction: ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        ScheduleWidget().updateAll(context)
+        // Обновляем только этот виджет: у каждого экземпляра может быть своё расписание
+        ScheduleWidget().update(context, glanceId)
         Logger.i("Refreshed schedule widget $glanceId")
     }
 }

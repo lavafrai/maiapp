@@ -11,8 +11,10 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.AppWidgetId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.appWidgetBackground
@@ -41,6 +43,7 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.widget_choose_schedule
 import maiapp.composeapp.generated.resources.widget_no_lessons
 import maiapp.composeapp.generated.resources.widget_schedule_not_loaded
 import maiapp.composeapp.generated.resources.widget_sign_in_required
@@ -69,10 +72,25 @@ class ScheduleWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val settings = ApplicationSettings.getCurrent()
-        val group = settings.selectedSchedule
-        Logger.i("Loading schedule for widget $id")
 
-        val schedule = if (group != null) AbstractLessonRepository().loadLessonsFromCacheOrNull(group) else null
+        // Какие расписания вообще можно показать: сохранённые плюс текущее
+        val choices = (listOfNotNull(settings.selectedSchedule) + settings.savedSchedules)
+            .distinctBy { it.scheduleId }
+
+        // Что показать: выбранное для этого виджета; если выбора ещё нет или такое расписание удалили —
+        // единственное/текущее расписание
+        val chosenName = (id as? AppWidgetId)
+            ?.let { WidgetScheduleState.scheduleName(context, it.appWidgetId) }
+            ?.takeIf { name -> choices.any { it.scheduleId == name } }
+        val group = when {
+            chosenName != null -> BaseScheduleId(chosenName)
+            choices.size <= 1 -> choices.firstOrNull()
+            else -> null // несколько расписаний — спросим, какое показывать
+        }
+
+        Logger.i("Loading schedule ${group?.scheduleId} for widget $id")
+
+        val schedule = group?.let { AbstractLessonRepository().loadLessonsFromCacheOrNull(it) }
         // The app language, even if its UI hasn't been started in this process yet
         LocalAppLocale.apply(settings.language)
         val strings = WidgetStrings.load(today = LocalDate.now())
@@ -92,7 +110,7 @@ class ScheduleWidget : GlanceAppWidget() {
                     ),
                     LocalWidgetStrings provides strings,
                 ) {
-                    ScheduleWidgetContent(group, schedule)
+                    ScheduleWidgetContent(group, schedule, choices)
                 }
             }
         }
@@ -111,6 +129,7 @@ class WidgetStrings(
     val noLessons: String,
     val notLoaded: String,
     val signInRequired: String,
+    val chooseSchedule: String,
 ) {
     companion object {
         suspend fun load(today: LocalDate): WidgetStrings {
@@ -126,6 +145,7 @@ class WidgetStrings(
                 noLessons = getString(Res.string.widget_no_lessons),
                 notLoaded = getString(Res.string.widget_schedule_not_loaded),
                 signInRequired = getString(Res.string.widget_sign_in_required),
+                chooseSchedule = getString(Res.string.widget_choose_schedule),
             )
         }
     }
@@ -137,11 +157,50 @@ val LocalWidgetStrings = staticCompositionLocalOf<WidgetStrings> { error("No wid
 fun ScheduleWidgetContent(
     group: BaseScheduleId?,
     schedule: SimpleSchedule?,
+    choices: List<BaseScheduleId> = emptyList(),
 ) {
     ScheduleWidgetHeader(modifier = GlanceModifier.clickable(actionStartActivity<MainActivity>()))
-    if (schedule != null) ScheduleWidgetSchedule(schedule)
-    else if (group != null) ScheduleWidgetNotLoaded()
-    else ScheduleWidgetNotLoggedIn()
+    when {
+        schedule != null -> ScheduleWidgetSchedule(schedule)
+        group != null -> ScheduleWidgetNotLoaded()
+        choices.size > 1 -> ScheduleWidgetChooser(choices)
+        else -> ScheduleWidgetNotLoggedIn()
+    }
+}
+
+/**
+ * Выбор расписания для этого экземпляра виджета. Показывается, пока выбор не сделан;
+ * решение запоминается только для этого виджета, соседние остаются со своими.
+ */
+@Composable
+fun ScheduleWidgetChooser(
+    choices: List<BaseScheduleId>,
+) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+    ) {
+        GlanceText(LocalWidgetStrings.current.chooseSchedule, fontSize = 15.sp)
+        Spacer(modifier = GlanceModifier.height(4.dp))
+
+        choices.forEach { choice ->
+            Box(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .padding(vertical = 3.dp)
+                    .clickable(
+                        actionRunCallback<ChooseWidgetScheduleAction>(
+                            actionParametersOf(
+                                ChooseWidgetScheduleAction.ScheduleNameKey to choice.scheduleId
+                            )
+                        )
+                    ),
+            ) {
+                GlanceText(choice.scheduleId, maxLines = 1)
+            }
+        }
+    }
 }
 
 /**

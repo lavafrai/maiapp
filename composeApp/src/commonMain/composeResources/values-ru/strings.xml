@@ -243,6 +243,7 @@
     <string name="widget_no_lessons">В этот день нет занятий</string>
     <string name="widget_schedule_not_loaded">Расписание не загружено</string>
     <string name="widget_sign_in_required">Откройте приложение и выберите расписание</string>
+    <string name="widget_choose_schedule">Какое расписание показывать?</string>
     <string name="widget_today_title">%1$s, %3$s</string>
 
     <plurals name="hours_count">
