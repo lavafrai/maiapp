@@ -10,6 +10,7 @@ import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotationType
 import ru.lavafrai.maiapp.models.annotations.isAnnotatedBy
 import ru.lavafrai.maiapp.models.schedule.LessonLike
+import ru.lavafrai.maiapp.models.schedule.matchesUid
 
 object LessonAnnotationsRepository: BaseRepository() {
     // val storage = getPlatform().storage()
@@ -63,7 +64,7 @@ object LessonAnnotationsRepository: BaseRepository() {
         repositoryScope.launch {
             mutex.withLock {
                 val annotations = loadAnnotations(group).toMutableList()
-                annotations.removeAll { it.lessonUid == lesson.getUid() && it.type == annotation }
+                annotations.removeAll { lesson.matchesUid(it.lessonUid) && it.type == annotation }
                 saveAnnotations(group, annotations)
                 flows[group]?.value = annotations
             }

@@ -31,6 +31,10 @@ kotlin {
     iosSimulatorArm64()
 
     sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+
         commonMain.dependencies {
             implementation(projects.shared)
             implementation(projects.models)

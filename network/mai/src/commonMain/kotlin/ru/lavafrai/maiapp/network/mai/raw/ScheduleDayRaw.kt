@@ -30,11 +30,12 @@ data class ScheduleDayRaw (
         else ScheduleDay(
             date = date,
             dayOfWeek = dayOfWeek,
-            lessons = lessons.map {
-                json.decodeFromJsonElement<LessonRaw>(it.value.values.first()).toLesson(
-                    it.value.keys.first(),
-                    date,
-                )
+            // В одной паре может быть несколько предметов — по подгруппам или потокам.
+            // Раньше отсюда брался только первый, и остальные занятия пропадали
+            lessons = lessons.values.flatMap { pair ->
+                pair.map { (name, lesson) ->
+                    json.decodeFromJsonElement<LessonRaw>(lesson).toLesson(name, date)
+                }
             }
         )
     }
