@@ -29,6 +29,7 @@ import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
+import ru.lavafrai.maiapp.models.schedule.matchesUid
 import ru.lavafrai.maiapp.theme.LinkColor
 import ru.lavafrai.maiapp.utils.conditional
 
@@ -60,7 +61,7 @@ fun LessonView(
             Column { // Pair number and annotations
                 PairNumber(text = lesson.getPairNumber().toString())
 
-                val lessonAnnotations = annotations.filter { it.lessonUid == lesson.getUid() }
+                val lessonAnnotations = annotations.filter { lesson.matchesUid(it.lessonUid) }
                 AnnotationsView(
                     annotations = lessonAnnotations,
                     modifier = Modifier.padding(top = 4.dp),

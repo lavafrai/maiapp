@@ -35,6 +35,19 @@ data class Lesson(
     }
 
     override fun getUid(): Int {
+        // В uid входит всё, что отличает две пары с одинаковым названием в одно время:
+        // преподаватели и аудитории. Иначе у них один uid, и пометка на одной паре «прилипает» к обеим
+        return listOf(
+            name,
+            day.toString(),
+            getPairNumber().toString(),
+            lectors.map { it.uid.uid }.sorted().joinToString(","),
+            rooms.map { it.uid }.sorted().joinToString(","),
+        ).joinToString("|").hashCode()
+    }
+
+    /** Прежний uid — только название, день и номер пары: по нему находим пометки, поставленные до обновления */
+    override fun getLegacyUid(): Int {
         return "$name $day ${getPairNumber()}".hashCode()
     }
 

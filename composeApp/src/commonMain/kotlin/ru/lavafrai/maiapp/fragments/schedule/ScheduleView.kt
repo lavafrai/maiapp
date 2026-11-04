@@ -26,6 +26,7 @@ import ru.lavafrai.maiapp.fragments.PageColumn
 import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.matchesUid
 import ru.lavafrai.maiapp.models.time.DateRange
 import ru.lavafrai.maiapp.models.time.now
 import ru.lavafrai.maiapp.models.time.week
@@ -58,7 +59,7 @@ fun ScheduleView(
                 selector.test(
                     day.date,
                     lesson,
-                    annotations.filter { it.lessonUid == lesson.getUid() }
+                    annotations.filter { lesson.matchesUid(it.lessonUid) }
                 )
             })
         }.filter { it.lessons.isNotEmpty() }

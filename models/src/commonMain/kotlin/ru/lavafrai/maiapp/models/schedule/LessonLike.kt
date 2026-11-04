@@ -14,6 +14,12 @@ interface LessonLike {
 
     fun getUid(): Int
 
+    /**
+     * Uid, который считался раньше — до того, как в него добавили преподавателей и аудитории.
+     * Нужен, чтобы пометки, поставленные пользователем до обновления, не потерялись.
+     */
+    fun getLegacyUid(): Int = getUid()
+
     val startTimePaddedString: String
         get() = "${startTime.hour.toString().padStart(2, '0')}:${startTime.minute.toString().padStart(2, '0')}"
     val endTimePaddedString: String
@@ -27,3 +33,6 @@ interface LessonLike {
         return endTime < LocalTime.now()
     }
 }
+
+/** Относится ли пометка с этим uid к занятию: по новому uid или по старому, до обновления */
+fun LessonLike.matchesUid(uid: Int): Boolean = uid == getUid() || uid == getLegacyUid()
