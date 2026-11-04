@@ -70,7 +70,9 @@ fun SchedulesSettings(
                 disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
             trailingIcon = {
-                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }, enabled = schedule.isNotLoading()) {
+                // Переключать расписание можно и во время загрузки: ViewModel отменит текущую загрузку
+                // и начнёт загрузку выбранного расписания
+                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = FeatherIcons.ChevronDown,
                         contentDescription = stringResource(Res.string.schedule),
