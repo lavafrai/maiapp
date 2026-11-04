@@ -67,6 +67,27 @@ fun ColumnScope.TeacherReviewsView(
                 .padding(horizontal = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Сразу под фотографиями: иначе при большом числе отзывов до кнопки приходится долго листать
+            InputChip(
+                onClick = {
+                    appContext.openUrl(teacherInfo.link, forcedInBrowser = true)
+                },
+                modifier = Modifier
+                    .align(Alignment.End),
+                label = {
+                    Text(stringResource(Res.string.open_on_exler))
+                },
+                selected = false,
+                trailingIcon = {
+                    Icon(
+                        imageVector = FeatherIcons.ExternalLink,
+                        contentDescription = null,
+                        modifier = Modifier.size(LocalTextStyle.current.fontSize.asDp),
+                        tint = LocalContentColor.current,
+                    )
+                },
+            )
+
             if (teacherUid != TeacherUid.Empty) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
@@ -95,26 +116,6 @@ fun ColumnScope.TeacherReviewsView(
             teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->
                 TeacherReviewView(review)
             }
-
-            InputChip(
-                onClick = {
-                    appContext.openUrl(teacherInfo.link, forcedInBrowser = true)
-                },
-                modifier = Modifier
-                    .align(Alignment.End),
-                label = {
-                    Text(stringResource(Res.string.open_on_exler))
-                },
-                selected = false,
-                trailingIcon = {
-                    Icon(
-                        imageVector = FeatherIcons.ExternalLink,
-                        contentDescription = null,
-                        modifier = Modifier.size(LocalTextStyle.current.fontSize.asDp),
-                        tint = LocalContentColor.current,
-                    )
-                },
-            )
 
             Box(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
         }
