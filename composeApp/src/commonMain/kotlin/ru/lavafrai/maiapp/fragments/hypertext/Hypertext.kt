@@ -16,7 +16,7 @@ import ru.lavafrai.maiapp.utils.UrlHandler
 @Composable
 fun Hypertext(
     hypertext: String,
-    baseLinkPath: String = "https://mai-exler.ru",
+    baseLinkPath: String = "https://mai-sten.online",
     color: Color = LocalContentColor.current,
 ) {
     val state = rememberRichTextState()

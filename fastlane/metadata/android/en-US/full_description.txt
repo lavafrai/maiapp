@@ -8,7 +8,7 @@ Available features:
 • Downloading several schedules and switching between them
 • Campus information and map
 • The schedule is updated automatically every time the app starts
-• Teacher reviews, in cooperation with MAI.Exler.ru
+• Teacher reviews, in cooperation with MAI Sten
 • You can mark works so you don't forget about upcoming tests and quizzes
 • Even teachers can use the app
 • my.mai.ru personal account: grades and debts

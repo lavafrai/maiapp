@@ -15,18 +15,19 @@ class UrlHandler(
         url: String,
         forcedInBrowser: Boolean = false,
     ) {
-        if (url.startsWith("https://mai-exler.ru") && !forcedInBrowser) {
-            if (tryToOpenExlerInApp(url)) return
+        if (!forcedInBrowser) {
+            val siteUrl = reviewsSiteUrls.find { url.startsWith(it) }
+            if (siteUrl != null && tryToOpenTeacherInApp(url, siteUrl)) return
         }
 
         val platform = getPlatform()
         platform.openUrl(url)
     }
 
-    private fun tryToOpenExlerInApp(url: String): Boolean {
-        if (!url.startsWith("https://mai-exler.ru/prepods")) return false
+    private fun tryToOpenTeacherInApp(url: String, siteUrl: String): Boolean {
+        if (!url.startsWith("$siteUrl/prepods")) return false
         val teachers = ExlerRepository().getTeachersFromCacheOrNull() ?: return false
-        val teacherId = teachers.find { "https://mai-exler.ru${it.path}" == url } ?: return false
+        val teacherId = teachers.find { "$siteUrl${it.path}" == url } ?: return false
         openTeacherInfo(teacherId, TeacherUid.Empty)
         return true
     }
@@ -36,6 +37,12 @@ class UrlHandler(
     }
 
     companion object {
+        /**
+         * Адрес сайта с отзывами: новый и прежний.
+         * Старый нужен для ссылок в уже загруженных на устройство страницах.
+         */
+        private val reviewsSiteUrls = listOf("https://mai-sten.online", "https://mai-exler.ru")
+
         @Composable
         fun create(): UrlHandler {
             val context = LocalApplicationContext.current

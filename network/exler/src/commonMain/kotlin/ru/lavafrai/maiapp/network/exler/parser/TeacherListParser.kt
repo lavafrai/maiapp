@@ -23,7 +23,7 @@ suspend fun parseTeachers(
     faculty: ExlerFaculty,
 ): List<ExlerTeacher> {
     val teacherNameMatcher = "\\S+\\s\\S+\\s\\S+".toRegex()
-    val teachersHtml = httpGet("https://mai-exler.ru${faculty.path}")
+    val teachersHtml = httpGet("https://mai-sten.online${faculty.path}")
     val teachersDocument = Ksoup.parse(teachersHtml)
     val teachers = teachersDocument
         .selectFirst("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > ol")!!
@@ -37,7 +37,7 @@ suspend fun parseTeachers(
 suspend fun parseFaculties(
     httpGet: HttpGet,
 ): List<ExlerFaculty> {
-    val facultiesHtml = httpGet("https://mai-exler.ru/prepods/")
+    val facultiesHtml = httpGet("https://mai-sten.online/prepods/")
     val facultiesDocument = Ksoup.parse(facultiesHtml)
     val faculties = facultiesDocument
         .selectFirst("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > div > table > tbody > tr > td > table > tbody")!!
