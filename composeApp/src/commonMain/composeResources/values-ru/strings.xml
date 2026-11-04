@@ -20,6 +20,11 @@
     <string name="something_went_wrong">Что-то пошло не так</string>
     <string name="some_data_must_be_loaded">Нужно кое-что загрузить…</string>
     <string name="schedule">Расписание</string>
+    <string name="schedule_label">Подпись расписания</string>
+    <string name="schedule_label_hint">Например, «Моя группа»</string>
+    <string name="schedule_label_remove">Убрать подпись</string>
+    <string name="schedule_current">Текущее расписание</string>
+    <string name="save">Сохранить</string>
     <string name="schedules">Расписания</string>
     <string name="add_schedule">Добавить расписание</string>
     <string name="add_schedule_description">Вы можете сохранить несколько расписаний и переключаться между ними по мере необходимости.</string>
