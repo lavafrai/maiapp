@@ -1,9 +1,7 @@
 package ru.lavafrai.maiapp.fragments.schedule
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,13 +18,15 @@ fun AnnotationsView(
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     onOpenAnnotations: () -> Unit = {},
 ) {
-    Box(
+    // Значки встают друг под друга с отступом: раньше они рисовались стопкой с шагом 8dp
+    // при размере значка 36dp и почти полностью закрывали друг друга
+    Column(
         modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        annotations.sortedBy { it.type.priority }.forEachIndexed { index, annotation ->
+        annotations.sortedBy { it.type.priority }.forEach { annotation ->
             AnnotationView(
-                annotation,
-                topOffset = (annotations.size - index - 1) * 8,
+                annotation = annotation,
                 backgroundColor = backgroundColor,
                 onOpenAnnotations = onOpenAnnotations,
             )
@@ -37,20 +37,15 @@ fun AnnotationsView(
 @Composable
 fun AnnotationView(
     annotation: LessonAnnotation,
-    topOffset: Int = 0,
     backgroundColor: Color,
     onOpenAnnotations: () -> Unit = {},
 ) {
-    Column {
-        Spacer(modifier = Modifier.height(topOffset.dp))
-
-        PairNumber(
-            text = annotation.letter(),
-            background = annotation.color(),
-            color = backgroundColor,
-            borderColor = backgroundColor,
-            borderWidth = 4.dp,
-            onClick = onOpenAnnotations,
-        )
-    }
+    PairNumber(
+        text = annotation.letter(),
+        background = annotation.color(),
+        color = backgroundColor,
+        borderColor = backgroundColor,
+        borderWidth = 4.dp,
+        onClick = onOpenAnnotations,
+    )
 }
