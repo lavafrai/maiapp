@@ -5,6 +5,7 @@ import ru.lavafrai.maiapp.ApplicationContext
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.repositories.ExlerRepository
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
+import ru.lavafrai.maiapp.models.exler.ReviewsSite
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.platform.getPlatform
 
@@ -16,7 +17,7 @@ class UrlHandler(
         forcedInBrowser: Boolean = false,
     ) {
         if (!forcedInBrowser) {
-            val siteUrl = reviewsSiteUrls.find { url.startsWith(it) }
+            val siteUrl = ReviewsSite.urls.find { url.startsWith(it) }
             if (siteUrl != null && tryToOpenTeacherInApp(url, siteUrl)) return
         }
 
@@ -37,12 +38,6 @@ class UrlHandler(
     }
 
     companion object {
-        /**
-         * Адрес сайта с отзывами: новый и прежний.
-         * Старый нужен для ссылок в уже загруженных на устройство страницах.
-         */
-        private val reviewsSiteUrls = listOf("https://mai-sten.online", "https://mai-exler.ru")
-
         @Composable
         fun create(): UrlHandler {
             val context = LocalApplicationContext.current

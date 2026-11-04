@@ -10,13 +10,14 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material.RichText
+import ru.lavafrai.maiapp.models.exler.ReviewsSite
 import ru.lavafrai.maiapp.theme.LinkColor
 import ru.lavafrai.maiapp.utils.UrlHandler
 
 @Composable
 fun Hypertext(
     hypertext: String,
-    baseLinkPath: String = "https://mai-sten.online",
+    baseLinkPath: String = ReviewsSite.URL,
     color: Color = LocalContentColor.current,
 ) {
     val state = rememberRichTextState()

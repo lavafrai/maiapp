@@ -3,6 +3,7 @@ package ru.lavafrai.maiapp.network.exler.parser
 import com.fleeksoft.ksoup.Ksoup
 import ru.lavafrai.maiapp.models.exler.ExlerFaculty
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
+import ru.lavafrai.maiapp.models.exler.ReviewsSite
 import ru.lavafrai.maiapp.utils.mapAsync
 
 suspend fun parseTeacherList(
@@ -23,7 +24,7 @@ suspend fun parseTeachers(
     faculty: ExlerFaculty,
 ): List<ExlerTeacher> {
     val teacherNameMatcher = "\\S+\\s\\S+\\s\\S+".toRegex()
-    val teachersHtml = httpGet("https://mai-sten.online${faculty.path}")
+    val teachersHtml = httpGet("${ReviewsSite.URL}${faculty.path}")
     val teachersDocument = Ksoup.parse(teachersHtml)
     val teachers = teachersDocument
         .selectFirst("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > ol")!!
@@ -37,7 +38,7 @@ suspend fun parseTeachers(
 suspend fun parseFaculties(
     httpGet: HttpGet,
 ): List<ExlerFaculty> {
-    val facultiesHtml = httpGet("https://mai-sten.online/prepods/")
+    val facultiesHtml = httpGet("${ReviewsSite.URL}/prepods/")
     val facultiesDocument = Ksoup.parse(facultiesHtml)
     val faculties = facultiesDocument
         .selectFirst("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > div > table > tbody > tr > td > table > tbody")!!
