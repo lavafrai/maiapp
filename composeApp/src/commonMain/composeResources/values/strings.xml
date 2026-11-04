@@ -20,6 +20,11 @@
     <string name="something_went_wrong">Something went wrong</string>
     <string name="some_data_must_be_loaded">Loading some data…</string>
     <string name="schedule">Schedule</string>
+    <string name="schedule_label">Schedule label</string>
+    <string name="schedule_label_hint">For example, “My group”</string>
+    <string name="schedule_label_remove">Remove the label</string>
+    <string name="schedule_current">Current schedule</string>
+    <string name="save">Save</string>
     <string name="schedules">Schedules</string>
     <string name="add_schedule">Add schedule</string>
     <string name="add_schedule_description">You can save several schedules and switch between them when needed.</string>
