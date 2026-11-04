@@ -27,10 +27,13 @@ import maiapp.composeapp.generated.resources.start_typing
 import maiapp.composeapp.generated.resources.wait_a_minute
 import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.data.BaseLoadableStatus
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
+import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.ErrorView
 import ru.lavafrai.maiapp.models.Nameable
 import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.viewmodels.login.LoginPageViewModel
+import ru.lavafrai.maiapp.viewmodels.login.LoginType
 import soup.compose.material.motion.MaterialFadeThrough
 
 @Composable
@@ -49,6 +52,30 @@ fun LoginPage(
     // val viewModel = viewModel { LoginPageViewModel(loginData, onNavigateBack, onLoginDone) }
 
     val viewState by viewModel.state.collectAsState()
+
+    val settings by rememberSettings()
+    // Преподаватели, которые недавно открывались: свои списки для расписаний и для отзывов
+    val recentTeachers = remember(
+        settings.recentScheduleTeachers,
+        settings.recentReviewTeachers,
+        viewState.neededLoadable.data,
+        loginData.type,
+    ) {
+        val stored = when (loginData.type) {
+            LoginType.TEACHER -> settings.recentScheduleTeachers
+            LoginType.EXLER -> settings.recentReviewTeachers
+            LoginType.STUDENT -> emptyList()
+        }
+        // Показываем только тех, у кого действительно есть расписание или отзывы
+        val loaded = viewState.neededLoadable.data.orEmpty()
+        stored.mapNotNull { recent -> loaded.find { it.name == recent.name } }
+    }
+    // Недавние тоже фильтруются поиском и пропадают, только когда не подходит никто
+    val visibleRecentTeachers = remember(recentTeachers, searchQuery) {
+        val query = searchQuery.trim()
+        if (query.isEmpty()) recentTeachers else recentTeachers.filter { it.name.contains(query, ignoreCase = true) }
+    }
+    val visibleRecentNames = remember(visibleRecentTeachers) { visibleRecentTeachers.map { it.name }.toSet() }
 
     LaunchedEffect(viewState.neededLoadable.baseStatus) {
         if (viewState.neededLoadable.baseStatus == BaseLoadableStatus.Actual) {
@@ -115,7 +142,52 @@ fun LoginPage(
                     onExpandedChange = { isExpanded = it },
                 ) {
                     LazyColumn {
-                        items(viewState.filteredData) {
+                        if (visibleRecentTeachers.isNotEmpty()) {
+                            item(key = "recent title") {
+                                Text(
+                                    text = stringResource(Res.string.recent_teachers),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+                                )
+                            }
+                            items(visibleRecentTeachers, key = { "recent ${it.name}" }) { teacher ->
+                                ListItem(
+                                    headlineContent = { Text(teacher.name) },
+                                    leadingContent = {
+                                        Icon(FeatherIcons.Clock, contentDescription = null)
+                                    },
+                                    trailingContent = {
+                                        IconButton(
+                                            onClick = {
+                                                ApplicationSettings.removeRecentTeacher(
+                                                    name = teacher.name,
+                                                    forReviews = loginData.type == LoginType.EXLER,
+                                                )
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = FeatherIcons.X,
+                                                contentDescription = stringResource(Res.string.recent_teachers_remove),
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .animateItem()
+                                        .clickable {
+                                            viewModel.select(teacher)
+                                            isExpanded = false
+                                            searchQuery = teacher.name
+                                        }
+                                )
+                            }
+                            item(key = "recent divider") { HorizontalDivider() }
+                        }
+
+                        // Недавних убираем из общего списка, чтобы не было двух одинаковых строк подряд
+                        items(
+                            viewState.filteredData.filterNot { it.name in visibleRecentNames },
+                        ) {
                             ListItem(
                                 headlineContent = { Text(it.name) },
                                 modifier = Modifier
