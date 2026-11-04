@@ -4,6 +4,14 @@
     <string name="student">Student</string>
     <string name="teacher">Teacher</string>
     <string name="start_typing">Start typing…</string>
+    <string name="recent_teachers">Recent teachers</string>
+    <string name="recent_teachers_shared">Share the list between schedules and reviews</string>
+    <string name="recent_teachers_limit">Remember</string>
+    <string name="recent_teachers_remove">Remove from recents</string>
+    <string name="recent_teachers_share_title">Change the recents list?</string>
+    <string name="recent_teachers_share_on">The schedule and review lists will be merged into one. Duplicates are removed, and the later opening date is kept for each teacher.</string>
+    <string name="recent_teachers_share_off">The shared list will be copied into two separate lists, one for schedules and one for reviews. After that they are filled independently.</string>
+    <string name="got_it">Got it</string>
     <string name="wait_a_minute">Wait a minute…</string>
     <string name="network_error">Network error</string>
     <string name="no_internet_connection">No internet connection</string>

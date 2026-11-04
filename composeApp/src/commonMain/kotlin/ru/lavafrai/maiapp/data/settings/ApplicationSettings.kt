@@ -17,12 +17,28 @@ import ru.lavafrai.maiapp.models.schedule.BaseScheduleId
 import ru.lavafrai.maiapp.platform.getPlatform
 import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
+import kotlin.time.Clock
+
+
+/** Преподаватель, чьё расписание или отзывы недавно открывали */
+@Serializable
+data class RecentTeacher(
+    val name: String,
+    /** Время открытия: по нему списки правильно сливаются при смене настройки */
+    val openedAt: Long,
+)
 
 
 @Serializable
 data class ApplicationSettingsData(
     val selectedSchedule: BaseScheduleId? = null,
     val savedSchedules: List<BaseScheduleId> = emptyList(),
+    // Недавно открытые преподаватели: отдельно для поиска по расписаниям и по отзывам.
+    // При общем списке (shareRecentTeachers) оба списка содержат одно и то же.
+    val recentScheduleTeachers: List<RecentTeacher> = emptyList(),
+    val recentReviewTeachers: List<RecentTeacher> = emptyList(),
+    val shareRecentTeachers: Boolean = true,
+    val recentTeachersLimit: Int = 10,
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
     val hideMilitaryTraining: Boolean = false,
@@ -39,6 +55,9 @@ data class ApplicationSettingsData(
 
 @Serializable
 object ApplicationSettings {
+    // ignoreUnknownKeys: настройки, записанные более новой версией приложения, не должны сбрасываться
+    private val json = Json { ignoreUnknownKeys = true }
+
     private val flow = MutableStateFlow(getCurrent())
     private val storage
         get() = getPlatform().storage()
@@ -49,7 +68,7 @@ object ApplicationSettings {
         val settings = try {
             val settingsSerialized =
                 storage.getStringOrNull("settings") ?: return ApplicationSettingsData()
-            Json.decodeFromString<ApplicationSettingsData>(settingsSerialized)
+            json.decodeFromString<ApplicationSettingsData>(settingsSerialized)
         } catch (e: SerializationException) {
             return ApplicationSettingsData()
         } catch (e: Exception) {
@@ -62,7 +81,7 @@ object ApplicationSettings {
 
     private fun update(new: ApplicationSettingsData) {
         //storage.encodeValue("settings", new)
-        val scheduleEncoded = Json.encodeToString(new)
+        val scheduleEncoded = json.encodeToString(new)
         storage.putString("settings", scheduleEncoded)
         flow.value = (new)
     }
@@ -109,6 +128,75 @@ object ApplicationSettings {
                 .distinctBy { it.id }
             update(current.copy(savedSchedules = newSavedGroups))
         }
+    }
+
+    /**
+     * Запоминает, что открыли расписание ([forReviews] = false) или отзывы преподавателя.
+     * При общем списке обновляются оба списка, иначе — только нужный.
+     */
+    fun markTeacherOpened(name: String, forReviews: Boolean) {
+        val current = getCurrent()
+        val now = Clock.System.now().epochSeconds
+
+        fun updated(list: List<RecentTeacher>): List<RecentTeacher> {
+            return (listOf(RecentTeacher(name, now)) + list)
+                .distinctBy { it.name }
+                .sortedByDescending { it.openedAt }
+                .take(current.recentTeachersLimit)
+        }
+
+        val schedule = if (forReviews && !current.shareRecentTeachers) current.recentScheduleTeachers
+                       else updated(current.recentScheduleTeachers)
+        val reviews = if (!forReviews && !current.shareRecentTeachers) current.recentReviewTeachers
+                      else updated(current.recentReviewTeachers)
+
+        update(current.copy(recentScheduleTeachers = schedule, recentReviewTeachers = reviews))
+    }
+
+    /** Убирает преподавателя из недавних: при общем списке — из обоих */
+    fun removeRecentTeacher(name: String, forReviews: Boolean) {
+        val current = getCurrent()
+
+        val schedule = if (forReviews && !current.shareRecentTeachers) current.recentScheduleTeachers
+                       else current.recentScheduleTeachers.filterNot { it.name == name }
+        val reviews = if (!forReviews && !current.shareRecentTeachers) current.recentReviewTeachers
+                      else current.recentReviewTeachers.filterNot { it.name == name }
+
+        update(current.copy(recentScheduleTeachers = schedule, recentReviewTeachers = reviews))
+    }
+
+    /**
+     * Включает или выключает общий список недавних.
+     * При включении два списка сливаются без повторов (у преподавателя остаётся более позднее открытие),
+     * при выключении общий список копируется в оба.
+     */
+    fun setShareRecentTeachers(shared: Boolean) {
+        val current = getCurrent()
+        val merged = (current.recentScheduleTeachers + current.recentReviewTeachers)
+            .groupBy { it.name }
+            .map { (_, opened) -> opened.maxBy { it.openedAt } }
+            .sortedByDescending { it.openedAt }
+            .take(current.recentTeachersLimit)
+
+        update(
+            current.copy(
+                shareRecentTeachers = shared,
+                recentScheduleTeachers = merged,
+                recentReviewTeachers = merged,
+            )
+        )
+    }
+
+    /** Меняет, сколько преподавателей запоминать; лишние отбрасываются с конца списка */
+    fun setRecentTeachersLimit(limit: Int) {
+        val current = getCurrent()
+        update(
+            current.copy(
+                recentTeachersLimit = limit,
+                recentScheduleTeachers = current.recentScheduleTeachers.take(limit),
+                recentReviewTeachers = current.recentReviewTeachers.take(limit),
+            )
+        )
     }
 
     suspend fun setSelectedSchedule(schedule: BaseScheduleId) {

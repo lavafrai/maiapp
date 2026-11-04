@@ -2,6 +2,7 @@ package ru.lavafrai.maiapp
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavController
+import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.models.events.RenderedEvent
 import ru.lavafrai.maiapp.models.maidata.MaiDataItem
 import ru.lavafrai.maiapp.models.maidata.MaiDataItemType
@@ -10,6 +11,7 @@ import ru.lavafrai.maiapp.models.maidata.asset.WebviewAsset
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.ScheduleId
+import ru.lavafrai.maiapp.models.schedule.TeacherId
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.navigation.pages.*
 import ru.lavafrai.maiapp.utils.UrlHandler
@@ -25,6 +27,9 @@ class ApplicationContext(
     val urlHandler: UrlHandler = UrlHandler(this)
 
     fun openTeacherReviews(teacherId: String, teacherUid: TeacherUid) {
+        // Запоминаем преподавателя, чьи отзывы открыли: в следующий раз он будет в начале поиска
+        ApplicationSettings.markTeacherOpened(teacherId, forReviews = true)
+
         navController.navigate(TeacherReviewsPage(teacherId, teacherUid))
     }
 
@@ -37,6 +42,14 @@ class ApplicationContext(
     }
 
     fun openSchedule(scheduleId: ScheduleId, title: String? = null) {
+        // Запоминаем преподавателя, чьё расписание открыли: в следующий раз он будет в начале поиска
+        val teacherName = when (scheduleId) {
+            is TeacherId -> scheduleId.name
+            is TeacherUid -> title // у расписания преподавателя название передаётся всегда
+            else -> null
+        }
+        if (teacherName != null) ApplicationSettings.markTeacherOpened(teacherName, forReviews = false)
+
         navController.navigate(DedicatedSchedulePage(scheduleId, title))
     }
 
