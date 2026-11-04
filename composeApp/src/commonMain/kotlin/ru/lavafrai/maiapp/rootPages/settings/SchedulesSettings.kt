@@ -13,10 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Check
 import compose.icons.feathericons.ChevronDown
+import compose.icons.feathericons.Edit3
 import compose.icons.feathericons.Trash2
 import kotlinx.coroutines.launch
 import maiapp.composeapp.generated.resources.*
@@ -27,6 +30,7 @@ import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
+import ru.lavafrai.maiapp.fragments.schedule.ScheduleName
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.navigation.pages.LoginPage
 import ru.lavafrai.maiapp.utils.conditional
@@ -45,7 +49,13 @@ fun SchedulesSettings(
     val otherSchedules = remember(settings) {
         settings.savedSchedules.filter { it.scheduleId != settings.selectedSchedule?.scheduleId }
     }
+    // В списке показываем и текущее расписание: его подпись можно править, не переключаясь на другое
+    val allSchedules = remember(settings, otherSchedules) {
+        listOfNotNull(settings.selectedSchedule) + otherSchedules
+    }
     var expanded by remember { mutableStateOf(false) }
+    // id расписания, для которого открыт диалог подписи
+    var labelDialogScheduleId by remember { mutableStateOf<String?>(null) }
     val openButtonRotationDegrees by animateFloatAsState(if (expanded) -180f else 0f)
 
     LaunchedEffect(otherSchedules) {
@@ -70,12 +80,22 @@ fun SchedulesSettings(
                 disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
             trailingIcon = {
-                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }, enabled = schedule.isNotLoading()) {
-                    Icon(
-                        imageVector = FeatherIcons.ChevronDown,
-                        contentDescription = stringResource(Res.string.schedule),
-                        modifier = Modifier.rotate(openButtonRotationDegrees),
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (settings.selectedSchedule != null) IconButton(
+                        onClick = { labelDialogScheduleId = settings.selectedSchedule?.scheduleId }
+                    ) {
+                        Icon(
+                            imageVector = FeatherIcons.Edit3,
+                            contentDescription = stringResource(Res.string.schedule_label),
+                        )
+                    }
+                    if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }, enabled = schedule.isNotLoading()) {
+                        Icon(
+                            imageVector = FeatherIcons.ChevronDown,
+                            contentDescription = stringResource(Res.string.schedule),
+                            modifier = Modifier.rotate(openButtonRotationDegrees),
+                        )
+                    }
                 }
             }
         )
@@ -86,7 +106,8 @@ fun SchedulesSettings(
                 expanded = false
             },
         ) {
-            otherSchedules.forEach { schedule ->
+            allSchedules.forEach { schedule ->
+                val isCurrent = schedule.scheduleId == settings.selectedSchedule?.scheduleId
                 var calculatedSize by remember { mutableStateOf(null as Long?) }
                 LaunchedEffect(schedule) {
                     val size = scheduleRepository.getScheduleSizeInCache(schedule)
@@ -95,23 +116,48 @@ fun SchedulesSettings(
 
                 DropdownMenuItem(
                     text = {
-                        Text(text = schedule.readableName())
+                        ScheduleName(
+                            name = schedule.readableName(),
+                            label = settings.scheduleLabels[schedule.scheduleId],
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     },
                     trailingIcon = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (isCurrent) Icon(
+                                imageVector = FeatherIcons.Check,
+                                contentDescription = stringResource(Res.string.schedule_current),
+                            )
                             Text(
                                 text = if (calculatedSize != null) calculatedSize!!.formatBinarySize() else "100hn",
                                 modifier = Modifier
                                     .alpha(0.7f)
                                     .conditional(calculatedSize == null) { shimmer() }
                             )
-                            IconButton(onClick = { scope.launch { ApplicationSettings.removeSavedGroup(schedule) } }) {
+                            IconButton(onClick = { labelDialogScheduleId = schedule.scheduleId }) {
+                                Icon(
+                                    imageVector = FeatherIcons.Edit3,
+                                    contentDescription = stringResource(Res.string.schedule_label),
+                                )
+                            }
+                            // Последнее расписание удалять нельзя: приложению нечего будет показать
+                            if (allSchedules.size > 1) IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        val index = allSchedules.indexOfFirst { it.scheduleId == schedule.scheduleId }
+                                        val next = allSchedules.getOrNull(index + 1)
+                                            ?: allSchedules.getOrNull(index - 1)
+                                        ApplicationSettings.removeSavedGroupAndSelect(schedule, next)
+                                    }
+                                }
+                            ) {
                                 Icon(imageVector = FeatherIcons.Trash2, contentDescription = null)
                             }
                         }
                     },
                     onClick = {
-                        scope.launch {
+                        if (!isCurrent) scope.launch {
                             ApplicationSettings.setSelectedSchedule(schedule)
                         }
                         expanded = false
@@ -142,4 +188,11 @@ fun SchedulesSettings(
         onToggle = { ApplicationSettings.setHideMilitaryTraining(it) },
         enabled = schedule.isNotLoading() && otherSchedules.isNotEmpty(),
     )
+
+    labelDialogScheduleId?.let { scheduleId ->
+        ScheduleLabelDialog(
+            scheduleId = scheduleId,
+            onDismiss = { labelDialogScheduleId = null },
+        )
+    }
 }
