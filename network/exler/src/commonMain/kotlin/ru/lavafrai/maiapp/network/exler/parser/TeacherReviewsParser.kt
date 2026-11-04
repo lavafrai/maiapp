@@ -4,6 +4,7 @@ import com.fleeksoft.ksoup.Ksoup
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherInfo
 import ru.lavafrai.maiapp.models.exler.ExlerTeacherReview
+import ru.lavafrai.maiapp.models.exler.ReviewsSite
 import ru.lavafrai.maiapp.utils.contextual
 import ru.lavafrai.maiapp.utils.globalUrl
 import ru.lavafrai.maiapp.utils.isUrlToImage
@@ -13,7 +14,7 @@ suspend fun parseTeacherReviews(
     httpGet: HttpGet,
     teacherId: ExlerTeacher,
 ): ExlerTeacherInfo {
-    val pageUrl = "https://mai-exler.ru${teacherId.path}"
+    val pageUrl = "${ReviewsSite.URL}${teacherId.path}"
     val reviewsPage = httpGet(pageUrl)
     val reviewsElement = Ksoup.parse(reviewsPage).select("body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td")
     val reviewTexts = "<!--subscribeBegin-->([\\s\\S]+?)<!--subscribeEnd-->"
@@ -69,11 +70,11 @@ suspend fun parseTeacherReview(
     teacherId: ExlerTeacher,
 ): ExlerTeacherReview? {
     val normalizedText = text
-        .also { if (it.contains("<table")) {println("skip table: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/vestyak/
-        .also { if (it.contains("<b>ФРАЗЫ</b>")) {println("skip phrases: $teacherId") ; return null} } // cause: https://mai-exler.ru/prepods/08/sharikov/
-        .contextual(case = { trim().startsWith("small&gt;") }) { println("fix: $teacherId") ; replace("small&gt;", "<small>") } // cause: https://mai-exler.ru/prepods/02/uskova/
+        .also { if (it.contains("<table")) {println("skip table: $teacherId") ; return null} } // cause: https://mai-sten.online/prepods/08/vestyak/
+        .also { if (it.contains("<b>ФРАЗЫ</b>")) {println("skip phrases: $teacherId") ; return null} } // cause: https://mai-sten.online/prepods/08/sharikov/
+        .contextual(case = { trim().startsWith("small&gt;") }) { println("fix: $teacherId") ; replace("small&gt;", "<small>") } // cause: https://mai-sten.online/prepods/02/uskova/
         .modify() { replace("&nbsp;", " ") }
-        .modify() { replace("<small><font color=\"#666666\"> </font></small>", "") } // cause: https://mai-exler.ru/prepods/02/mikhailova/
+        .modify() { replace("<small><font color=\"#666666\"> </font></small>", "") } // cause: https://mai-sten.online/prepods/02/mikhailova/
 
     val reviewMeta = Ksoup.parse(normalizedText).select("small").joinToString("\n")
     if (reviewMeta.isBlank()) {
@@ -117,6 +118,6 @@ suspend fun parseBaseTeacherInfo(
         photos = emptyList(),
         largePhotos = emptyMap(),
         reviews = emptyList(),
-        link = "https://mai-exler.ru${teacherId.path}",
+        link = "${ReviewsSite.URL}${teacherId.path}",
     )
 }

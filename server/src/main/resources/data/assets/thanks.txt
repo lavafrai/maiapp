@@ -3,7 +3,7 @@ I would like to thank the following people and projects for their contributions,
 Максим Онищенко (maximon0101) for testing support throughout the development process
 Артем Лазарев (ArtemBay) for the initial development of promo-materials
 Артем Бирюков for testing of some application features and ideas for improvements
-Георгий Суворов for ideas and help with mai-exler integration and also for mai campus map
+Георгий Суворов for ideas and help with the MAI Sten reviews site integration and also for mai campus map
 Evgeny Meltsaykin for idea to rewrite the application in Compose Multiplatform and for code reviews
 Георгий Воложанин и Павел Голощапов for making it possible to release the app on iOS
 

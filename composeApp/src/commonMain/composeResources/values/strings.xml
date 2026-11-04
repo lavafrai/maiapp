@@ -76,7 +76,7 @@
     <string name="update_dialog_gratitude">Thank you for keeping the app up to date!</string>
     <string name="update_dialog_scam">How about supporting the developer with a coin? :)</string>
     <string name="schedule_is_empty">There are no classes here, time to rest!</string>
-    <string name="open_on_exler">Open on MAI.Exler.ru</string>
+    <string name="open_on_exler">Open on the MAI Sten website</string>
     <string name="semester">Semester</string>
     <string name="semesterComplete">Completed</string>
     <string name="widget_description">The app can show your schedule in a widget. Try adding it to your home screen.</string>

@@ -17,7 +17,7 @@ use crate::{
     telemetry::Telemetry,
 };
 
-// #1: Kotlin использует mai-exler.ru, Rust ранее ошибочно использовал mai-sten.online
+// Сайт с отзывами: mai-sten.online (прежний адрес — mai-exler.ru, он больше не работает)
 const EXLER_BASE: &str = "https://mai-sten.online";
 
 /// Hosts of teacher photos. Browsers can't load them in the web version directly
