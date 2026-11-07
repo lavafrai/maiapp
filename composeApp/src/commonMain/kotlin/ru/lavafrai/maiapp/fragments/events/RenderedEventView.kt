@@ -90,7 +90,6 @@ fun RenderedEventView(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 event.teachers.filter { it.isNotBlank() }.forEach { teacherName ->
-                    // ФИО в событии и в отзывах может отличаться буквой ё, регистром или порядком слов
                     val exlerTeacher = remember(exlerTeachers, teacherName) { exlerTeachers?.findByTeacherName(teacherName) }
                     val hasSchedule = false // remember(it) { it.uid != TeacherUid.Empty }
                     val clickable = exlerTeacher != null || hasSchedule
@@ -100,7 +99,6 @@ fun RenderedEventView(
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (clickable) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.conditional(clickable) { clickable {
-                            // Открываем отзывы по имени из списка СтЭна: именно его знает сервер
                             if (exlerTeacher != null) appContext.openTeacherReviews(exlerTeacher.name, TeacherUid(Uuid.NIL.toString()))
                             // else if (hasSchedule) appContext.openSchedule(it.uid, it.name)
                         }}
