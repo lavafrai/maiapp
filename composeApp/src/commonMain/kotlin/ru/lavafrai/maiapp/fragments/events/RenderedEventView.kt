@@ -29,6 +29,7 @@ import ru.lavafrai.maiapp.localizers.localized
 import ru.lavafrai.maiapp.models.annotations.LessonAnnotation
 import ru.lavafrai.maiapp.models.events.RenderedEvent
 import ru.lavafrai.maiapp.models.exler.ExlerTeacher
+import ru.lavafrai.maiapp.models.exler.findByTeacherName
 import ru.lavafrai.maiapp.models.schedule.Schedule
 import ru.lavafrai.maiapp.models.schedule.TeacherUid
 import ru.lavafrai.maiapp.theme.LinkColor
@@ -89,16 +90,16 @@ fun RenderedEventView(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 event.teachers.filter { it.isNotBlank() }.forEach { teacherName ->
-                    val areOnExler = remember(exlerTeachers) { exlerTeachers?.any { exler -> exler.name == teacherName } ?: false }
+                    val exlerTeacher = remember(exlerTeachers, teacherName) { exlerTeachers?.findByTeacherName(teacherName) }
                     val hasSchedule = false // remember(it) { it.uid != TeacherUid.Empty }
-                    val clickable = areOnExler || hasSchedule
+                    val clickable = exlerTeacher != null || hasSchedule
 
                     Text(
                         teacherName,
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (clickable) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.conditional(clickable) { clickable {
-                            if (areOnExler) appContext.openTeacherReviews(teacherName, TeacherUid(Uuid.NIL.toString()))
+                            if (exlerTeacher != null) appContext.openTeacherReviews(exlerTeacher.name, TeacherUid(Uuid.NIL.toString()))
                             // else if (hasSchedule) appContext.openSchedule(it.uid, it.name)
                         }}
                     )
