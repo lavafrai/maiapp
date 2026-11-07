@@ -86,7 +86,6 @@ fun LessonView(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 lesson.lectors.filter { it.teacherName.name.isNotBlank() }.forEach {
-                    // ФИО в расписании и в отзывах может отличаться буквой ё, регистром или порядком слов
                     val exlerTeacher = remember(exlerTeachers, it.name) { exlerTeachers?.findByTeacherName(it.name) }
                     val hasSchedule = remember(it) { it.uid != TeacherUid.Empty }
                     val clickable = exlerTeacher != null || hasSchedule
@@ -96,7 +95,6 @@ fun LessonView(
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (clickable) LinkColor else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.conditional(clickable) { clickable {
-                            // Открываем отзывы по имени из списка СтЭна: именно его знает сервер
                             if (exlerTeacher != null) appContext.openTeacherReviews(exlerTeacher.name, it.uid)
                             else if (hasSchedule) appContext.openSchedule(it.uid, it.name)
                         }}

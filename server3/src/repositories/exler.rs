@@ -101,27 +101,22 @@ impl ExlerRepository {
         &self,
         name: &str,
     ) -> anyhow::Result<Option<Cached<ExlerTeacherInfo>>> {
-        let teacher = self
-            .teachers()
-            .await?
-            .value
-            .into_iter()
-            .find(|teacher| teacher.name.to_lowercase() == name.to_lowercase());
-        match teacher {
-            Some(teacher) => {
-                let client = self.client.clone();
-                let cache_key = teacher.path.clone();
-                Ok(Some(
-                    self.teacher_info
-                        .get_or_refresh(cache_key, move || async move {
-                            let repo = ExlerFetcher { client };
-                            repo.teacher_info(&teacher).await
-                        })
-                        .await?,
-                ))
-            }
-            None => Ok(None),
-        }
+        let teachers = self.teachers().await?.value;
+        let teacher = match find_teacher(&teachers, name) {
+            Some(teacher) => teacher.clone(),
+            None => return Ok(None),
+        };
+
+        let client = self.client.clone();
+        let cache_key = teacher.path.clone();
+        Ok(Some(
+            self.teacher_info
+                .get_or_refresh(cache_key, move || async move {
+                    let repo = ExlerFetcher { client };
+                    repo.teacher_info(&teacher).await
+                })
+                .await?,
+        ))
     }
 }
 
@@ -515,34 +510,90 @@ fn is_url_to_image(url: &str) -> bool {
     )
 }
 
-fn teacher_name_hash(name: &str) -> i32 {
-    java_hash_code(
-        &name
-            .trim()
-            .split_whitespace()
-            .collect::<Vec<_>>()
-            .tap_sort()
-            .join(" ")
-            .to_lowercase()
-            .replace('ё', "е"),
-    )
-}
-
-trait TapSort {
-    fn tap_sort(self) -> Self;
-}
-
-impl<'a> TapSort for Vec<&'a str> {
-    fn tap_sort(mut self) -> Self {
-        self.sort_unstable();
-        self
+/// Ищет преподавателя по ФИО: сначала точное совпадение, потом без учёта регистра и ё/е.
+///
+/// Точное совпадение приоритетнее: если в каталоге есть и «Ёлкин», и «Елкин», вернётся тот,
+/// что написан так же, как в расписании.
+fn find_teacher<'a>(teachers: &'a [ExlerTeacher], name: &str) -> Option<&'a ExlerTeacher> {
+    if let Some(teacher) = teachers.iter().find(|teacher| teacher.name == name) {
+        return Some(teacher);
     }
+
+    let normalized = normalize_teacher_name(name);
+    teachers
+        .iter()
+        .find(|teacher| normalize_teacher_name(&teacher.name) == normalized)
+}
+
+/// ФИО без учёта регистра и ё/е: в расписании МАИ и в каталоге СтЭна одна и та же фамилия
+/// может быть записана по-разному («Ёлкин» и «Елкин»)
+fn normalize_teacher_name(name: &str) -> String {
+    name.trim().to_lowercase().replace('ё', "е")
+}
+
+fn teacher_name_hash(name: &str) -> i32 {
+    java_hash_code(&normalize_teacher_name(name))
 }
 
 fn java_hash_code(value: &str) -> i32 {
     value.encode_utf16().fold(0i32, |hash, unit| {
         hash.wrapping_mul(31).wrapping_add(unit as i32)
     })
+}
+
+#[cfg(test)]
+mod teacher_lookup_tests {
+    use super::{ExlerFaculty, ExlerTeacher, find_teacher};
+
+    fn teacher(name: &str, path: &str) -> ExlerTeacher {
+        ExlerTeacher {
+            name: name.to_owned(),
+            path: path.to_owned(),
+            faculty: ExlerFaculty {
+                name: "Факультет № 1".to_owned(),
+                path: "/prepods/01/".to_owned(),
+            },
+            name_hash: 0,
+        }
+    }
+
+    #[test]
+    fn finds_teacher_ignoring_yo_and_case() {
+        let teachers = vec![teacher("Ёлкин Алексей Петрович", "/prepods/01/elkin/")];
+
+        assert_eq!(
+            find_teacher(&teachers, "Елкин Алексей Петрович").map(|teacher| teacher.path.as_str()),
+            Some("/prepods/01/elkin/")
+        );
+        assert_eq!(
+            find_teacher(&teachers, "ёлкин алексей петрович").map(|teacher| teacher.path.as_str()),
+            Some("/prepods/01/elkin/")
+        );
+    }
+
+    #[test]
+    fn exact_match_has_priority() {
+        let teachers = vec![
+            teacher("Ёлкин Алексей Петрович", "/prepods/01/elkin-yo/"),
+            teacher("Елкин Алексей Петрович", "/prepods/01/elkin-e/"),
+        ];
+
+        assert_eq!(
+            find_teacher(&teachers, "Елкин Алексей Петрович").map(|teacher| teacher.path.as_str()),
+            Some("/prepods/01/elkin-e/")
+        );
+        assert_eq!(
+            find_teacher(&teachers, "Ёлкин Алексей Петрович").map(|teacher| teacher.path.as_str()),
+            Some("/prepods/01/elkin-yo/")
+        );
+    }
+
+    #[test]
+    fn returns_none_for_unknown_teacher() {
+        let teachers = vec![teacher("Ёлкин Алексей Петрович", "/prepods/01/elkin/")];
+
+        assert!(find_teacher(&teachers, "Петров Пётр Петрович").is_none());
+    }
 }
 
 #[cfg(test)]

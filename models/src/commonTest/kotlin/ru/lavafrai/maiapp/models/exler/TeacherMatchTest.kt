@@ -8,63 +8,67 @@ import kotlin.test.assertNull
 class TeacherMatchTest {
     private val faculty = ExlerFaculty(name = "Факультет № 1", path = "/prepods/01/")
 
-    private fun teacher(name: String, path: String = "/prepods/01/sidorov/") =
+    private fun teacher(name: String, path: String = "/prepods/01/elkin/") =
         ExlerTeacher(internalName = name, path = path, faculty = faculty)
 
     @Test
     fun letterYoDoesNotMatter() {
-        assertEquals(normalizeTeacherName("Сидоров Пётр Иванович"), normalizeTeacherName("Сидоров Петр Иванович"))
+        assertEquals(normalizeTeacherName("Ёлкин Алексей Петрович"), normalizeTeacherName("Елкин Алексей Петрович"))
     }
 
     @Test
     fun caseDoesNotMatter() {
-        assertEquals(normalizeTeacherName("Сидоров Пётр Иванович"), normalizeTeacherName("сидоров пётр иванович"))
+        assertEquals(normalizeTeacherName("Ёлкин Алексей Петрович"), normalizeTeacherName("ёлкин алексей петрович"))
     }
 
     @Test
-    fun wordOrderDoesNotMatter() {
-        assertEquals(normalizeTeacherName("Сидоров Пётр Иванович"), normalizeTeacherName("Пётр Иванович Сидоров"))
+    fun findsTeacherWrittenWithAnotherLetterYo() {
+        val teachers = listOf(teacher("Елкин Алексей Петрович"))
+        assertNotNull(teachers.findByTeacherName("Ёлкин Алексей Петрович"))
     }
 
     @Test
-    fun extraSpacesDoNotMatter() {
-        assertEquals(normalizeTeacherName("Сидоров Пётр Иванович"), normalizeTeacherName("  Сидоров  Пётр Иванович "))
+    fun findsTeacherWrittenWithoutYo() {
+        val teachers = listOf(teacher("Ёлкин Алексей Петрович"))
+        assertNotNull(teachers.findByTeacherName("Елкин Алексей Петрович"))
     }
 
     @Test
-    fun findsTeacherWithAnotherLetterYo() {
-        val teachers = listOf(teacher("Сидоров Петр Иванович"))
-        assertNotNull(teachers.findByTeacherName("Сидоров Пётр Иванович"))
+    fun findsTeacherIgnoringCase() {
+        val teachers = listOf(teacher("Ёлкин Алексей Петрович"))
+        assertEquals("Ёлкин Алексей Петрович", teachers.findByTeacherName("ёлкин алексей петрович")?.name)
     }
 
     @Test
-    fun returnsTeacherNameThatServerKnows() {
-        val teachers = listOf(teacher("Сидоров Петр Иванович"))
-        assertEquals("Сидоров Петр Иванович", teachers.findByTeacherName("Сидоров Пётр Иванович")?.name)
-    }
-
-    @Test
-    fun findsTeacherAmongOthers() {
+    fun exactMatchHasPriority() {
         val teachers = listOf(
-            teacher("Иванов Иван Иванович", "/prepods/01/ivanov/"),
-            teacher("Сидоров Петр Иванович", "/prepods/02/sidorov/"),
+            teacher("Ёлкин Алексей Петрович", "/prepods/01/elkin-yo/"),
+            teacher("Елкин Алексей Петрович", "/prepods/01/elkin-e/"),
         )
-        assertEquals("/prepods/02/sidorov/", teachers.findByTeacherName("Сидоров Пётр Иванович")?.path)
+
+        assertEquals("/prepods/01/elkin-e/", teachers.findByTeacherName("Елкин Алексей Петрович")?.path)
+        assertEquals("/prepods/01/elkin-yo/", teachers.findByTeacherName("Ёлкин Алексей Петрович")?.path)
+    }
+
+    @Test
+    fun returnsNameAsInTheCatalog() {
+        val teachers = listOf(teacher("Ёлкин Алексей Петрович"))
+        assertEquals("Ёлкин Алексей Петрович", teachers.findByTeacherName("Елкин Алексей Петрович")?.name)
     }
 
     @Test
     fun returnsNullForTeacherWithoutReviews() {
-        val teachers = listOf(teacher("Сидоров Петр Иванович"))
+        val teachers = listOf(teacher("Ёлкин Алексей Петрович"))
         assertNull(teachers.findByTeacherName("Петров Пётр Петрович"))
     }
 
     @Test
     fun returnsNullForEmptyList() {
-        assertNull(emptyList<ExlerTeacher>().findByTeacherName("Сидоров Пётр Иванович"))
+        assertNull(emptyList<ExlerTeacher>().findByTeacherName("Ёлкин Алексей Петрович"))
     }
 
     @Test
-    fun nameHashIgnoresYoAndWordOrder() {
-        assertEquals(teacherNameHash("Сидоров Пётр Иванович"), teacherNameHash("Петр Иванович Сидоров"))
+    fun nameHashIgnoresYoAndCase() {
+        assertEquals(teacherNameHash("Ёлкин Алексей Петрович"), teacherNameHash("ёлкин алексей петрович"))
     }
 }
