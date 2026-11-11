@@ -244,6 +244,14 @@
     <string name="widget_sign_in_required">Open the app and choose a schedule</string>
     <string name="widget_today_title">%2$s, %1$s</string>
 
+    <string name="nav_info">Info</string>
+    <string name="nav_works">Works</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="unsupported_event_type">Unsupported event type: %1$s</string>
+
     <plurals name="hours_count">
         <item quantity="one">%1$d hour</item>
         <item quantity="other">%1$d hours</item>

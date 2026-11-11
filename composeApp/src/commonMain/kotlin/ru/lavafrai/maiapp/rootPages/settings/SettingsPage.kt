@@ -130,6 +130,7 @@ private fun languageName(language: String?): String = when (language) {
     null -> stringResource(Res.string.language_system)
     "ru" -> "Русский"
     "en" -> "English"
+    "zh" -> "中文"
     else -> language
 }
 
