@@ -245,6 +245,14 @@
     <string name="widget_sign_in_required">Откройте приложение и выберите расписание</string>
     <string name="widget_today_title">%1$s, %3$s</string>
 
+    <string name="nav_info">Инфо</string>
+    <string name="nav_works">Работы</string>
+    <string name="nav_home">Главная</string>
+    <string name="nav_account">Аккаунт</string>
+    <string name="nav_settings">Настройки</string>
+
+    <string name="unsupported_event_type">Неподдерживаемый тип события: %1$s</string>
+
     <plurals name="hours_count">
         <item quantity="one">%1$d час</item>
         <item quantity="few">%1$d часа</item>

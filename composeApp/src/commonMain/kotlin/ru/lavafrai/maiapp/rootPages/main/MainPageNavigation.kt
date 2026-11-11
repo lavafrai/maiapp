@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import maiapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.fragments.AnimatedIcon
 import soup.compose.material.motion.MaterialMotion
 import soup.compose.material.motion.animation.materialSharedAxisX
@@ -32,7 +33,7 @@ val mainNavigationItems = listOf(
             contentDescription = "Info",
             enabled = selected,
         )},
-        title = { Text("Info") },
+        title = { Text(stringResource(Res.string.nav_info)) },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.WORKS,
@@ -42,7 +43,7 @@ val mainNavigationItems = listOf(
             contentDescription = "Works",
             enabled = selected,
         )},
-        title = { Text("Works") },
+        title = { Text(stringResource(Res.string.nav_works)) },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.HOME,
@@ -52,7 +53,7 @@ val mainNavigationItems = listOf(
             contentDescription = "Home",
             enabled = selected,
         )},
-        title = { Text("Home") },
+        title = { Text(stringResource(Res.string.nav_home)) },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.ACCOUNT,
@@ -62,7 +63,7 @@ val mainNavigationItems = listOf(
             contentDescription = "Account",
             enabled = selected,
         )},
-        title = { Text("Account") },
+        title = { Text(stringResource(Res.string.nav_account)) },
     ),
     MainNavigationItem(
         id = MainNavigationPageId.SETTINGS,
@@ -72,7 +73,7 @@ val mainNavigationItems = listOf(
             contentDescription = "Settings",
             enabled = selected,
         )},
-        title = { Text("Settings") },
+        title = { Text(stringResource(Res.string.nav_settings)) },
     ),
 )
 

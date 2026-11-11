@@ -12,7 +12,7 @@ import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 
 /** Languages the app is translated to, as BCP 47 tags; null in settings means the system language */
-val appLanguages = listOf("ru", "en")
+val appLanguages = listOf("ru", "en", "zh")
 
 /**
  * The language resources are taken in. Compose resources take it from the platform locale, so choosing a language
