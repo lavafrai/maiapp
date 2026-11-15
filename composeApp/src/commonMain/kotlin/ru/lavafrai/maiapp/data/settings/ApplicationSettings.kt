@@ -19,10 +19,21 @@ import ru.lavafrai.maiapp.theme.colorSchemas.DefaultColorSchema
 import ru.lavafrai.maiapp.theme.themes.SystemTheme
 
 
+/** Подпись и цвет сохранённого расписания — чтобы отличать их друг от друга в списке */
+@Serializable
+data class ScheduleLabel(
+    val text: String,
+    /** Цвет подписи в виде #RRGGBB; null — цвет приложения по умолчанию */
+    val color: String? = null,
+)
+
+
 @Serializable
 data class ApplicationSettingsData(
     val selectedSchedule: BaseScheduleId? = null,
     val savedSchedules: List<BaseScheduleId> = emptyList(),
+    // Подписи расписаний по их id
+    val scheduleLabels: Map<String, ScheduleLabel> = emptyMap(),
     val theme: String = SystemTheme().id,
     val colorSchema: String = DefaultColorSchema().id,
     val hideMilitaryTraining: Boolean = false,
@@ -109,6 +120,37 @@ object ApplicationSettings {
                 .distinctBy { it.id }
             update(current.copy(savedSchedules = newSavedGroups))
         }
+    }
+
+    /**
+     * Удаляет расписание и, если удалили текущее, сразу выбирает [next] — чтобы приложение
+     * не осталось без выбранного расписания и не переключилось на что-то неожиданное.
+     */
+    suspend fun removeSavedGroupAndSelect(group: BaseScheduleId, next: BaseScheduleId?) {
+        mutex.withLock {
+            val current = getCurrent()
+            val savedSchedules = current.savedSchedules.filterNot { it.scheduleId == group.scheduleId }
+            val wasSelected = current.selectedSchedule?.scheduleId == group.scheduleId
+
+            update(
+                current.copy(
+                    savedSchedules = savedSchedules,
+                    selectedSchedule = if (wasSelected) next ?: savedSchedules.firstOrNull() else current.selectedSchedule,
+                )
+            )
+        }
+    }
+
+    /** Задаёт подпись расписания; пустая подпись её убирает */
+    fun setScheduleLabel(scheduleId: String, text: String, color: String?) {
+        val current = getCurrent()
+        val labels = current.scheduleLabels.toMutableMap()
+        val trimmed = text.trim()
+
+        if (trimmed.isEmpty()) labels.remove(scheduleId)
+        else labels[scheduleId] = ScheduleLabel(trimmed, color)
+
+        update(current.copy(scheduleLabels = labels))
     }
 
     suspend fun setSelectedSchedule(schedule: BaseScheduleId) {
