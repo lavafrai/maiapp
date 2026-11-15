@@ -453,16 +453,14 @@ fn capture_line(text: &str, prefix: &str) -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-/// Kotlin: reviewsElement.select("img") — photos берутся из скоупированного content HTML
 fn parse_photos(html: &str, base_url: &str) -> Vec<String> {
     let document = Html::parse_document(html);
     let selector = Selector::parse("img").unwrap();
     document
         .select(&selector)
         .filter_map(|img| img.value().attr("src"))
-        .filter(|src| !src.contains("Jeremy-Hillary-Boob-PhD_form-header.png"))
-        .filter(|src| !src.contains("spacer.gif"))
         .map(|src| global_url(base_url, src))
+        .filter(|url| is_teacher_photo_url(url))
         .collect()
 }
 
@@ -479,23 +477,34 @@ fn parse_large_photos(html: &str, base_url: &str) -> BTreeMap<String, String> {
         let Some(src) = img.value().attr("src") else {
             continue;
         };
-        if src.contains("Jeremy-Hillary-Boob-PhD_form-header.png") {
+        let src_url = global_url(base_url, src);
+        if !is_teacher_photo_url(&src_url) {
             continue;
         }
-        // Kotlin: if (it.parent()?.hasAttr("href") == true && it.parent()?.attr("href")?.isUrlToImage() == true)
-        //   → large = parent.attr("href")
-        // else → large = src
+
         let large = img
             .parent()
             .and_then(|parent| parent.value().as_element())
             .and_then(|parent_el| parent_el.attr("href"))
-            .filter(|href| is_url_to_image(href))
             .map(|href| global_url(base_url, href))
-            .unwrap_or_else(|| global_url(base_url, src));
+            .filter(|url| is_teacher_photo_url(url))
+            .or_else(|| full_size_photo_name(&src_url))
+            .unwrap_or_else(|| src_url.clone());
 
-        photos.insert(global_url(base_url, src), large);
+        photos.insert(src_url, large);
     }
     photos
+}
+
+/// По конвенции сайта крупная версия — то же имя без `_small` перед расширением
+fn full_size_photo_name(url: &str) -> Option<String> {
+    let mut parsed = reqwest::Url::parse(url).ok()?;
+    let path = parsed.path();
+    let (without_extension, extension) = path.rsplit_once('.')?;
+    let without_suffix = without_extension.strip_suffix("_small")?;
+
+    parsed.set_path(&format!("{without_suffix}.{extension}"));
+    Some(parsed.to_string())
 }
 
 fn global_url(base_url: &str, path: &str) -> String {
@@ -508,11 +517,32 @@ fn global_url(base_url: &str, path: &str) -> String {
         .unwrap_or_else(|| path.to_owned())
 }
 
-fn is_url_to_image(url: &str) -> bool {
-    matches!(
-        url.rsplit('.').next().map(str::to_lowercase).as_deref(),
-        Some("jpg" | "jpeg" | "png" | "gif" | "webp")
-    )
+fn is_image_path(path: &str) -> bool {
+    let path = path.split(|character| character == '?' || character == '#').next().unwrap_or(path);
+    match path.rsplit('.').next() {
+        Some(extension) => matches!(
+            extension.to_lowercase().as_str(),
+            "jpg" | "jpeg" | "png" | "gif" | "webp"
+        ),
+        None => false,
+    }
+}
+
+/// Фотографии лежат в каталоге преподавателя и начинаются с `prepods_`; иконки, подписи и общие картинки сайта — нет
+fn is_teacher_photo_url(url: &str) -> bool {
+    let Some(parsed) = allowed_photo_url(url) else {
+        return false;
+    };
+
+    let path = parsed.path();
+    let Some(inside_prepods) = path.strip_prefix("/prepods/") else {
+        return false;
+    };
+    let Some(file_name) = path.rsplit('/').next() else {
+        return false;
+    };
+
+    inside_prepods.matches('/').count() >= 2 && file_name.starts_with("prepods_") && is_image_path(path)
 }
 
 fn teacher_name_hash(name: &str) -> i32 {
@@ -547,7 +577,7 @@ fn java_hash_code(value: &str) -> i32 {
 
 #[cfg(test)]
 mod photo_url_tests {
-    use super::allowed_photo_url;
+    use super::{allowed_photo_url, full_size_photo_name, is_teacher_photo_url, parse_large_photos, parse_photos};
 
     #[test]
     fn allows_teacher_photos_of_exler_hosts() {
@@ -569,5 +599,115 @@ mod photo_url_tests {
         ] {
             assert!(allowed_photo_url(url).is_none(), "{url}");
         }
+    }
+
+    #[test]
+    fn recognizes_teacher_photo_urls() {
+        assert!(is_teacher_photo_url(
+            "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg"
+        ));
+        assert!(is_teacher_photo_url(
+            "https://mai-sten.online/prepods/08/vestyak/prepods_311_vestyak_5_small.jpg"
+        ));
+        assert!(is_teacher_photo_url(
+            "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.JPG"
+        ));
+        assert!(is_teacher_photo_url(
+            "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg?v=2"
+        ));
+    }
+
+    #[test]
+    fn ignores_site_icons_and_attachments() {
+        for url in [
+            "https://mai-sten.online/images/download_icon.gif",
+            "https://mai-sten.online/images/file_type_MP3.gif",
+            "https://mai-sten.online/images/Telegram_logo_2019_inverted.gif",
+            "https://mai-sten.online/articles/people/vestyak_signature.gif",
+            "https://mai-sten.online/prepods/Jeremy-Hillary-Boob-PhD_form-header.png",
+            "https://mai-sten.online/prepods/08/vestyak/e_ln(x).png",
+            "https://mai-sten.online/prepods/08/vestyak/BTR_Vestyak_fake.jpg",
+            "https://mai-sten.online/prepods/08/vestyak/vestyak_sheet_small.jpg",
+            "http://stat.livejournal.com/img/community.gif",
+            "https://mai-sten.online/prepods/08/osokin/notes.zip",
+            "not a url",
+        ] {
+            assert!(!is_teacher_photo_url(url), "{url}");
+        }
+    }
+
+    #[test]
+    fn derives_large_photo_from_small_name() {
+        let page = r#"
+            <img src="/prepods/08/osokin/prepods_804_osokin_small.jpg">
+            <a href="/prepods/08/osokin/prepods_804_osokin2.jpg">
+                <img src="/prepods/08/osokin/prepods_804_osokin2_small.jpg">
+            </a>
+        "#;
+
+        let photos = parse_large_photos(page, "https://mai-sten.online/prepods/08/osokin/");
+
+        assert_eq!(
+            photos
+                .get("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg")
+                .map(String::as_str),
+            Some("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin.jpg")
+        );
+        assert_eq!(
+            photos
+                .get("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin2_small.jpg")
+                .map(String::as_str),
+            Some("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin2.jpg")
+        );
+    }
+
+    #[test]
+    fn ignores_foreign_domains() {
+        assert!(!is_teacher_photo_url(
+            "https://example.com/prepods/08/osokin/prepods_804_osokin_small.jpg"
+        ));
+        assert!(!is_teacher_photo_url(
+            "http://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg"
+        ));
+    }
+
+    #[test]
+    fn derives_large_photo_ignoring_query() {
+        assert_eq!(
+            full_size_photo_name(
+                "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg?v=2.1"
+            )
+            .as_deref(),
+            Some("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin.jpg?v=2.1")
+        );
+    }
+
+    #[test]
+    fn parse_photos_keeps_only_teacher_images() {
+        let page = r#"
+            <img src="/images/download_icon.gif">
+            <img src="/images/file_type_MP3.gif">
+            <img src="/images/Telegram_logo_2019_inverted.gif">
+            <img src="http://stat.livejournal.com/img/community.gif">
+            <img src="/articles/people/vestyak_signature.gif">
+            <a href="/prepods/08/osokin/prepods_804_osokin.jpg">
+                <img src="/prepods/08/osokin/prepods_804_osokin_small.jpg">
+            </a>
+            <a href="/prepods/08/osokin/prepods_804_osokin2.jpg">
+                <img src="prepods_804_osokin2_small.jpg">
+            </a>
+            <img src="/prepods/08/osokin/e_ln(x).png">
+            <img src="/prepods/08/osokin/notes.zip">
+        "#;
+
+        let photos = parse_photos(page, "https://mai-sten.online/prepods/08/osokin/");
+
+        assert_eq!(
+            photos,
+            vec![
+                "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg".to_owned(),
+                "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin2_small.jpg".to_owned(),
+            ]
+        );
     }
 }
