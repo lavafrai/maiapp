@@ -162,6 +162,13 @@ impl ScheduleRepository for LocalMaiRepository {
         Box::pin(async { Ok(self.current_teacher_index().await?.teachers()) })
     }
 
+    fn teacher_uid<'a>(&'a self, name: &'a str) -> BoxFuture<'a, Option<String>> {
+        Box::pin(async move {
+            let index = self.current_teacher_index().await.ok()?;
+            index.uid_by_name(name)
+        })
+    }
+
     fn schedule_by_id<'a>(
         &'a self,
         id: &'a str,

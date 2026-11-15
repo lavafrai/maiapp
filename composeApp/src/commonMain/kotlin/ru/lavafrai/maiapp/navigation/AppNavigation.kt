@@ -109,7 +109,10 @@ fun AppNavigation(
                                     if (loginData.type == LoginType.EXLER) {
                                         val exlerTeacher = it as ExlerTeacher
 
-                                        appContext.openTeacherReviews(exlerTeacher.name, TeacherUid.Empty)
+                                        appContext.openTeacherReviews(
+                                            exlerTeacher.name,
+                                            exlerTeacher.maiUuid?.let { uid -> TeacherUid(uid) } ?: TeacherUid.Empty,
+                                        )
                                         return@LoginPage
                                     }
                                     appContext.openSchedule(it as ScheduleId)

@@ -84,8 +84,14 @@ async fn schedule(
 async fn exler_teachers(State(state): State<AppState>) -> AppResult<impl IntoResponse> {
     state.telemetry.record_endpoint("/exler-teachers").await;
     let teachers = state.exler.teachers().await?;
+
+    let mut value = teachers.value;
+    for teacher in &mut value {
+        teacher.mai_uuid = state.schedule.teacher_uid(&teacher.name).await;
+    }
+
     Ok(cache_with_status(
-        Json(teachers.value),
+        Json(value),
         3600,
         Some(teachers.status),
     ))

@@ -29,7 +29,7 @@ class UrlHandler(
         if (!url.startsWith("$siteUrl/prepods")) return false
         val teachers = ExlerRepository().getTeachersFromCacheOrNull() ?: return false
         val teacherId = teachers.find { "$siteUrl${it.path}" == url } ?: return false
-        openTeacherInfo(teacherId, TeacherUid.Empty)
+        openTeacherInfo(teacherId, teacherId.maiUuid?.let { TeacherUid(it) } ?: TeacherUid.Empty)
         return true
     }
 

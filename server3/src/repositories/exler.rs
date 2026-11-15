@@ -250,6 +250,7 @@ impl ExlerFetcher {
                     name,
                     path,
                     faculty: faculty.clone(),
+                    mai_uuid: None,
                 });
             }
         }

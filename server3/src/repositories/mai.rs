@@ -10,7 +10,7 @@ use crate::{
     cache::{AsyncCache, Cached},
     config::AppConfig,
     models::*,
-    repositories::schedule::ScheduleRepository,
+    repositories::{schedule::ScheduleRepository, teacher_directory::TeacherDirectory},
     telemetry::Telemetry,
 };
 
@@ -44,6 +44,7 @@ pub struct MaiRepository {
     groups: AsyncCache<Vec<Group>>,
     schedules: AsyncCache<Schedule>,
     teachers: RwLock<Vec<TeacherId>>,
+    directory: Arc<TeacherDirectory>,
 }
 
 impl MaiRepository {
@@ -56,12 +57,36 @@ impl MaiRepository {
         config: &AppConfig,
         telemetry: Arc<Telemetry>,
     ) -> Self {
+        let directory = Arc::new(TeacherDirectory::load(&config.cache_dir));
+        let teachers = directory
+            .records()
+            .into_iter()
+            .map(|record| TeacherId {
+                name: TeacherName { name: record.name },
+                uid: TeacherUid { uid: record.uid },
+            })
+            .collect();
+
         Self {
             source,
             groups: AsyncCache::new("groups", config, telemetry.clone()),
             schedules: AsyncCache::new("schedule", config, telemetry),
-            teachers: RwLock::new(Vec::new()),
+            teachers: RwLock::new(teachers),
+            directory,
         }
+    }
+
+    /// Сохраняет справочник на диск, даже если изменений не набралось на порог
+    pub fn spawn_persistence(self: &Arc<Self>) {
+        let directory = self.directory.clone();
+        tokio::spawn(async move {
+            let mut interval = tokio::time::interval(std::time::Duration::from_secs(300));
+            interval.tick().await;
+            loop {
+                interval.tick().await;
+                directory.flush().await;
+            }
+        });
     }
 
     pub async fn groups(&self) -> anyhow::Result<Cached<Vec<Group>>> {
@@ -144,19 +169,28 @@ impl MaiRepository {
     }
 
     async fn remember_teachers(&self, schedule: &Schedule) {
-        let mut teachers = self.teachers.write().await;
+        let mut found = Vec::new();
         for day in &schedule.days {
             for lesson in &day.lessons {
                 for teacher in &lesson.lectors {
                     if teacher.uid.uid == "00000000-0000-0000-0000-000000000000" {
                         continue;
                     }
-                    if !teachers.iter().any(|known| known.uid == teacher.uid) {
-                        teachers.push(teacher.clone());
-                    }
+                    found.push(teacher.clone());
                 }
             }
         }
+
+        {
+            let mut teachers = self.teachers.write().await;
+            for teacher in &found {
+                if !teachers.iter().any(|known| known.uid == teacher.uid) {
+                    teachers.push(teacher.clone());
+                }
+            }
+        }
+
+        self.directory.remember(&found).await;
     }
 }
 
@@ -181,6 +215,10 @@ impl ScheduleRepository for MaiRepository {
         id: &'a str,
     ) -> BoxFuture<'a, anyhow::Result<Cached<Schedule>>> {
         Box::pin(MaiRepository::schedule_by_id(self, id))
+    }
+
+    fn teacher_uid<'a>(&'a self, name: &'a str) -> BoxFuture<'a, Option<String>> {
+        Box::pin(async move { self.directory.uid_by_name(name) })
     }
 }
 

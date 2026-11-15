@@ -11,6 +11,10 @@ data class ExlerTeacher(
     val faculty: ExlerFaculty,
 
     val nameHash: Int = teacherNameHash(internalName),
+
+    /** uuid преподавателя в расписании МАИ; null, если он ни в одной группе не ведёт занятий */
+    @SerialName("maiUuid")
+    val maiUuid: String? = null,
 ): Nameable {
     override val name: String
         get() = internalName

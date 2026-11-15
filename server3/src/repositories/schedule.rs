@@ -12,4 +12,10 @@ pub trait ScheduleRepository: Send + Sync {
 
     fn schedule_by_id<'a>(&'a self, id: &'a str)
     -> BoxFuture<'a, anyhow::Result<Cached<Schedule>>>;
+
+    /// uuid преподавателя в расписании МАИ по ФИО; None, если его ещё не встречали
+    fn teacher_uid<'a>(&'a self, name: &'a str) -> BoxFuture<'a, Option<String>> {
+        let _ = name;
+        Box::pin(async { None })
+    }
 }

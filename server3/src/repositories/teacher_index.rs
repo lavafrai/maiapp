@@ -8,6 +8,7 @@ use crate::models::{
 };
 
 use super::mai::{MaiDataSource, parse_raw_schedule};
+use super::teacher_directory::normalize_teacher_name;
 
 pub(super) struct TeacherIndex {
     pub cached_at: i64,
@@ -183,6 +184,15 @@ impl TeacherIndex {
 
     pub fn teachers(&self) -> Vec<TeacherId> {
         self.teachers.clone()
+    }
+
+    /// uuid преподавателя по ФИО; сравнение без регистра и различия «ё»/«е»
+    pub fn uid_by_name(&self, name: &str) -> Option<String> {
+        let key = normalize_teacher_name(name);
+        self.teachers
+            .iter()
+            .find(|teacher| normalize_teacher_name(&teacher.name.name) == key)
+            .map(|teacher| teacher.uid.uid.clone())
     }
 
     pub fn find(&self, id: &str) -> Option<(&str, &Schedule)> {
