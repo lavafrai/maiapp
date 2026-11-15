@@ -222,38 +222,15 @@ impl ExlerFetcher {
         };
 
         let html = html?;
-        let document = Html::parse_document(&html);
-
-        // #3: Kotlin: selectFirst("body > center > table > ... > ol")
-        //   .children()            ← <li> элементы
-        //   .map { it.selectFirst("a") }
-        // Старый Rust: "ol a" (любой <a> в любом <ol>) + лишний фильтр по числу слов
-        let ol_sel = Selector::parse(
-            "body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > ol",
-        )
-        .unwrap();
-        // children().selectFirst("a") ≡ li > a (первый <a> в каждом <li>)
-        let a_sel = Selector::parse("li > a").unwrap();
-
-        let mut teachers = Vec::new();
-        if let Some(ol) = document.select(&ol_sel).next() {
-            for link in ol.select(&a_sel) {
-                let name = link.text().collect::<String>().trim().to_owned();
-                let path = link.value().attr("href").unwrap_or("").to_owned();
-                if name.is_empty() || path.is_empty() {
-                    continue;
-                }
-                // #3: Kotlin НЕ фильтрует по числу слов (teacherNameMatcher объявлен, но не применялся)
-                // Старый Rust: if name.split_whitespace().count() < 2 { continue; } — убрано
-                teachers.push(ExlerTeacher {
-                    name_hash: teacher_name_hash(&name),
-                    name,
-                    path,
-                    faculty: faculty.clone(),
-                });
-            }
-        }
-        Ok(teachers)
+        Ok(parse_teacher_list(&html, &faculty)
+            .into_iter()
+            .map(|(name, path)| ExlerTeacher {
+                name_hash: teacher_name_hash(&name),
+                name,
+                path,
+                faculty: faculty.clone(),
+            })
+            .collect())
     }
 
     async fn teacher_info(&self, teacher: &ExlerTeacher) -> anyhow::Result<ExlerTeacherInfo> {
@@ -329,8 +306,8 @@ fn filter_banned(mut teachers: Vec<ExlerTeacher>) -> Vec<ExlerTeacher> {
 fn parse_base_teacher_info(teacher: &ExlerTeacher, html: &str) -> ExlerTeacherInfo {
     // Kotlin: val baseInfoElement = Ksoup.parse(text)
     //         val baseInfoElementText = baseInfoElement.wholeText()
-    let doc = Html::parse_fragment(html);
-    let text = doc.root_element().text().collect::<Vec<_>>().join("\n");
+    let text = inline_text(html);
+    let places = parse_places(&text);
 
     // Kotlin: "<font color="#006699"><b>(.+?)</b></font>".toRegex()
     //   .findAll(text).lastOrNull()?.groupValues?.get(1)?.trim() ?: defaultName
@@ -345,14 +322,55 @@ fn parse_base_teacher_info(teacher: &ExlerTeacher, html: &str) -> ExlerTeacherIn
     ExlerTeacherInfo {
         name,
         link: format!("{EXLER_BASE}{}", teacher.path),
-        // #10: Kotlin использует findAll().lastOrNull() — берёт ПОСЛЕДНЕЕ совпадение
-        // Старый Rust: find_map (первое совпадение)
-        faculty: capture_line(&text, "Факультет:"),
-        department: capture_line(&text, "Кафедра:"),
+        // Старые поля — последнее место работы, чтобы клиенты без support of places не ломались
+        faculty: places.iter().rev().find_map(|place| place.faculty.clone()),
+        department: places.iter().rev().find_map(|place| place.department.clone()),
+        unit: places.iter().rev().find_map(|place| place.unit.clone()),
+        places,
         photos: Vec::new(),
         large_photos: BTreeMap::new(),
         reviews: Vec::new(),
     }
+}
+
+/// Места работы со страницы: «Факультет» начинает новый блок, «Кафедра» и «Подразделение» дополняют его
+fn parse_places(text: &str) -> Vec<ExlerTeacherPlace> {
+    let mut places: Vec<ExlerTeacherPlace> = Vec::new();
+    let mut current: Option<ExlerTeacherPlace> = None;
+
+    for line in text.lines() {
+        let line = line.trim();
+        let value = |prefix: &str| {
+            line.strip_prefix(prefix)
+                .map(|value| value.trim().replace('\u{a0}', " "))
+                .filter(|value| !value.is_empty())
+        };
+
+        if let Some(faculty) = value("Факультет:") {
+            if let Some(place) = current.take() {
+                places.push(place);
+            }
+            current = Some(ExlerTeacherPlace {
+                faculty: Some(faculty),
+                department: None,
+                unit: None,
+            });
+        } else if let Some(department) = value("Кафедра:") {
+            current
+                .get_or_insert_with(ExlerTeacherPlace::default)
+                .department = Some(department);
+        } else if let Some(unit) =
+            value("Подразделение:").or_else(|| value("Подготовительные курсы:"))
+        {
+            current.get_or_insert_with(ExlerTeacherPlace::default).unit = Some(unit);
+        }
+    }
+    if let Some(place) = current {
+        places.push(place);
+    }
+
+    places.retain(|place| place.faculty.is_some() || place.department.is_some() || place.unit.is_some());
+    places
 }
 
 fn parse_teacher_review(html: &str) -> Option<ExlerTeacherReview> {
@@ -441,16 +459,47 @@ fn capture_html_meta(html: &str, patterns: &[&str]) -> Option<String> {
     None
 }
 
-/// #10: Kotlin: "Факультет:(.+?)\n".toRegex().findAll(text).lastOrNull()?.groupValues?.get(1)?.trim()
-/// Берёт ПОСЛЕДНЕЕ совпадение. Старый Rust: find_map (первое совпадение).
-fn capture_line(text: &str, prefix: &str) -> Option<String> {
-    text.lines()
-        .filter_map(|line| {
-            let trimmed = line.trim();
-            trimmed.strip_prefix(prefix).map(|v| v.trim().to_owned())
-        })
-        .last()
-        .filter(|value| !value.is_empty())
+/// Страницы подписаны по-разному: у школ «Подразделение», у подготовительных курсов свои подписи.
+/// Зачёркнутый текст (`<strike>`, `<s>`, `<del>`) пропускается: это старые подразделения
+fn inline_text(html: &str) -> String {
+    let mut text = String::with_capacity(html.len());
+    let mut rest = html;
+    let mut struck_depth = 0usize;
+
+    while let Some(start) = rest.find('<') {
+        if struck_depth == 0 {
+            text.push_str(&rest[..start]);
+        }
+        let Some(end) = rest[start..].find('>') else {
+            rest = "";
+            break;
+        };
+        let tag = rest[start + 1..start + end].trim();
+        rest = &rest[start + end + 1..];
+
+        let closing = tag.starts_with('/');
+        let name = tag
+            .trim_start_matches('/')
+            .split(|c: char| c.is_whitespace() || c == '/')
+            .next()
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+
+        if matches!(name.as_str(), "strike" | "s" | "del") {
+            if closing {
+                struck_depth = struck_depth.saturating_sub(1);
+            } else {
+                struck_depth += 1;
+            }
+        } else if name == "br" && struck_depth == 0 {
+            text.push('\n');
+        }
+    }
+    if struck_depth == 0 {
+        text.push_str(rest);
+    }
+
+    html_escape::decode_html_entities(&text).into_owned()
 }
 
 fn parse_photos(html: &str, base_url: &str) -> Vec<String> {
@@ -545,6 +594,70 @@ fn is_teacher_photo_url(url: &str) -> bool {
     inside_prepods.matches('/').count() >= 2 && file_name.starts_with("prepods_") && is_image_path(path)
 }
 
+/// Преподаватель лежит на `/prepods/<факультет>/<человек>/`, у страницы факультета сегментов меньше.
+/// Так в каталог не попадают перекрёстные ссылки вида «Война» со страницы другого факультета
+fn is_teacher_path(path: &str) -> bool {
+    path.starts_with("/prepods/")
+        && path
+            .trim_matches('/')
+            .split('/')
+            .filter(|segment| !segment.is_empty())
+            .count()
+            == 3
+}
+
+/// В списке попадаются относительные ссылки (`boldinov/`), их надо достроить до полного пути
+fn resolve_teacher_path(faculty_path: &str, href: &str) -> Option<String> {
+    let path = if href.starts_with('/') {
+        href.to_owned()
+    } else if href.starts_with("http") {
+        return None;
+    } else {
+        format!("{faculty_path}{}", href.trim_start_matches("./"))
+    };
+
+    if is_image_path(&path) || !is_teacher_path(&path) {
+        return None;
+    }
+    Some(path)
+}
+
+/// Список преподавателей на странице факультета: `<li>` без закрывающих тегов, перед именем бывает иконка
+fn parse_teacher_list(html: &str, faculty: &ExlerFaculty) -> Vec<(String, String)> {
+    let document = Html::parse_document(html);
+    // #3: Kotlin: selectFirst("body > center > table > ... > ol")
+    //   .children()            ← <li> элементы
+    //   .map { it.selectFirst("a") }
+    let ol_sel = Selector::parse(
+        "body > center > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > ol",
+    )
+    .unwrap();
+    let li_sel = Selector::parse("li").unwrap();
+    let a_sel = Selector::parse("a").unwrap();
+
+    let mut teachers = Vec::new();
+    let Some(ol) = document.select(&ol_sel).next() else {
+        return teachers;
+    };
+
+    for item in ol.select(&li_sel) {
+        // children().selectFirst("a") ≡ первая ссылка с текстом: перед ней в <li> бывает иконка ⊞
+        let Some(link) = item
+            .select(&a_sel)
+            .find(|link| !link.text().collect::<String>().trim().is_empty())
+        else {
+            continue;
+        };
+        let name = link.text().collect::<String>().trim().to_owned();
+        let Some(path) = resolve_teacher_path(&faculty.path, link.value().attr("href").unwrap_or(""))
+        else {
+            continue;
+        };
+        teachers.push((name, path));
+    }
+    teachers
+}
+
 fn teacher_name_hash(name: &str) -> i32 {
     java_hash_code(
         &name
@@ -573,6 +686,173 @@ fn java_hash_code(value: &str) -> i32 {
     value.encode_utf16().fold(0i32, |hash, unit| {
         hash.wrapping_mul(31).wrapping_add(unit as i32)
     })
+}
+
+#[cfg(test)]
+mod teacher_info_tests {
+    use super::{
+        is_teacher_path, parse_base_teacher_info, parse_teacher_list, resolve_teacher_path,
+    };
+    use crate::models::{ExlerFaculty, ExlerTeacher};
+
+    fn teacher(name: &str) -> ExlerTeacher {
+        ExlerTeacher {
+            name: name.to_owned(),
+            path: "/prepods/02/uskova/".to_owned(),
+            faculty: ExlerFaculty {
+                name: "Факультет №2".to_owned(),
+                path: "/prepods/02/".to_owned(),
+            },
+            name_hash: 0,
+        }
+    }
+
+    #[test]
+    fn reads_faculty_and_department() {
+        let html = r##"<small><font color="#666666"><b>Факультет:</b> Факультет №8 «Аэрокосмический»<br><b>Кафедра:</b> 802 «Проектирование авиационных двигателей»<br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Осокин Андрей Владимирович"), html);
+
+        assert_eq!(info.faculty.as_deref(), Some("Факультет №8 «Аэрокосмический»"));
+        assert_eq!(info.department.as_deref(), Some("802 «Проектирование авиационных двигателей»"));
+        assert_eq!(info.unit, None);
+    }
+
+    #[test]
+    fn reads_unit_of_school() {
+        let html = r##"<small><font color="#666666"><b>Подразделение:</b> школа «Предуниверсарий&nbsp;МАИ» (ПУМ)<br><br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Курочкина Ирина Юрьевна"), html);
+
+        assert_eq!(info.unit.as_deref(), Some("школа «Предуниверсарий МАИ» (ПУМ)"));
+        assert_eq!(info.faculty, None);
+        assert_eq!(info.department, None);
+    }
+
+    #[test]
+    fn reads_unit_of_preparatory_courses() {
+        let html = r##"<small><font color="#666666"><b>Подготовительные курсы:</b> «МАИНО»<br><br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Гринченко Борис Исакович"), html);
+
+        assert_eq!(info.unit.as_deref(), Some("«МАИНО»"));
+        assert_eq!(info.faculty, None);
+        assert_eq!(info.department, None);
+    }
+
+    #[test]
+    fn parses_teacher_list_with_icons_and_cross_links() {
+        let html = r##"<html><body><center><table><tbody><tr><td><table><tbody><tr><td>
+<ol>
+<li><img src="/prepods/icon_camera.png">&nbsp;<a href="/prepods/war/artamonov/">Артамонов Андрей Валентинович</a>, каф. ОВП
+<li><img src="/prepods/icon_camera.png">&nbsp;<a href="/prepods/war/pochuev/">Почуев Сергей Анатольевич</a>, цикл <a title="цикл">[№ 1]</a>
+<li><a href="/prepods/war/korobovsky/">Коробковский Александр Валентинович</a>, цикл <a title="цикл">[№ 4]</a>
+<li><a href="/prepods/war/">«Война»</a>
+</ol>
+</td></tr></tbody></table></td></tr></tbody></table></center></body></html>"##;
+        let faculty = ExlerFaculty {
+            name: "Война".to_owned(),
+            path: "/prepods/war/".to_owned(),
+        };
+
+        let teachers = parse_teacher_list(html, &faculty);
+
+        assert_eq!(
+            teachers
+                .iter()
+                .map(|(_, path)| path.as_str())
+                .collect::<Vec<_>>(),
+            vec![
+                "/prepods/war/artamonov/",
+                "/prepods/war/pochuev/",
+                "/prepods/war/korobovsky/",
+            ]
+        );
+    }
+
+    #[test]
+    fn reads_every_place_of_work() {
+        let html = r##"<small><font color="#666666"><b>Факультет:</b> № 7, «Робототехнические и интеллектуальные системы» (ФАУСТ)<br><b>Кафедра:</b> 701, «Авиационные робототехнические системы»<br><br><b>Факультет:</b> «Война»: Военный учебный центр (ВУЦ) МАИ<br><b>Кафедра:</b> АВ, «Авиационное вооружение»<br><b>Звание:</b> подполковник<br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Болдинов Виктор Александрович"), html);
+
+        assert_eq!(info.places.len(), 2);
+        assert_eq!(
+            info.places[0].faculty.as_deref(),
+            Some("№ 7, «Робототехнические и интеллектуальные системы» (ФАУСТ)")
+        );
+        assert_eq!(
+            info.places[0].department.as_deref(),
+            Some("701, «Авиационные робототехнические системы»")
+        );
+        assert_eq!(
+            info.places[1].faculty.as_deref(),
+            Some("«Война»: Военный учебный центр (ВУЦ) МАИ")
+        );
+        assert_eq!(
+            info.places[1].department.as_deref(),
+            Some("АВ, «Авиационное вооружение»")
+        );
+        assert_eq!(info.faculty.as_deref(), info.places[1].faculty.as_deref());
+        assert_eq!(info.department.as_deref(), info.places[1].department.as_deref());
+    }
+
+    #[test]
+    fn ignores_struck_places() {
+        let html = r##"<small><font color="#666666"><strike><b>Факультет:</b> № 10, «[Социальный инжиниринг]»</strike><br><strike><b>Кафедра:</b> 009 (позже 514, ныне 920), «Социология»</strike><br><b>Факультет:</b> № 5, «Экономика»<br><b>Кафедра:</b> 514, «Социология»<br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Ластовенко Дарья Викторовна"), html);
+
+        assert_eq!(info.places.len(), 1);
+        assert_eq!(info.places[0].faculty.as_deref(), Some("№ 5, «Экономика»"));
+        assert_eq!(info.places[0].department.as_deref(), Some("514, «Социология»"));
+    }
+
+    #[test]
+    fn ignores_struck_value_without_label() {
+        let html = r##"<small><b>Факультет:</b> <s>№ 10, «[Социальный инжиниринг]»</s><br><b>Кафедра:</b> 920, «Социология»<br></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Ластовенко Дарья Викторовна"), html);
+
+        assert_eq!(info.places.len(), 1);
+        assert_eq!(info.places[0].faculty, None);
+        assert_eq!(info.places[0].department.as_deref(), Some("920, «Социология»"));
+    }
+
+    #[test]
+    fn takes_name_from_page_header() {
+        let html = r##"<big><font color="#006699"><b>Ирина Юрьевна Курочкина</b></font></big>"##;
+
+        let info = parse_base_teacher_info(&teacher("Курочкина И.Ю."), html);
+
+        assert_eq!(info.name, "Ирина Юрьевна Курочкина");
+    }
+
+    #[test]
+    fn accepts_only_teacher_paths() {
+        assert!(is_teacher_path("/prepods/09/ukhvakov/"));
+        assert!(is_teacher_path("/prepods/;-)/Grinchenko_B_I__Kak_reshat_zadachi_po_fizike_1998.djvu"));
+
+        assert!(!is_teacher_path("/prepods/war/"));
+        assert!(!is_teacher_path("/prepods/"));
+        assert!(!is_teacher_path("https://example.com/prepods/09/ukhvakov/"));
+    }
+
+    #[test]
+    fn resolves_relative_teacher_links() {
+        assert_eq!(
+            resolve_teacher_path("/prepods/war/", "boldinov/").as_deref(),
+            Some("/prepods/war/boldinov/")
+        );
+        assert_eq!(
+            resolve_teacher_path("/prepods/war/", "/prepods/war/orlov/").as_deref(),
+            Some("/prepods/war/orlov/")
+        );
+
+        assert_eq!(resolve_teacher_path("/prepods/war/", "prepods_war_boldinov.jpg"), None);
+        assert_eq!(resolve_teacher_path("/prepods/war/", "https://example.com/x/"), None);
+        assert_eq!(resolve_teacher_path("/prepods/war/", "/prepods/war/"), None);
+    }
 }
 
 #[cfg(test)]
