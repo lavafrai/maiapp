@@ -329,8 +329,7 @@ fn filter_banned(mut teachers: Vec<ExlerTeacher>) -> Vec<ExlerTeacher> {
 fn parse_base_teacher_info(teacher: &ExlerTeacher, html: &str) -> ExlerTeacherInfo {
     // Kotlin: val baseInfoElement = Ksoup.parse(text)
     //         val baseInfoElementText = baseInfoElement.wholeText()
-    let doc = Html::parse_fragment(html);
-    let text = doc.root_element().text().collect::<Vec<_>>().join("\n");
+    let text = inline_text(html);
 
     // Kotlin: "<font color="#006699"><b>(.+?)</b></font>".toRegex()
     //   .findAll(text).lastOrNull()?.groupValues?.get(1)?.trim() ?: defaultName
@@ -349,6 +348,7 @@ fn parse_base_teacher_info(teacher: &ExlerTeacher, html: &str) -> ExlerTeacherIn
         // Старый Rust: find_map (первое совпадение)
         faculty: capture_line(&text, "Факультет:"),
         department: capture_line(&text, "Кафедра:"),
+        unit: capture_line(&text, "Подразделение:"),
         photos: Vec::new(),
         large_photos: BTreeMap::new(),
         reviews: Vec::new(),
@@ -451,6 +451,36 @@ fn capture_line(text: &str, prefix: &str) -> Option<String> {
         })
         .last()
         .filter(|value| !value.is_empty())
+}
+
+/// Текст фрагмента так, как его видит `wholeText()` в Kotlin: инлайн-узлы склеиваются без разделителей,
+/// перевод строки даёт только `<br>`
+fn inline_text(html: &str) -> String {
+    let mut text = String::with_capacity(html.len());
+    let mut rest = html;
+
+    while let Some(start) = rest.find('<') {
+        text.push_str(&rest[..start]);
+        let Some(end) = rest[start..].find('>') else {
+            rest = "";
+            break;
+        };
+        let tag = rest[start + 1..start + end].trim();
+        rest = &rest[start + end + 1..];
+
+        let name = tag
+            .trim_start_matches('/')
+            .split(|c: char| c.is_whitespace() || c == '/')
+            .next()
+            .unwrap_or_default()
+            .to_ascii_lowercase();
+        if name == "br" {
+            text.push('\n');
+        }
+    }
+    text.push_str(rest);
+
+    html_escape::decode_html_entities(&text).into_owned()
 }
 
 fn parse_photos(html: &str, base_url: &str) -> Vec<String> {
@@ -573,6 +603,55 @@ fn java_hash_code(value: &str) -> i32 {
     value.encode_utf16().fold(0i32, |hash, unit| {
         hash.wrapping_mul(31).wrapping_add(unit as i32)
     })
+}
+
+#[cfg(test)]
+mod teacher_info_tests {
+    use super::parse_base_teacher_info;
+    use crate::models::{ExlerFaculty, ExlerTeacher};
+
+    fn teacher(name: &str) -> ExlerTeacher {
+        ExlerTeacher {
+            name: name.to_owned(),
+            path: "/prepods/02/uskova/".to_owned(),
+            faculty: ExlerFaculty {
+                name: "Факультет №2".to_owned(),
+                path: "/prepods/02/".to_owned(),
+            },
+            name_hash: 0,
+        }
+    }
+
+    #[test]
+    fn reads_faculty_and_department() {
+        let html = r##"<small><font color="#666666"><b>Факультет:</b> Факультет №8 «Аэрокосмический»<br><b>Кафедра:</b> 802 «Проектирование авиационных двигателей»<br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Осокин Андрей Владимирович"), html);
+
+        assert_eq!(info.faculty.as_deref(), Some("Факультет №8 «Аэрокосмический»"));
+        assert_eq!(info.department.as_deref(), Some("802 «Проектирование авиационных двигателей»"));
+        assert_eq!(info.unit, None);
+    }
+
+    #[test]
+    fn reads_unit_of_school() {
+        let html = r##"<small><font color="#666666"><b>Подразделение:</b> школа «Предуниверсарий&nbsp;МАИ» (ПУМ)<br><br></font></small>"##;
+
+        let info = parse_base_teacher_info(&teacher("Курочкина Ирина Юрьевна"), html);
+
+        assert_eq!(info.unit.as_deref(), Some("школа «Предуниверсарий\u{a0}МАИ» (ПУМ)"));
+        assert_eq!(info.faculty, None);
+        assert_eq!(info.department, None);
+    }
+
+    #[test]
+    fn takes_name_from_page_header() {
+        let html = r##"<big><font color="#006699"><b>Ирина Юрьевна Курочкина</b></font></big>"##;
+
+        let info = parse_base_teacher_info(&teacher("Курочкина И.Ю."), html);
+
+        assert_eq!(info.name, "Ирина Юрьевна Курочкина");
+    }
 }
 
 #[cfg(test)]

@@ -8,6 +8,8 @@ data class ExlerTeacherInfo (
     val link: String,
     val faculty: String?,
     val department: String?,
+    // Подразделение вместо факультета: так на сайте подписаны школы и предуниверсарий
+    val unit: String? = null,
     val photos: List<String>,
     val largePhotos: Map<String, String>,
     val reviews: List<ExlerTeacherReview>,

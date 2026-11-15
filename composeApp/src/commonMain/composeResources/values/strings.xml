@@ -111,6 +111,8 @@
     <string name="delete">Delete</string>
     <string name="event">Event</string>
     <string name="department">Department</string>
+    <string name="faculty">Faculty</string>
+    <string name="unit">Unit</string>
     <string name="hide_military_training">Hide military training</string>
     <string name="events">Events</string>
 

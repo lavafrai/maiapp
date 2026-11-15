@@ -85,11 +85,14 @@ fun ColumnScope.TeacherReviewsView(
                 }
             }
 
-            if (
-                setOf(teacherInfo.department).any { it != null }
-            ) AppCard {
+            val info = listOfNotNull(
+                teacherInfo.faculty?.let { stringResource(Res.string.faculty) to it },
+                teacherInfo.department?.let { stringResource(Res.string.department) to it },
+                teacherInfo.unit?.let { stringResource(Res.string.unit) to it },
+            )
+            if (info.isNotEmpty()) AppCard {
                 Text(stringResource(Res.string.information), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
-                if (teacherInfo.department != null) Text("${stringResource(Res.string.department)} ${teacherInfo.department!!}")
+                info.forEach { (label, value) -> Text("$label $value") }
             }
 
             teacherInfo.reviews.sortedBy { it.publishTime }.reversed().forEach { review ->

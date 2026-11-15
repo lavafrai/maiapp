@@ -210,6 +210,9 @@ pub struct ExlerTeacherInfo {
     pub link: String,
     pub faculty: Option<String>,
     pub department: Option<String>,
+    /// Подразделение вместо факультета: так на сайте подписаны школы и предуниверсарий
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
     pub photos: Vec<String>,
     #[serde(rename = "largePhotos")]
     pub large_photos: BTreeMap<String, String>,
