@@ -213,10 +213,23 @@ pub struct ExlerTeacherInfo {
     /// Подразделение вместо факультета: так на сайте подписаны школы и предуниверсарий
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
+    /// Все места работы со страницы: у преподавателя их бывает несколько
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub places: Vec<ExlerTeacherPlace>,
     pub photos: Vec<String>,
     #[serde(rename = "largePhotos")]
     pub large_photos: BTreeMap<String, String>,
     pub reviews: Vec<ExlerTeacherReview>,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct ExlerTeacherPlace {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub faculty: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub department: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
