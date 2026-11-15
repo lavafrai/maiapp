@@ -62,6 +62,8 @@ fun SettingsPage(
 
         SchedulesSettings(schedule = schedule)
 
+        RecentTeachersSettings()
+
         SettingsSection(title = stringResource(Res.string.appearance)) {
             ThemeSelectButton { themeId ->
                 ApplicationSettings.setTheme(themeId)
