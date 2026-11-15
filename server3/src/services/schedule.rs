@@ -24,6 +24,11 @@ impl ScheduleService {
         Ok(self.repository.teachers().await?)
     }
 
+    /// uuid преподавателя в расписании МАИ по ФИО; None, если его ещё не встречали
+    pub async fn teacher_uid(&self, name: &str) -> Option<String> {
+        self.repository.teacher_uid(name).await
+    }
+
     pub async fn schedule(&self, id: &str) -> AppResult<Cached<Schedule>> {
         self.repository.schedule_by_id(id).await.map_err(|error| {
             let message = error.to_string();

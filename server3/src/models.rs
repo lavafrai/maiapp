@@ -202,6 +202,9 @@ pub struct ExlerTeacher {
     pub faculty: ExlerFaculty,
     #[serde(rename = "nameHash")]
     pub name_hash: i32,
+    /// uuid преподавателя в расписании МАИ; null, если он ни в одной группе не ведёт занятий
+    #[serde(rename = "maiUuid", skip_serializing_if = "Option::is_none")]
+    pub mai_uuid: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

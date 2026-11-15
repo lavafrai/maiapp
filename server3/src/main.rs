@@ -36,11 +36,12 @@ async fn main() -> anyhow::Result<()> {
     let client = config.http_client()?;
     let telemetry = Arc::new(Telemetry::load_or_new(&config).await);
     let schedule_repository: Arc<dyn ScheduleRepository> = match &config.schedule_provider {
-        ScheduleProvider::Mai => Arc::new(MaiRepository::new(
-            client.clone(),
-            &config,
-            telemetry.clone(),
-        )),
+        ScheduleProvider::Mai => {
+            let repository =
+                Arc::new(MaiRepository::new(client.clone(), &config, telemetry.clone()));
+            repository.spawn_persistence();
+            repository
+        }
         ScheduleProvider::Local(root) => {
             Arc::new(LocalMaiRepository::new(root, &config, telemetry.clone()).await?)
         }
