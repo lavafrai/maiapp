@@ -70,7 +70,6 @@ fun MainPageHomeTitle(
                     modifier = Modifier
                         .padding(end = 2.dp)
                         .clip(MaterialTheme.shapes.small)
-                        // Меню доступно и во время загрузки: смена расписания отменит текущую загрузку
                         .contextual(otherSchedules.isNotEmpty()) {
                             clickable { expanded = true }
                         },
