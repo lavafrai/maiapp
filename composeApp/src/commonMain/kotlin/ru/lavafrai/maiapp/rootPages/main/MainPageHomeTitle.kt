@@ -70,7 +70,7 @@ fun MainPageHomeTitle(
                     modifier = Modifier
                         .padding(end = 2.dp)
                         .clip(MaterialTheme.shapes.small)
-                        .contextual(otherSchedules.isNotEmpty() && schedule.isNotLoading()) {
+                        .contextual(otherSchedules.isNotEmpty()) {
                             clickable { expanded = true }
                         },
                     maxLines = 1,

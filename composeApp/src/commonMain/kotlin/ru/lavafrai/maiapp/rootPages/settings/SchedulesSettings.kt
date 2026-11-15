@@ -70,7 +70,7 @@ fun SchedulesSettings(
                 disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
             ),
             trailingIcon = {
-                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }, enabled = schedule.isNotLoading()) {
+                if (otherSchedules.isNotEmpty()) IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         imageVector = FeatherIcons.ChevronDown,
                         contentDescription = stringResource(Res.string.schedule),
