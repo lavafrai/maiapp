@@ -498,9 +498,13 @@ fn parse_large_photos(html: &str, base_url: &str) -> BTreeMap<String, String> {
 
 /// По конвенции сайта крупная версия — то же имя без `_small` перед расширением
 fn full_size_photo_name(url: &str) -> Option<String> {
-    let (without_extension, extension) = url.rsplit_once('.')?;
+    let mut parsed = reqwest::Url::parse(url).ok()?;
+    let path = parsed.path();
+    let (without_extension, extension) = path.rsplit_once('.')?;
     let without_suffix = without_extension.strip_suffix("_small")?;
-    Some(format!("{without_suffix}.{extension}"))
+
+    parsed.set_path(&format!("{without_suffix}.{extension}"));
+    Some(parsed.to_string())
 }
 
 fn global_url(base_url: &str, path: &str) -> String {
@@ -526,7 +530,7 @@ fn is_image_path(path: &str) -> bool {
 
 /// Фотографии лежат в каталоге преподавателя и начинаются с `prepods_`; иконки, подписи и общие картинки сайта — нет
 fn is_teacher_photo_url(url: &str) -> bool {
-    let Ok(parsed) = reqwest::Url::parse(url) else {
+    let Some(parsed) = allowed_photo_url(url) else {
         return false;
     };
 
@@ -573,7 +577,7 @@ fn java_hash_code(value: &str) -> i32 {
 
 #[cfg(test)]
 mod photo_url_tests {
-    use super::{allowed_photo_url, is_teacher_photo_url, parse_large_photos, parse_photos};
+    use super::{allowed_photo_url, full_size_photo_name, is_teacher_photo_url, parse_large_photos, parse_photos};
 
     #[test]
     fn allows_teacher_photos_of_exler_hosts() {
@@ -654,6 +658,27 @@ mod photo_url_tests {
                 .get("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin2_small.jpg")
                 .map(String::as_str),
             Some("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin2.jpg")
+        );
+    }
+
+    #[test]
+    fn ignores_foreign_domains() {
+        assert!(!is_teacher_photo_url(
+            "https://example.com/prepods/08/osokin/prepods_804_osokin_small.jpg"
+        ));
+        assert!(!is_teacher_photo_url(
+            "http://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg"
+        ));
+    }
+
+    #[test]
+    fn derives_large_photo_ignoring_query() {
+        assert_eq!(
+            full_size_photo_name(
+                "https://mai-sten.online/prepods/08/osokin/prepods_804_osokin_small.jpg?v=2.1"
+            )
+            .as_deref(),
+            Some("https://mai-sten.online/prepods/08/osokin/prepods_804_osokin.jpg?v=2.1")
         );
     }
 
