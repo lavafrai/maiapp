@@ -15,6 +15,7 @@ import ru.lavafrai.maiapp.models.exler.ExlerTeacher
 import ru.lavafrai.maiapp.models.schedule.Lesson
 import ru.lavafrai.maiapp.models.schedule.LessonLike
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.schedule.matchesUid
 
 @Composable
 fun DayView(
@@ -50,7 +51,7 @@ fun DayView(
             if (lesson is Lesson) LessonView(
                 lesson = lesson,
                 exlerTeachers = exlerTeachers,
-                annotations = annotations.filter { it.lessonUid == lesson.getUid() },
+                annotations = annotations.filter { lesson.matchesUid(it.lessonUid) },
                 schedule = schedule,
                 shape = shape,
             )
