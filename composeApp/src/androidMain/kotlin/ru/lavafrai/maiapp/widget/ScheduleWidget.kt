@@ -11,8 +11,10 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.AppWidgetId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.appWidgetBackground
@@ -24,6 +26,7 @@ import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
@@ -41,14 +44,19 @@ import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.widget_choose_schedule
+import maiapp.composeapp.generated.resources.widget_local_data
 import maiapp.composeapp.generated.resources.widget_no_lessons
 import maiapp.composeapp.generated.resources.widget_schedule_not_loaded
+import maiapp.composeapp.generated.resources.widget_server_check_failed
+import maiapp.composeapp.generated.resources.widget_server_data
 import maiapp.composeapp.generated.resources.widget_sign_in_required
 import maiapp.composeapp.generated.resources.widget_today_title
 import org.jetbrains.compose.resources.getString
 import ru.lavafrai.maiapp.MainActivity
 import ru.lavafrai.maiapp.R
 import ru.lavafrai.maiapp.data.repositories.AbstractLessonRepository
+import ru.lavafrai.maiapp.data.repositories.ScheduleRepository
 import ru.lavafrai.maiapp.data.repositories.SimpleSchedule
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.localizers.LocalAppLocale
@@ -63,19 +71,74 @@ import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceText
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.GlanceTitle
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.text.LocalGlanceTextStyle
 import ru.lavafrai.maiapp.theme.MaiColor
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 class ScheduleWidget : GlanceAppWidget() {
     private val widgetBackground = Color(0xE0000000)
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val settings = ApplicationSettings.getCurrent()
-        val group = settings.selectedSchedule
-        Logger.i("Loading schedule for widget $id")
 
-        val schedule = if (group != null) AbstractLessonRepository().loadLessonsFromCacheOrNull(group) else null
+        // Какие расписания вообще можно показать: сохранённые плюс текущее
+        val choices = (listOfNotNull(settings.selectedSchedule) + settings.savedSchedules)
+            .distinctBy { it.scheduleId }
+
+        // Что показать: выбранное для этого виджета; если выбора ещё нет или такое расписание удалили —
+        // единственное/текущее расписание
+        val appWidgetId = (id as? AppWidgetId)?.appWidgetId
+        val chosenName = appWidgetId
+            ?.let { WidgetScheduleState.scheduleName(context, it) }
+            ?.takeIf { name -> choices.any { it.scheduleId == name } }
+        val group = when {
+            chosenName != null -> BaseScheduleId(chosenName)
+            choices.size <= 1 -> choices.firstOrNull()
+            else -> null // несколько расписаний — спросим, какое показывать
+        }
+
+        // Запоминаем показанное расписание за виджетом: иначе после добавления второго
+        // расписания виджет снова предложит выбор
+        if (appWidgetId != null && chosenName == null && group != null) {
+            WidgetScheduleState.setScheduleName(context, appWidgetId, group.scheduleId)
+        }
+
+        Logger.i("Loading schedule ${group?.scheduleId} for widget $id")
+
+        // Когда приложение последний раз загружало это расписание: это и есть возраст локальных данных
+        val fetchedAt = group?.let { ScheduleRepository().getFetchedAtFromCacheOrNull(it) } ?: 0L
+        val schedule = group?.let { scheduleId ->
+            ScheduleWidgetCache.schedule("${scheduleId.scheduleId}:$fetchedAt") {
+                AbstractLessonRepository().loadLessonsFromCacheOrNull(scheduleId)
+            }
+        }
+
         // The app language, even if its UI hasn't been started in this process yet
         LocalAppLocale.apply(settings.language)
-        val strings = WidgetStrings.load(today = LocalDate.now())
+
+        val labels = WidgetScheduleLabels.load(choices.map { it.scheduleId })
+        val serverUpdatedAt = appWidgetId?.let { WidgetScheduleState.serverUpdatedAt(context, it) }
+        val serverCheckFailed = appWidgetId?.let { WidgetScheduleState.serverCheckFailed(context, it) } ?: false
+        val today = LocalDate.now()
+
+        val strings = ScheduleWidgetCache.strings(
+            listOf(
+                settings.language,
+                today,
+                labels,
+                schedule?.updatedAt ?: 0L,
+                serverUpdatedAt ?: 0L,
+                serverCheckFailed,
+            )
+        ) {
+            WidgetStrings.load(
+                today = today,
+                labels = labels,
+                localDataAt = schedule?.updatedAt,
+                serverDataAt = serverUpdatedAt,
+                serverCheckFailed = serverCheckFailed,
+            )
+        }
 
         provideContent {
             Column(
@@ -92,10 +155,54 @@ class ScheduleWidget : GlanceAppWidget() {
                     ),
                     LocalWidgetStrings provides strings,
                 ) {
-                    ScheduleWidgetContent(group, schedule)
+                    ScheduleWidgetHeader(group)
+                    Box(modifier = GlanceModifier.defaultWeight()) {
+                        ScheduleWidgetContent(group, schedule, choices)
+                    }
+                    ScheduleWidgetFooter()
                 }
             }
         }
+    }
+}
+
+/**
+ * Разбор расписания и загрузка строк — дорогие операции, а Glance перерисовывает виджет
+ * на каждое действие. Держим результат в памяти и сбрасываем, когда приложение обновило данные.
+ */
+internal object ScheduleWidgetCache {
+    private var scheduleKey: String? = null
+    private var scheduleValue: SimpleSchedule? = null
+    private var stringsKey: Any? = null
+    private var stringsValue: WidgetStrings? = null
+
+    suspend fun schedule(key: String, load: suspend () -> SimpleSchedule?): SimpleSchedule? {
+        val cached = scheduleValue
+        if (cached != null && scheduleKey == key) return cached
+
+        val loaded = load()
+        if (loaded != null) {
+            scheduleKey = key
+            scheduleValue = loaded
+        }
+        return loaded
+    }
+
+    suspend fun strings(key: Any, load: suspend () -> WidgetStrings): WidgetStrings {
+        val cached = stringsValue
+        if (cached != null && stringsKey == key) return cached
+
+        val loaded = load()
+        stringsKey = key
+        stringsValue = loaded
+        return loaded
+    }
+
+    fun clear() {
+        scheduleKey = null
+        scheduleValue = null
+        stringsKey = null
+        stringsValue = null
     }
 }
 
@@ -108,12 +215,22 @@ class WidgetStrings(
     val todayTitle: String,
     val dayTitles: Map<LocalDate, String>,
     val lessonTypes: Map<LessonType, String>,
+    val labels: Map<String, WidgetScheduleLabel>,
     val noLessons: String,
     val notLoaded: String,
     val signInRequired: String,
+    val chooseSchedule: String,
+    val localData: String?,
+    val serverData: String?,
 ) {
     companion object {
-        suspend fun load(today: LocalDate): WidgetStrings {
+        suspend fun load(
+            today: LocalDate,
+            labels: Map<String, WidgetScheduleLabel>,
+            localDataAt: Long?,
+            serverDataAt: Long?,
+            serverCheckFailed: Boolean,
+        ): WidgetStrings {
             val weekday = getString(today.dayOfWeek.nameResource)
             return WidgetStrings(
                 today = today,
@@ -123,12 +240,38 @@ class WidgetStrings(
                     date to "${getString(date.dayOfWeek.nameResource)}, ${date.loadDayMonth()}"
                 },
                 lessonTypes = LessonType.entries.associateWith { getString(it.shortNameResource) },
+                labels = labels,
                 noLessons = getString(Res.string.widget_no_lessons),
                 notLoaded = getString(Res.string.widget_schedule_not_loaded),
                 signInRequired = getString(Res.string.widget_sign_in_required),
+                chooseSchedule = getString(Res.string.widget_choose_schedule),
+                localData = localDataAt?.formatTimestamp()?.let { getString(Res.string.widget_local_data, it) },
+                serverData = when {
+                    serverCheckFailed -> getString(
+                        Res.string.widget_server_data,
+                        getString(Res.string.widget_server_check_failed),
+                    )
+                    serverDataAt != null -> serverDataAt.formatTimestamp()
+                        ?.let { getString(Res.string.widget_server_data, it) }
+                    else -> null
+                },
             )
         }
     }
+}
+
+/** Время из кэша приходит то в секундах, то в миллисекундах; показываем «дд.мм.гггг чч:мм:сс» */
+private fun Long.formatTimestamp(): String? {
+    if (this <= 0L) return null
+    val epochMillis = if (this > 100_000_000_000L) this else this * 1000L
+    val iso = Instant.fromEpochMilliseconds(epochMillis)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .toString()
+    val date = iso.substringBefore('T')
+    val time = iso.substringAfter('T').take(8)
+    val parts = date.split('-')
+    if (parts.size != 3) return null
+    return "${parts[2]}.${parts[1]}.${parts[0]} $time"
 }
 
 val LocalWidgetStrings = staticCompositionLocalOf<WidgetStrings> { error("No widget strings provided") }
@@ -137,11 +280,75 @@ val LocalWidgetStrings = staticCompositionLocalOf<WidgetStrings> { error("No wid
 fun ScheduleWidgetContent(
     group: BaseScheduleId?,
     schedule: SimpleSchedule?,
+    choices: List<BaseScheduleId> = emptyList(),
 ) {
-    ScheduleWidgetHeader(modifier = GlanceModifier.clickable(actionStartActivity<MainActivity>()))
-    if (schedule != null) ScheduleWidgetSchedule(schedule)
-    else if (group != null) ScheduleWidgetNotLoaded()
-    else ScheduleWidgetNotLoggedIn()
+    when {
+        schedule != null -> ScheduleWidgetSchedule(schedule)
+        group != null -> ScheduleWidgetNotLoaded()
+        choices.size > 1 -> ScheduleWidgetChooser(choices)
+        else -> ScheduleWidgetNotLoggedIn()
+    }
+}
+
+/**
+ * Выбор расписания для этого экземпляра виджета. Показывается, пока выбор не сделан;
+ * решение запоминается только для этого виджета, соседние остаются со своими.
+ */
+@Composable
+fun ScheduleWidgetChooser(
+    choices: List<BaseScheduleId>,
+) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+    ) {
+        GlanceText(LocalWidgetStrings.current.chooseSchedule, fontSize = 16.sp)
+        Spacer(modifier = GlanceModifier.height(4.dp))
+
+        LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+            items(choices, itemId = { it.scheduleId.hashCode().toLong() }) { choice ->
+                Column(
+                    modifier = GlanceModifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .clickable(
+                            actionRunCallback<ChooseWidgetScheduleAction>(
+                                actionParametersOf(
+                                    ChooseWidgetScheduleAction.ScheduleNameKey to choice.scheduleId
+                                )
+                            )
+                        ),
+                ) {
+                    ScheduleWidgetScheduleName(choice.scheduleId, fontSize = 18.sp)
+                }
+            }
+        }
+    }
+}
+
+/** Номер расписания и его подпись из настроек: подпись своим цветом, если она задана */
+@Composable
+fun ScheduleWidgetScheduleName(
+    scheduleId: String,
+    fontSize: androidx.compose.ui.unit.TextUnit? = null,
+) {
+    val label = LocalWidgetStrings.current.labels[scheduleId]
+    if (label == null) {
+        GlanceText(scheduleId, maxLines = 1, fontSize = fontSize)
+        return
+    }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        GlanceText(scheduleId, maxLines = 1, fontSize = fontSize)
+        Spacer(modifier = GlanceModifier.width(6.dp))
+        GlanceText(
+            text = label.text,
+            maxLines = 1,
+            fontSize = fontSize,
+            color = widgetLabelColor(label.color) ?: Color.White.copy(alpha = 0.7f),
+        )
+    }
 }
 
 /**
@@ -265,33 +472,62 @@ fun ScheduleWidgetNotLoggedIn() {
 }
 
 @Composable
+fun ColumnScope.ScheduleWidgetFooter() {
+    val strings = LocalWidgetStrings.current
+    val lines = listOfNotNull(strings.localData, strings.serverData)
+    if (lines.isEmpty()) return
+
+    Column(
+        modifier = GlanceModifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp),
+    ) {
+        lines.forEach { line ->
+            GlanceText(
+                text = line,
+                maxLines = 1,
+                fontSize = 10.sp,
+                color = Color.White.copy(alpha = 0.6f),
+            )
+        }
+    }
+}
+
+@Composable
 fun ScheduleWidgetHeader(
-    modifier: GlanceModifier,
+    group: BaseScheduleId?,
 ) {
-    Column(modifier = modifier) {
-        Box(modifier = GlanceModifier.padding(8.dp), contentAlignment = Alignment.Center) {
-            Row(
+    Column(modifier = GlanceModifier.fillMaxWidth()) {
+        Row(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
                 modifier = GlanceModifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.Start,
+                    .defaultWeight()
+                    .clickable(actionStartActivity<MainActivity>()),
             ) {
                 GlanceTitle(LocalWidgetStrings.current.todayTitle)
+                if (group != null) {
+                    Row(modifier = GlanceModifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                        ScheduleWidgetScheduleName(group.scheduleId)
+                    }
+                }
             }
 
-            Row(
+            Box(
                 modifier = GlanceModifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.End,
+                    .size(44.dp)
+                    .cornerRadius(22.dp)
+                    .clickable(actionRunCallback<RefreshScheduleWidgetAction>()),
+                contentAlignment = Alignment.Center,
             ) {
                 Image(
                     ImageProvider(R.drawable.ic_refresh),
                     null,
-                    modifier = GlanceModifier
-                        .size(18.dp)
-                        .clickable(actionRunCallback<RefreshScheduleWidgetAction>())
-                        .cornerRadius(4.dp),
+                    modifier = GlanceModifier.size(26.dp),
                 )
             }
         }

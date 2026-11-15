@@ -17,6 +17,7 @@ import ru.lavafrai.maiapp.models.schedule.ScheduleId
 import ru.lavafrai.maiapp.models.schedule.toBaseScheduleId
 import ru.lavafrai.maiapp.network.MaiApi
 import ru.lavafrai.maiapp.platform.getPlatform
+import kotlin.time.Clock
 
 class ScheduleRepository(
     httpClient: HttpClient = baseHttpClient,
@@ -28,8 +29,19 @@ class ScheduleRepository(
     suspend fun getSchedule(name: ScheduleId) = withCache("schedule:${name.scheduleId}") {
         if (name.scheduleId !in localScheduleList) api.schedule(name.scheduleId)
         else Schedule.empty(name.toBaseScheduleId())
+    }.also {
+        cache.putLong(fetchedAtKey(name), Clock.System.now().toEpochMilliseconds())
+        // Виджет показывает это же расписание из кэша, поэтому сразу перерисовываем его
+        getPlatform().onScheduleChanged()
     }
     suspend fun getScheduleFromCacheOrNull(name: ScheduleId) = fromCache<Schedule>("schedule:${name.scheduleId}")
+
+    /** Когда приложение последний раз получило это расписание; null, если ещё не получало */
+    suspend fun getFetchedAtFromCacheOrNull(name: ScheduleId): Long? =
+        cache.getLongOrNull(fetchedAtKey(name))
+
+    private fun fetchedAtKey(name: ScheduleId) = "schedule:${name.scheduleId}:fetched_at"
+
     suspend fun getScheduleSizeInCache(name: ScheduleId) = cache.getStringOrNull("schedule:${name.scheduleId}")?.length?.toLong() ?: 0L
 
     private suspend inline fun <reified T>withCache(key: String, block: () -> @Serializable T): T {

@@ -243,7 +243,11 @@
     <string name="widget_no_lessons">В этот день нет занятий</string>
     <string name="widget_schedule_not_loaded">Расписание не загружено</string>
     <string name="widget_sign_in_required">Откройте приложение и выберите расписание</string>
+    <string name="widget_choose_schedule">Какое расписание показывать?</string>
     <string name="widget_today_title">%1$s, %3$s</string>
+    <string name="widget_local_data">Локальные данные: %1$s</string>
+    <string name="widget_server_data">Данные с сервера: %1$s</string>
+    <string name="widget_server_check_failed">не удалось проверить</string>
 
     <plurals name="hours_count">
         <item quantity="one">%1$d час</item>
