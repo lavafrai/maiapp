@@ -27,6 +27,9 @@ interface Platform {
     /** The widget shows texts in the app language, so it's redrawn when that changes */
     fun onLanguageChanged() {}
 
+    /** The widget shows the schedule from the app cache, so it's redrawn when the app updates the data */
+    fun onScheduleChanged() {}
+
     /** Connects the back navigation of the platform to the app one where the platform doesn't do it itself */
     suspend fun bindBackNavigation(navController: NavController) {}
 

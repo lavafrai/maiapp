@@ -5,10 +5,12 @@ import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.AppWidgetId
 import androidx.glance.appwidget.action.ActionCallback
-import co.touchlab.kermit.Logger
 
 /**
- * Выбор расписания для одного экземпляра виджета: запоминает его и перерисовывает только этот виджет.
+ * Выбор расписания для одного экземпляра виджета.
+ *
+ * Только переключает и перерисовывает: данные берутся из кэша приложения, поэтому выбор
+ * срабатывает сразу. За сервер отвечает кнопка обновления и прогрев кэша в приложении.
  */
 class ChooseWidgetScheduleAction : ActionCallback {
     override suspend fun onAction(
@@ -21,7 +23,6 @@ class ChooseWidgetScheduleAction : ActionCallback {
 
         WidgetScheduleState.setScheduleName(context, appWidgetId, scheduleName)
         ScheduleWidget().update(context, glanceId)
-        Logger.i("Widget $appWidgetId shows schedule $scheduleName")
     }
 
     companion object {

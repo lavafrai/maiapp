@@ -18,6 +18,7 @@ import ru.lavafrai.maiapp.AndroidApplication
 import ru.lavafrai.maiapp.platformHttpClientProvider
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.platform.AndroidChromeView
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.ScheduleWidget
+import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.ScheduleWidgetCache
 import ru.lavafrai.maiapp.ru.lavafrai.maiapp.widget.ScheduleWidgetReceiver
 import ru.lavafrai.maiapp.theme.ApplicationColorSchema
 import ru.lavafrai.maiapp.theme.colorSchemas.MonetColorSchema
@@ -61,6 +62,12 @@ class AndroidPlatform: Platform {
 
     @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
     override fun onLanguageChanged() {
+        GlobalScope.launch { ScheduleWidget().updateAll(context) }
+    }
+
+    @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
+    override fun onScheduleChanged() {
+        ScheduleWidgetCache.clear()
         GlobalScope.launch { ScheduleWidget().updateAll(context) }
     }
     override fun ktorEngine() = platformHttpClientProvider()

@@ -28,7 +28,8 @@ class AbstractLessonRepository: BaseRepository() {
         return SimpleSchedule(
             id = groupId,
             name = schedule.name,
-            days = lessons.groupBy { it.date }
+            days = lessons.groupBy { it.date },
+            updatedAt = scheduleRepository.getFetchedAtFromCacheOrNull(groupId) ?: 0L,
         )
     }
 }
@@ -38,4 +39,6 @@ data class SimpleSchedule(
     val id: ScheduleId,
     val name: String,
     val days: Map<LocalDate, List<LessonLike>>,
+    /** Когда приложение получило расписание, в миллисекундах; 0, если время неизвестно */
+    val updatedAt: Long = 0L,
 )

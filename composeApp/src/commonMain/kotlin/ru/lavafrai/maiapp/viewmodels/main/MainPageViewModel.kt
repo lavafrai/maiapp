@@ -65,12 +65,28 @@ class MainPageViewModel(
     init {
         _instance = this
         startLoading()
+        prefetchSavedSchedules()
 
         if (VersionInfo.hasBeenUpdated()) {
             val lastVersion = VersionInfo.lastVersion
             val currentVersion = VersionInfo.currentVersion
 
             onVersionUpdated(lastVersion, currentVersion)
+        }
+    }
+
+    /**
+     * Подтягивает сохранённые расписания в кэш: виджеты показывают именно кэш приложения,
+     * и без этого выбор расписания в виджете ждал бы загрузку из сети
+     */
+    private fun prefetchSavedSchedules() {
+        viewModelScope.launch(dispatchers.IO) {
+            val settings = ApplicationSettings.getCurrent()
+            settings.savedSchedules
+                .filter { it.scheduleId != settings.selectedSchedule?.scheduleId }
+                .forEach { schedule ->
+                    runCatching { scheduleRepository.getSchedule(schedule) }
+                }
         }
     }
 

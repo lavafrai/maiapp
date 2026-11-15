@@ -244,6 +244,9 @@
     <string name="widget_sign_in_required">Open the app and choose a schedule</string>
     <string name="widget_choose_schedule">Which schedule should it show?</string>
     <string name="widget_today_title">%2$s, %1$s</string>
+    <string name="widget_local_data">Local data: %1$s</string>
+    <string name="widget_server_data">Server data: %1$s</string>
+    <string name="widget_server_check_failed">check failed</string>
 
     <plurals name="hours_count">
         <item quantity="one">%1$d hour</item>
