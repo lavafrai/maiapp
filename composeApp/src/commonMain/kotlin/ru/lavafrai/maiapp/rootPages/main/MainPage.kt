@@ -65,6 +65,14 @@ fun MainPage(
     LaunchedEffect(settings.selectedSchedule) {
         viewModel.reloadSchedule(settings.selectedSchedule, restartIfLoading = false)
     }
+    // The Info tab content is language-dependent; reload it when the language changes
+    var lastLanguage by remember { mutableStateOf(settings.language) }
+    LaunchedEffect(settings.language) {
+        if (settings.language != lastLanguage) {
+            lastLanguage = settings.language
+            viewModel.reloadMaiData()
+        }
+    }
     val viewState by viewModel.state.collectAsState()
     LaunchedEffect(viewState.page) {
         getPlatform().trackScreen("main.${viewState.page.name.lowercase()}")

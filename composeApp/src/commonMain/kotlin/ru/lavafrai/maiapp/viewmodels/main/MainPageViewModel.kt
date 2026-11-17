@@ -207,6 +207,20 @@ class MainPageViewModel(
         }
     }
 
+    /** Re-fetches the Info tab content, e.g. after the language changes; the old content stays visible until the new arrives */
+    fun reloadMaiData() {
+        viewModelScope.launch(dispatchers.IO) {
+            val handler = CoroutineExceptionHandler { _, e ->
+                e.printStackTrace()
+                emit(stateValue.copy(maidata = stateValue.maidata.copy(error = e)))
+            }
+            launch(handler) {
+                val maidata = maidataRepository.getData()
+                emit(stateValue.copy(maidata = Loadable.actual(maidata)))
+            }
+        }
+    }
+
     fun clearSettings() {
         viewModelScope.launch(dispatchers.IO) {
             ApplicationSettings.clear()
