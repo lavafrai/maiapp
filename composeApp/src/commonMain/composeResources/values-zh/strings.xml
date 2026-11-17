@@ -90,8 +90,8 @@
     <string name="marks">成绩</string>
     <string name="statistics">统计</string>
     <string name="average_mark">平均成绩</string>
-    <string name="academic_debt_count">学业欠债数</string>
-    <string name="academic_debt">欠债</string>
+    <string name="academic_debt_count">未通过科目数</string>
+    <string name="academic_debt">未通过</string>
     <string name="start">开始</string>
     <string name="end">结束</string>
     <string name="date">日期</string>
@@ -253,8 +253,8 @@
     <string name="unsupported_event_type">不支持的事件类型：%1$s</string>
 
     <plurals name="hours_count">
-        <item quantity="one">%1$d小时</item>
-        <item quantity="other">%1$d小时</item>
+        <item quantity="one">%1$d学时</item>
+        <item quantity="other">%1$d学时</item>
     </plurals>
     <plurals name="attempts_count">
         <item quantity="one">%1$d次尝试</item>
