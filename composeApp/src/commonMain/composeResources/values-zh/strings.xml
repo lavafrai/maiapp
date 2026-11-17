@@ -51,7 +51,7 @@
     <string name="author">作者</string>
     <string name="publishTime">发布时间</string>
     <string name="source">来源</string>
-    <string name="update">应用已更新</string>
+    <string name="update">更新</string>
     <string name="do_support">捐赠</string>
     <string name="continue">继续</string>
     <string name="information">信息</string>
@@ -178,7 +178,7 @@
     <string name="crash_app">崩溃测试</string>
     <string name="disable_developer_mode">关闭开发者模式</string>
     <string name="disable_developer_mode_confirmation">隐藏开发者设置？你可以通过连续点击应用版本号七次重新开启。</string>
-    <string name="disable">关闭</string>
+    <string name="disable">禁用</string>
     <string name="open_telegram">打开 Telegram</string>
     <string name="open_thanks">致谢与开源许可</string>
     <string name="support_project">支持本项目</string>
