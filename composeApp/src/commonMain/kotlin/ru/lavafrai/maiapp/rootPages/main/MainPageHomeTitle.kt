@@ -71,7 +71,9 @@ fun MainPageHomeTitle(
     val localClipboardManager = LocalClipboardManager.current
 
     BoxWithConstraints {
-        val narrowHeader = maxWidth < 420.dp
+        val scheduleName = settings.selectedSchedule!!.readableName()
+        val scheduleLabel = settings.selectedSchedule?.let { settings.scheduleLabels[it.scheduleId] }
+        val labelStacked = maxWidth < 590.dp
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -83,8 +85,8 @@ fun MainPageHomeTitle(
                 titleText = { Text(title) },
                 subtitleText = {
                     ScheduleName(
-                        name = settings.selectedSchedule!!.readableName(),
-                        label = settings.selectedSchedule?.let { settings.scheduleLabels[it.scheduleId] },
+                        name = scheduleName,
+                        label = scheduleLabel,
                         modifier = Modifier
                             .padding(end = 2.dp)
                             .clip(MaterialTheme.shapes.small)
@@ -93,7 +95,7 @@ fun MainPageHomeTitle(
                             },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        stacked = narrowHeader,
+                        stacked = labelStacked,
                     )
 
                 ExposedDropdownMenu(
