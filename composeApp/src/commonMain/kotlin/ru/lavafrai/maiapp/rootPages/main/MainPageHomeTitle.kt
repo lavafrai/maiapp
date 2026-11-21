@@ -70,27 +70,31 @@ fun MainPageHomeTitle(
     val scope = rememberCoroutineScope()
     val localClipboardManager = LocalClipboardManager.current
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
+    BoxWithConstraints {
+        val narrowHeader = maxWidth < 420.dp
 
-        },
-    ) {
-        MainPageTitle(
-            titleText = { Text(title) },
-            subtitleText = {
-                ScheduleName(
-                    name = settings.selectedSchedule!!.readableName(),
-                    label = settings.selectedSchedule?.let { settings.scheduleLabels[it.scheduleId] },
-                    modifier = Modifier
-                        .padding(end = 2.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .contextual(otherSchedules.isNotEmpty()) {
-                            clickable { expanded = true }
-                        },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+
+            },
+        ) {
+            MainPageTitle(
+                titleText = { Text(title) },
+                subtitleText = {
+                    ScheduleName(
+                        name = settings.selectedSchedule!!.readableName(),
+                        label = settings.selectedSchedule?.let { settings.scheduleLabels[it.scheduleId] },
+                        modifier = Modifier
+                            .padding(end = 2.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .contextual(otherSchedules.isNotEmpty()) {
+                                clickable { expanded = true }
+                            },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        stacked = narrowHeader,
+                    )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -213,6 +217,7 @@ fun MainPageHomeTitle(
             },
             modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
         )
+        }
     }
 
     labelDialogScheduleId?.let { scheduleId ->

@@ -1,5 +1,6 @@
 package ru.lavafrai.maiapp.fragments.schedule
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,8 +45,28 @@ fun ScheduleName(
     style: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
+    stacked: Boolean = false,
 ) {
     val labelColor = scheduleLabelColor(label?.color) ?: MaterialTheme.colorScheme.primary
+
+    // Узкая шапка: подпись уезжает на вторую строку и обе строки сокращаются по отдельности
+    if (stacked && label != null) {
+        Column(modifier = modifier) {
+            Text(
+                text = name,
+                style = style,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = label.text,
+                style = style.copy(color = labelColor),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        return
+    }
 
     Text(
         text = buildAnnotatedString {
