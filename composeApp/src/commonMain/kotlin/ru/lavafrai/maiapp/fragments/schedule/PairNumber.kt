@@ -32,7 +32,7 @@ fun PairNumber(
     borderWidth: Dp = 1.dp,
     borderColor: Color = Color.Transparent,
     bold: Boolean = false,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
 ) {
     Box (
         modifier = modifier
@@ -44,7 +44,7 @@ fun PairNumber(
             modifier = Modifier
                 .size(size.minus(borderWidth))
                 .clip(CircleShape)
-                .clickable(onClick = onClick)
+                .then(onClick?.let { Modifier.clickable(onClick = it) } ?: Modifier)
                 .align(Alignment.Center),
             color = background
         ) {
