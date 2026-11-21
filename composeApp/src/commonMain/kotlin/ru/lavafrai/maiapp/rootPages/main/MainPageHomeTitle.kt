@@ -21,9 +21,15 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.Check
 import compose.icons.feathericons.CloudOff
 import compose.icons.feathericons.DownloadCloud
+import compose.icons.feathericons.Edit3
 import kotlinx.coroutines.launch
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.schedule_current
+import maiapp.composeapp.generated.resources.schedule_label
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.LoadableStatus
@@ -31,8 +37,10 @@ import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
+import ru.lavafrai.maiapp.fragments.schedule.ScheduleName
 import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.rootPages.settings.ScheduleLabelDialog
 import ru.lavafrai.maiapp.utils.contextual
 
 @Composable
@@ -52,30 +60,43 @@ fun MainPageHomeTitle(
     val settings by rememberSettings()
     val otherSchedules =
         remember(settings) { settings.savedSchedules.filter { it.scheduleId != settings.selectedSchedule?.scheduleId } }
+    // В списке показываем и текущее расписание: его подпись можно править, не переключаясь на другое
+    val allSchedules = remember(settings, otherSchedules) {
+        listOfNotNull(settings.selectedSchedule) + otherSchedules
+    }
     var expanded by remember { mutableStateOf(false) }
+    // id расписания, для которого открыт диалог подписи и цвета
+    var labelDialogScheduleId by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val localClipboardManager = LocalClipboardManager.current
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
+    BoxWithConstraints {
+        val scheduleName = settings.selectedSchedule!!.readableName()
+        val scheduleLabel = settings.selectedSchedule?.let { settings.scheduleLabels[it.scheduleId] }
+        val labelStacked = maxWidth < 590.dp
 
-        },
-    ) {
-        MainPageTitle(
-            titleText = { Text(title) },
-            subtitleText = {
-                Text(
-                    settings.selectedSchedule!!.readableName(),
-                    modifier = Modifier
-                        .padding(end = 2.dp)
-                        .clip(MaterialTheme.shapes.small)
-                        .contextual(otherSchedules.isNotEmpty()) {
-                            clickable { expanded = true }
-                        },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+
+            },
+        ) {
+            MainPageTitle(
+                titleText = { Text(title) },
+                subtitleText = {
+                    ScheduleName(
+                        name = scheduleName,
+                        label = scheduleLabel,
+                        modifier = Modifier
+                            .padding(end = 2.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .contextual(otherSchedules.isNotEmpty()) {
+                                clickable { expanded = true }
+                            },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        stacked = labelStacked,
+                    )
 
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -84,7 +105,8 @@ fun MainPageHomeTitle(
                     },
                 ) {
                     //Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                    otherSchedules.forEach { schedule ->
+                    allSchedules.forEach { schedule ->
+                        val isCurrent = schedule.scheduleId == settings.selectedSchedule?.scheduleId
                         /*DropdownMenuItem(
                             text = { Text(schedule.toString()) },
                             onClick = {},
@@ -108,7 +130,7 @@ fun MainPageHomeTitle(
                                 .combinedClickable(
                                     onClick = {
                                         expanded = false
-                                        scope.launch {
+                                        if (!isCurrent) scope.launch {
                                             ApplicationSettings.setSelectedGroup(schedule)
                                         }
                                     },
@@ -119,9 +141,31 @@ fun MainPageHomeTitle(
                                     }
                                 )
                                 .fillMaxWidth()
-                                .padding(12.dp)
+                                // Отступы по вертикали минимальные: иконка-кнопка и так даёт 48dp высоты
+                                .padding(start = 12.dp, top = 2.dp, bottom = 2.dp, end = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(schedule.toString(), style = MaterialTheme.typography.labelLarge)
+                            ScheduleName(
+                                name = schedule.scheduleId,
+                                label = settings.scheduleLabels[schedule.scheduleId],
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            if (isCurrent) Icon(
+                                imageVector = FeatherIcons.Check,
+                                contentDescription = stringResource(Res.string.schedule_current),
+                            )
+                            IconButton(onClick = {
+                                expanded = false
+                                labelDialogScheduleId = schedule.scheduleId
+                            }) {
+                                Icon(
+                                    imageVector = FeatherIcons.Edit3,
+                                    contentDescription = stringResource(Res.string.schedule_label),
+                                )
+                            }
                         }
                     }
                     //}
@@ -174,6 +218,14 @@ fun MainPageHomeTitle(
                 )
             },
             modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
+        )
+        }
+    }
+
+    labelDialogScheduleId?.let { scheduleId ->
+        ScheduleLabelDialog(
+            scheduleId = scheduleId,
+            onDismiss = { labelDialogScheduleId = null },
         )
     }
 }
