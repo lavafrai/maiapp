@@ -19,11 +19,19 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import compose.icons.FeatherIcons
+import compose.icons.feathericons.ArrowLeft
+import compose.icons.feathericons.ArrowRight
 import compose.icons.feathericons.CloudOff
 import compose.icons.feathericons.DownloadCloud
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import maiapp.composeapp.generated.resources.Res
+import maiapp.composeapp.generated.resources.last_week
+import maiapp.composeapp.generated.resources.next_week
+import org.jetbrains.compose.resources.stringResource
 import ru.lavafrai.maiapp.LocalApplicationContext
 import ru.lavafrai.maiapp.data.Loadable
 import ru.lavafrai.maiapp.data.LoadableStatus
@@ -31,8 +39,12 @@ import ru.lavafrai.maiapp.data.repositories.readableName
 import ru.lavafrai.maiapp.data.settings.ApplicationSettings
 import ru.lavafrai.maiapp.data.settings.rememberSettings
 import ru.lavafrai.maiapp.fragments.animations.pulsatingTransparency
+import ru.lavafrai.maiapp.fragments.schedule.PairNumber
 import ru.lavafrai.maiapp.models.events.Event
 import ru.lavafrai.maiapp.models.schedule.Schedule
+import ru.lavafrai.maiapp.models.time.DateRange
+import ru.lavafrai.maiapp.models.time.now
+import ru.lavafrai.maiapp.models.time.week
 import ru.lavafrai.maiapp.utils.contextual
 
 @Composable
@@ -40,6 +52,9 @@ fun MainPageHomeTitle(
     title: String,
     schedule: Loadable<Schedule>,
     events: Loadable<List<Event>>,
+    selectedWeek: DateRange = DateRange.currentWeek(),
+    onWeekSelected: (DateRange) -> Unit = { },
+    showWeekSwitcher: Boolean = false,
     buttonText: String? = null,
     onButtonClick: () -> Unit = { },
     additionalButtonContent: (@Composable () -> Unit)? = null,
@@ -56,13 +71,25 @@ fun MainPageHomeTitle(
     val scope = rememberCoroutineScope()
     val localClipboardManager = LocalClipboardManager.current
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
+    val weeks = remember(schedule, events, showWeekSwitcher) {
+        val scheduleData = schedule.data
+        val eventsData = events.data
+        if (showWeekSwitcher && scheduleData != null && eventsData != null) scheduleData.weeks(eventsData)
+        else emptyList()
+    }
+    val weekIndex = if (showWeekSwitcher) weeks.indexOf(selectedWeek) else -1
+    val currentWeek = remember { LocalDate.now().week() }
 
-        },
-    ) {
-        MainPageTitle(
+    BoxWithConstraints {
+        val narrowHeader = maxWidth < 420.dp
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+
+            },
+        ) {
+            MainPageTitle(
             titleText = { Text(title) },
             subtitleText = {
                 Text(
@@ -129,7 +156,7 @@ fun MainPageHomeTitle(
                 }
             },
             rightButton = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                val headerPlus: @Composable () -> Unit = {
                     if (additionalButtonContent != null) Box(
                         modifier = Modifier
                             .size(40.dp) // размер зоны нажатия аналог IconButton
@@ -147,8 +174,71 @@ fun MainPageHomeTitle(
                     ) {
                         additionalButtonContent()
                     }
-                    if (buttonText != null) TextButton(onClick = onButtonClick, enabled = schedule.hasData() && events.hasData(), shapes = ButtonDefaults.shapes()) {
+                }
+
+                val headerButton: @Composable () -> Unit = {
+                    if (buttonText != null) TextButton(
+                        onClick = onButtonClick,
+                        enabled = schedule.hasData() && events.hasData(),
+                        shapes = ButtonDefaults.shapes(),
+                    ) {
                         Text(buttonText)
+                    }
+                }
+
+                if (narrowHeader) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        headerPlus()
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            headerButton()
+                            if (weekIndex >= 0) Row(verticalAlignment = Alignment.CenterVertically) {
+                                WeekArrowButton(
+                                    icon = FeatherIcons.ArrowLeft,
+                                    contentDescription = stringResource(Res.string.last_week),
+                                    enabled = weekIndex > 0,
+                                    onClick = { onWeekSelected(weeks[weekIndex - 1]) },
+                                )
+                                PairNumber(
+                                    text = "${weekIndex + 1}",
+                                    background = if (selectedWeek == currentWeek) MaterialTheme.colorScheme.secondary
+                                                 else MaterialTheme.colorScheme.primary,
+                                    size = 32.dp,
+                                )
+                                WeekArrowButton(
+                                    icon = FeatherIcons.ArrowRight,
+                                    contentDescription = stringResource(Res.string.next_week),
+                                    enabled = weekIndex < weeks.lastIndex,
+                                    onClick = { onWeekSelected(weeks[weekIndex + 1]) },
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        headerPlus()
+                        headerButton()
+
+                        if (weekIndex >= 0) {
+                            Spacer(Modifier.width(4.dp))
+                            WeekArrowButton(
+                                icon = FeatherIcons.ArrowLeft,
+                                contentDescription = stringResource(Res.string.last_week),
+                                enabled = weekIndex > 0,
+                                onClick = { onWeekSelected(weeks[weekIndex - 1]) },
+                            )
+                            PairNumber(
+                                text = "${weekIndex + 1}",
+                                background = if (selectedWeek == currentWeek) MaterialTheme.colorScheme.secondary
+                                             else MaterialTheme.colorScheme.primary,
+                                size = 32.dp,
+                            )
+                            WeekArrowButton(
+                                icon = FeatherIcons.ArrowRight,
+                                contentDescription = stringResource(Res.string.next_week),
+                                enabled = weekIndex < weeks.lastIndex,
+                                onClick = { onWeekSelected(weeks[weekIndex + 1]) },
+                            )
+                        }
                     }
                 }
             },
@@ -174,6 +264,33 @@ fun MainPageHomeTitle(
                 )
             },
             modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
+        )
+        }
+    }
+}
+
+@Composable
+private fun WeekArrowButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    contentDescription: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    size: Dp = 40.dp,
+    iconSize: Dp = 20.dp,
+) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(CircleShape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier
+                .size(iconSize)
+                .alpha(if (enabled) 1f else 0.3f),
         )
     }
 }
